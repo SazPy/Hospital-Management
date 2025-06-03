@@ -1,50 +1,133 @@
 {% extends 'hospital/admin_base.html' %}
 {% block content %}
 
-<head>
-  <link href="//netdna.bootstrapcdn.com/bootstrap/3.0.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-  <script src="//netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>
-  <script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
-
-  <style media="screen">
-    a:link {
-      text-decoration: none;
-    }
-
-    h6 {
-      text-align: center;
-    }
-
-    .row {
-      margin: 100px;
-    }
-  </style>
-</head>
-
-<div class="container">
-  <div class="panel panel-primary">
-    <div class="panel-heading">
-      <h6 class="panel-title">Appointments</h6>
+<!-- Page Header -->
+<div class="page-header">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <h1 class="fw-bold mb-3">View Appointments</h1>
+        <p class="lead mb-0">Manage and track all appointments</p>
+      </div>
+      <div class="col-lg-6 text-lg-end">
+        <a href="{% url 'admin-add-appointment' %}" class="btn btn-light">
+          <i class="fas fa-plus me-2"></i>Add Appointment
+        </a>
+      </div>
     </div>
-    <table class="table table-hover" id="dev-table">
-      <thead>
-        <tr>
-          <th>Doctor Name</th>
-          <th>Patient Name</th>
-          <th>Description</th>
-          <th>Date</th>
-        </tr>
-      </thead>
-      {% for a in appointments %}
-      <tr>
-        <td> {{a.doctorName}}</td>
-        <td>{{a.patientName}}</td>
-        <td>{{a.description}}</td>
-        <td>{{a.appointmentDate}}</td>
-      </tr>
-      {% endfor %}
-    </table>
   </div>
 </div>
 
+<div class="container py-4">
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+      {% if appointments %}
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="bg-light">
+            <tr>
+              <th class="px-4 py-3">Doctor</th>
+              <th class="px-4 py-3">Patient</th>
+              <th class="px-4 py-3">Date & Time</th>
+              <th class="px-4 py-3">Description</th>
+              <th class="px-4 py-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for a in appointments %}
+            <tr>
+              <td class="px-4 py-3">
+                <div class="d-flex align-items-center">
+                  <i class="fas fa-user-md text-primary me-3"></i>
+                  <div>
+                    <div class="fw-medium">Dr. {{a.doctorName}}</div>
+                    <div class="text-muted small">{{a.department}}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <div class="d-flex align-items-center">
+                  <i class="fas fa-user text-primary me-3"></i>
+                  <div>
+                    <div class="fw-medium">{{a.patientName}}</div>
+                    <div class="text-muted small">ID: {{a.patientId}}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <div class="fw-medium">{{a.appointmentDate}}</div>
+                <div class="text-muted small">{{a.appointmentTime}}</div>
+              </td>
+              <td class="px-4 py-3">{{a.description|truncatechars:50}}</td>
+              <td class="px-4 py-3">
+                <div class="action-buttons">
+                  <button class="btn btn-sm btn-outline-primary me-2" data-bs-toggle="tooltip" title="View Details">
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <button class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Cancel">
+                    <i class="fas fa-times"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="text-center py-5">
+        <img src="{% static 'images/no-appointments.png' %}" alt="No Appointments" class="mb-3" width="120" onerror="this.src='https://placehold.co/120x120/4f46e5/ffffff?text=No+Appointments'">
+        <h5 class="text-muted mb-3">No appointments found</h5>
+        <a href="{% url 'admin-add-appointment' %}" class="btn btn-primary">
+          <i class="fas fa-plus me-2"></i>Add New Appointment
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<style>
+.page-header {
+  background: linear-gradient(45deg, #4f46e5, #4338ca);
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.action-buttons .btn {
+  padding: 0.25rem 0.5rem;
+}
+
+.table th {
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.btn-outline-primary {
+  color: #4f46e5;
+  border-color: #4f46e5;
+}
+
+.btn-outline-primary:hover {
+  background-color: #4f46e5;
+  border-color: #4f46e5;
+  color: white;
+}
+
+.btn-outline-danger {
+  color: #dc2626;
+  border-color: #dc2626;
+}
+
+.btn-outline-danger:hover {
+  background-color: #dc2626;
+  border-color: #dc2626;
+  color: white;
+}
+
+.text-primary {
+  color: #4f46e5 !important;
+}
+</style>
 {% endblock content %}

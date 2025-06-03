@@ -133,7 +133,6 @@ def patient_signup_view(request):
     context = {
         'userForm': forms.PatientUserForm(),
         'patientForm': forms.PatientForm(),
-        'doctors': models.Doctor.objects.filter(status=True),
         'group_name': PATIENT_GROUP
     }
     
@@ -150,8 +149,12 @@ def patient_signup_view(request):
                     patient.save()
                     group, _ = Group.objects.get_or_create(name=PATIENT_GROUP)
                     user.groups.add(group)
-                messages.success(request, "Registration successful! Please log in.")
-                return redirect('patientlogin')
+                    
+                # Auto-login after signup
+                from django.contrib.auth import login
+                login(request, user)
+                messages.success(request, "Registration successful! Welcome to HMS.")
+                return redirect('patient-dashboard')
             except Exception as exc:
                 messages.error(request, f"Registration error: {exc}")
         else:
@@ -511,15 +514,15 @@ def admin_room_management(request, action=None, room_id=None, patient_id=None):
 def doctor_dashboard_view(request):
     doc = models.Doctor.objects.get(user_id=request.user.id)
     pat_cnt = models.Patient.objects.filter(status=True,
-                                            assignedDoctorId=request.user.id).count()
+                                          assignedDoctorId=request.user.id).count()
     app_cnt = models.Appointment.objects.filter(status=True,
-                                                doctorId=request.user.id).count()
+                                              doctor=doc).count()
     dis_cnt = models.PatientDischargeDetails.objects.filter(
         assignedDoctorName=request.user.first_name).distinct().count()
     apps = models.Appointment.objects.filter(status=True,
-                                             doctorId=request.user.id).order_by("-id")
+                                           doctor=doc).order_by("-id")
     pats = models.Patient.objects.filter(status=True,
-                                         user_id__in=apps.values_list("patientId", flat=True))
+                                       id__in=apps.values_list("patient", flat=True))
     return render(request, "hospital/doctor_dashboard.html", {
         "patientcount": pat_cnt,
         "appointmentcount": app_cnt,
@@ -540,7 +543,7 @@ def doctor_patient_views(request, action=None):
                       {"patients": pats, "doctor": doc})
 
     if action == "search":
-        q     = request.GET.get("query", "")
+        q = request.GET.get("query", "")
         pats = models.Patient.objects.filter(status=True, assignedDoctorId=request.user.id)\
                 .filter(Q(symptoms__icontains=q) | Q(user__first_name__icontains=q))
         return render(request, "hospital/doctor_view_patient.html",
@@ -561,22 +564,47 @@ def doctor_appointment_views(request, action=None, pk=None):
     doc = models.Doctor.objects.get(user_id=request.user.id)
 
     if action == "view":
-        apps = models.Appointment.objects.filter(status=True,
-                                                 doctorId=request.user.id,
-                                                 appointmentDate__gte=date.today()).order_by("appointmentDate")
-        pats = models.Patient.objects.filter(status=True,
-                             user_id__in=apps.values_list("patientId", flat=True))
+        # Show both approved and pending appointments
+        apps = models.Appointment.objects.filter(
+            doctor=doc,
+            appointmentDate__gte=date.today()
+        ).order_by("appointmentDate", "appointmentTime")
+        pats = models.Patient.objects.filter(
+            id__in=apps.values_list("patient", flat=True)
+        )
         return render(request, "hospital/doctor_view_appointment.html",
-                      {"appointments": zip(apps, pats), "doctor": doc})
+                     {"appointments": zip(apps, pats), "doctor": doc})
+
+    if action == "pending":
+        # Show only pending appointments
+        apps = models.Appointment.objects.filter(
+            doctor=doc,
+            status=False
+        ).order_by("appointmentDate", "appointmentTime")
+        pats = models.Patient.objects.filter(
+            id__in=apps.values_list("patient", flat=True)
+        )
+        return render(request, "hospital/doctor_pending_appointments.html",
+                     {"appointments": zip(apps, pats), "doctor": doc})
+
+    if action == "approve":
+        app = get_object_or_404(models.Appointment, id=pk, doctor=doc)
+        app.status = True
+        app.save()
+        messages.success(request, "Appointment approved successfully!")
+        return redirect("doctor-pending-appointments")
+
+    if action == "reject":
+        app = get_object_or_404(models.Appointment, id=pk, doctor=doc)
+        app.delete()
+        messages.success(request, "Appointment rejected successfully!")
+        return redirect("doctor-pending-appointments")
 
     if action == "delete":
         if pk:
-            get_object_or_404(models.Appointment, id=pk).delete()
-        apps = models.Appointment.objects.filter(status=True, doctorId=request.user.id)
-        pats = models.Patient.objects.filter(status=True,
-                             user_id__in=apps.values_list("patientId", flat=True))
-        return render(request, "hospital/doctor_delete_appointment.html",
-                      {"appointments": zip(apps, pats), "doctor": doc})
+            get_object_or_404(models.Appointment, id=pk, doctor=doc).delete()
+            messages.success(request, "Appointment deleted successfully!")
+        return redirect("doctor-view-appointment")
 
     return render(request, "hospital/doctor_appointment.html", {"doctor": doc})
 
@@ -587,6 +615,12 @@ def doctor_appointment_views(request, action=None, pk=None):
 @user_passes_test(is_patient)
 def patient_dashboard_view(request):
     pat = models.Patient.objects.get(user_id=request.user.id)
+    
+    # Get upcoming appointments
+    appointments = models.Appointment.objects.filter(
+        patient=pat,
+        appointmentDate__gte=date.today()
+    ).order_by('appointmentDate', 'appointmentTime')
     
     # Handle case where patient has no assigned doctor
     if not pat.assignedDoctorId:
@@ -599,6 +633,9 @@ def patient_dashboard_view(request):
             "symptoms": pat.symptoms,
             "doctorDepartment": "N/A",
             "admitDate": pat.admitDate,
+            "appointments": appointments,
+            "upcoming_appointments": appointments.count(),
+            "total_prescriptions": 0  # Add prescription count when feature is implemented
         })
     
     try:
@@ -611,6 +648,9 @@ def patient_dashboard_view(request):
             "symptoms": pat.symptoms,
             "doctorDepartment": doc.department,
             "admitDate": pat.admitDate,
+            "appointments": appointments,
+            "upcoming_appointments": appointments.count(),
+            "total_prescriptions": 0  # Add prescription count when feature is implemented
         })
     except models.Doctor.DoesNotExist:
         messages.error(request, "Assigned doctor not found. Please contact the admin.")
@@ -622,6 +662,9 @@ def patient_dashboard_view(request):
             "symptoms": pat.symptoms,
             "doctorDepartment": "N/A",
             "admitDate": pat.admitDate,
+            "appointments": appointments,
+            "upcoming_appointments": appointments.count(),
+            "total_prescriptions": 0  # Add prescription count when feature is implemented
         })
 
 
@@ -631,38 +674,52 @@ def patient_appointment_views(request, action=None):
     pat = models.Patient.objects.get(user_id=request.user.id)
 
     if action == "book":
+        initial = {}
+        if request.GET.get('doctor'):
+            try:
+                doctor = models.Doctor.objects.get(id=request.GET.get('doctor'))
+                initial['doctor'] = doctor
+            except models.Doctor.DoesNotExist:
+                pass
+        
         if request.method == "POST":
             form = forms.PatientAppointmentForm(request.POST)
             if form.is_valid():
                 app = form.save(commit=False)
-                app.doctorId  = request.POST.get("doctorId")
-                app.patientId = request.user.id
-                app.doctorName  = User.objects.get(id=app.doctorId).first_name
-                app.patientName = request.user.first_name
-                app.status = False
+                app.patient = pat
+                app.doctor = form.cleaned_data['doctor']  # Set the doctor from form
+                app.patientName = pat.get_name  # Set names for legacy support
+                app.doctorName = app.doctor.get_name
+                app.status = False  # Needs approval
                 app.save()
+                messages.success(request, "Appointment request submitted successfully! Awaiting doctor's approval.")
                 return redirect("patient-view-appointment")
+            else:
+                messages.error(request, "Please fix the errors in the form.")
         else:
-            form = forms.PatientAppointmentForm()
+            form = forms.PatientAppointmentForm(initial=initial)
         return render(request, "hospital/patient_book_appointment.html",
-                      {"appointmentForm": form, "patient": pat, "message": None})
+                     {"appointmentForm": form, "patient": pat})
 
     if action == "view":
-        apps = models.Appointment.objects.filter(patientId=request.user.id)
+        apps = models.Appointment.objects.filter(patient=pat)
         return render(request, "hospital/patient_view_appointment.html",
-                      {"appointments": apps, "patient": pat})
+                     {"appointments": apps, "patient": pat})
 
     if action == "view-doctors":
-        docs = models.Doctor.objects.filter(status=True)
+        docs = models.Doctor.objects.filter(status=True).order_by('department')
+        view_type = request.GET.get('view', 'grid')  # Default to grid view
         return render(request, "hospital/patient_view_doctor.html",
-                      {"patient": pat, "doctors": docs})
+                     {"patient": pat, "doctors": docs, "view_type": view_type})
 
     if action == "search-doctors":
-        q    = request.GET.get("query", "")
+        q = request.GET.get("query", "")
         docs = models.Doctor.objects.filter(status=True)\
-                .filter(Q(department__icontains=q) | Q(user__first_name__icontains=q))
+                .filter(Q(department__icontains=q) | Q(user__first_name__icontains=q))\
+                .order_by('department')
+        view_type = request.GET.get('view', 'grid')  # Default to grid view
         return render(request, "hospital/patient_view_doctor.html",
-                      {"patient": pat, "doctors": docs})
+                     {"patient": pat, "doctors": docs, "view_type": view_type})
 
     if action == "discharge":
         det = models.PatientDischargeDetails.objects.filter(patientId=pat.id)\

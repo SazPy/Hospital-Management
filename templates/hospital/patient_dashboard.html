@@ -4,209 +4,236 @@
 {% block title %}Patient Dashboard - HMS{% endblock %}
 
 {% block content %}
-<div class="row mb-4">
-  <div class="col">
-    <h2 class="mb-4">
-      <i class="fas fa-columns me-2"></i>Patient Dashboard
-    </h2>
-  </div>
-</div>
-
-<!-- Messages -->
-{% if messages %}
-<div class="row mb-4">
-  <div class="col">
-    {% for message in messages %}
-    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-      {{ message }}
-      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-    </div>
-    {% endfor %}
-  </div>
-</div>
-{% endif %}
-
-<!-- Info Cards -->
-<div class="row g-4 mb-4">
-  <!-- Doctor Info -->
-  <div class="col-md-6 col-xl-3">
-    <div class="card h-100 border-0 shadow-sm dashboard-card">
-      <div class="card-body">
-        <div class="d-flex align-items-center">
-          <div class="flex-shrink-0">
-            <div class="avatar-circle bg-primary-subtle">
-              <i class="fas fa-user-md"></i>
-            </div>
-          </div>
-          <div class="flex-grow-1 ms-3">
-            <h6 class="card-subtitle mb-1 text-muted">Your Doctor</h6>
-            <h5 class="card-title mb-0">{{ doctorName }}</h5>
-          </div>
-        </div>
-        <div class="mt-3">
-          <p class="mb-1"><i class="fas fa-stethoscope me-2"></i>{{ doctorDepartment }}</p>
-          <p class="mb-0"><i class="fas fa-phone me-2"></i>{{ doctorMobile }}</p>
-        </div>
+<!-- Page Header -->
+<div class="page-header">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <h1 class="fw-bold mb-3">Welcome, {{ request.user.first_name }}!</h1>
+        <p class="lead mb-0">Manage your appointments and medical records</p>
       </div>
-    </div>
-  </div>
-
-  <!-- Contact Info -->
-  <div class="col-md-6 col-xl-3">
-    <div class="card h-100 border-0 shadow-sm dashboard-card">
-      <div class="card-body">
-        <div class="d-flex align-items-center mb-3">
-          <div class="flex-shrink-0">
-            <div class="avatar-circle bg-success-subtle">
-              <i class="fas fa-map-marker-alt"></i>
-            </div>
-          </div>
-          <div class="flex-grow-1 ms-3">
-            <h6 class="card-subtitle mb-1 text-muted">Doctor's Location</h6>
-            <h5 class="card-title mb-0">Contact Details</h5>
-          </div>
-        </div>
-        <p class="card-text">{{ doctorAddress }}</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Medical Info -->
-  <div class="col-md-6 col-xl-3">
-    <div class="card h-100 border-0 shadow-sm dashboard-card">
-      <div class="card-body">
-        <div class="d-flex align-items-center mb-3">
-          <div class="flex-shrink-0">
-            <div class="avatar-circle bg-warning-subtle">
-              <i class="fas fa-notes-medical"></i>
-            </div>
-          </div>
-          <div class="flex-grow-1 ms-3">
-            <h6 class="card-subtitle mb-1 text-muted">Medical Status</h6>
-            <h5 class="card-title mb-0">Health Info</h5>
-          </div>
-        </div>
-        <p class="card-text">{{ symptoms }}</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Admission Info -->
-  <div class="col-md-6 col-xl-3">
-    <div class="card h-100 border-0 shadow-sm dashboard-card">
-      <div class="card-body">
-        <div class="d-flex align-items-center mb-3">
-          <div class="flex-shrink-0">
-            <div class="avatar-circle bg-info-subtle">
-              <i class="fas fa-calendar-check"></i>
-            </div>
-          </div>
-          <div class="flex-grow-1 ms-3">
-            <h6 class="card-subtitle mb-1 text-muted">Patient Since</h6>
-            <h5 class="card-title mb-0">Admission Info</h5>
-          </div>
-        </div>
-        <p class="card-text">{{ admitDate }}</p>
+      <div class="col-lg-6 text-lg-end">
+        <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#appointmentModal">
+          <i class="fas fa-calendar-plus me-2"></i>Book Appointment
+        </button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Quick Actions -->
-<div class="row mb-4">
-  <div class="col-12">
-    <div class="card border-0 shadow-sm">
-      <div class="card-header bg-white border-0">
-        <h5 class="card-title mb-0">
-          <i class="fas fa-bolt me-2"></i>Quick Actions
-        </h5>
+<!-- Stats Overview -->
+<div class="container mb-4">
+  <div class="row g-4 patient-stats">
+    <div class="col-md-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="stat-icon">
+            <i class="fas fa-calendar-check"></i>
+          </div>
+          <h3 class="fw-bold mb-1">{{ upcoming_appointments }}</h3>
+          <p class="text-muted mb-0">Upcoming Appointments</p>
+        </div>
       </div>
-      <div class="card-body">
-        <div class="row g-3">
-          <div class="col-sm-6 col-lg-3">
-            <a href="{% url 'patient-appointment' %}" class="btn btn-light w-100 p-4 text-start">
-              <i class="fas fa-calendar-plus text-primary me-2"></i>Book Appointment
-            </a>
+    </div>
+    <div class="col-md-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="stat-icon">
+            <i class="fas fa-file-medical"></i>
           </div>
-          <div class="col-sm-6 col-lg-3">
-            <a href="{% url 'patient-view-appointment' %}" class="btn btn-light w-100 p-4 text-start">
-              <i class="fas fa-calendar-alt text-success me-2"></i>View Appointments
-            </a>
+          <h3 class="fw-bold mb-1">{{ total_prescriptions }}</h3>
+          <p class="text-muted mb-0">Prescriptions</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="stat-icon">
+            <i class="fas fa-user-md"></i>
           </div>
-          <div class="col-sm-6 col-lg-3">
-            <a href="{% url 'patient-discharge' %}" class="btn btn-light w-100 p-4 text-start">
-              <i class="fas fa-file-medical text-warning me-2"></i>Discharge Summary
-            </a>
+          <h3 class="fw-bold mb-1">{{ assigned_doctor }}</h3>
+          <p class="text-muted mb-0">Assigned Doctor</p>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="stat-icon">
+            <i class="fas fa-heartbeat"></i>
           </div>
-          <div class="col-sm-6 col-lg-3">
-            <a href="{% url 'patient-view-doctor' %}" class="btn btn-light w-100 p-4 text-start">
-              <i class="fas fa-user-md text-info me-2"></i>Find Doctors
-            </a>
-          </div>
+          <h3 class="fw-bold mb-1">{{ admission_days }}</h3>
+          <p class="text-muted mb-0">Days Since Admission</p>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<style>
-.dashboard-card {
-  transition: transform 0.2s ease-in-out;
-}
+<!-- Main Content -->
+<div class="container">
+  <div class="row g-4">
+    <!-- Upcoming Appointments -->
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="card-title mb-0">Upcoming Appointments</h5>
+            <a href="{% url 'patient-appointment' %}" class="btn btn-outline-primary btn-sm">View All</a>
+          </div>
+          {% if appointments %}
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Date & Time</th>
+                  <th>Doctor</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for appointment in appointments %}
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <i class="fas fa-calendar text-primary me-2"></i>
+                      <div>
+                        <div class="fw-medium">{{ appointment.appointmentDate }}</div>
+                        <div class="text-muted small">{{ appointment.appointmentTime }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <img src="{% static 'images/doctor.png' %}" alt="Doctor" class="rounded-circle me-2" width="32" height="32">
+                      <div>
+                        <div class="fw-medium">Dr. {{ appointment.doctorName }}</div>
+                        <div class="text-muted small">{{ appointment.department }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="badge bg-{% if appointment.status == 'Pending' %}warning{% elif appointment.status == 'Completed' %}success{% else %}danger{% endif %}">
+                      {{ appointment.status }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="action-buttons">
+                      <button class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="View Details">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      {% if appointment.status == 'Pending' %}
+                      <button class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Cancel">
+                        <i class="fas fa-times"></i>
+                      </button>
+                      {% endif %}
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="text-center py-4">
+            <img src="{% static 'images/no-appointments.png' %}" alt="No Appointments" class="mb-3" width="120" onerror="this.src='https://placehold.co/120x120/4f46e5/ffffff?text=No+Appointments'">
+            <h6 class="text-muted">No upcoming appointments</h6>
+            <button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#appointmentModal">
+              Book Your First Appointment
+            </button>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
 
-.dashboard-card:hover {
-  transform: translateY(-5px);
-}
+    <!-- Medical History Timeline -->
+    <div class="col-lg-4">
+      <div class="medical-history">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h5 class="mb-0">Medical History</h5>
+          <button class="btn btn-outline-primary btn-sm">
+            <i class="fas fa-download me-1"></i>Download
+          </button>
+        </div>
+        <div class="timeline">
+          {% for record in medical_history %}
+          <div class="timeline-item">
+            <div class="mb-2">
+              <span class="badge bg-primary">{{ record.date }}</span>
+            </div>
+            <h6 class="mb-1">{{ record.title }}</h6>
+            <p class="text-muted small mb-0">{{ record.description }}</p>
+          </div>
+          {% empty %}
+          <div class="text-center py-4">
+            <img src="{% static 'images/no-records.png' %}" alt="No Records" class="mb-3" width="120" onerror="this.src='https://placehold.co/120x120/4f46e5/ffffff?text=No+Records'">
+            <h6 class="text-muted">No medical records yet</h6>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
-.avatar-circle {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+<!-- Book Appointment Modal -->
+<div class="modal fade" id="appointmentModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Book New Appointment</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="mb-3">
+            <label class="form-label">Department</label>
+            <select class="form-select" id="department">
+              <option selected disabled>Select Department</option>
+              {% for dept in departments %}
+              <option value="{{ dept.0 }}">{{ dept.1 }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Doctor</label>
+            <select class="form-select" id="doctor" disabled>
+              <option selected disabled>Select Doctor</option>
+            </select>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Preferred Date</label>
+            <input type="date" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Preferred Time</label>
+            <input type="time" class="form-control">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Description</label>
+            <textarea class="form-control" rows="3" placeholder="Describe your symptoms or reason for visit"></textarea>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary">Book Appointment</button>
+      </div>
+    </div>
+  </div>
+</div>
 
-.avatar-circle i {
-  font-size: 24px;
-  color: #4f46e5;
-}
-
-.bg-primary-subtle {
-  background-color: rgba(79, 70, 229, 0.1);
-}
-
-.bg-success-subtle {
-  background-color: rgba(0, 200, 81, 0.1);
-}
-
-.bg-warning-subtle {
-  background-color: rgba(255, 171, 0, 0.1);
-}
-
-.bg-info-subtle {
-  background-color: rgba(0, 186, 199, 0.1);
-}
-
-.btn-light {
-  background-color: #f8f9fa;
-  border-color: #e9ecef;
-  transition: all 0.2s;
-}
-
-.btn-light:hover {
-  background-color: #e9ecef;
-  border-color: #dee2e6;
-  transform: translateY(-2px);
-}
-
-.card-header {
-  padding: 1rem 1.25rem;
-}
-
-.text-primary { color: #4f46e5 !important; }
-.text-success { color: #00c851 !important; }
-.text-warning { color: #ffab00 !important; }
-.text-info { color: #00bac7 !important; }
-</style>
+{% block extra_js %}
+<script>
+  // Enable doctor selection when department is chosen
+  document.getElementById('department').addEventListener('change', function() {
+    const doctorSelect = document.getElementById('doctor');
+    doctorSelect.disabled = false;
+    // Here you would typically make an AJAX call to get doctors for the selected department
+  });
+</script>
+{% endblock %}
 {% endblock content %}

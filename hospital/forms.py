@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from .models import Doctor, Patient, Appointment  # Direct model imports help with IDEs/autocomplete
+from datetime import date
 
 
 # ==============================
@@ -84,40 +85,49 @@ class PatientForm(forms.ModelForm):
 # Appointment Forms
 # ==============================
 class AppointmentForm(forms.ModelForm):
-    doctorId = forms.ModelChoiceField(
-        queryset=Doctor.objects.filter(status=True),
-        empty_label="Select Doctor",
-        to_field_name="user_id",
-        widget=forms.Select(attrs={'class': 'form-control'})
-    )
-    patientId = forms.ModelChoiceField(
-        queryset=Patient.objects.filter(status=True),
-        empty_label="Select Patient",
-        to_field_name="user_id",
-        widget=forms.Select(attrs={'class': 'form-control'})
-    )
-
     class Meta:
         model = Appointment
-        fields = ['description', 'status']
+        fields = ['doctor', 'patient', 'appointmentDate', 'appointmentTime', 'description', 'status']
         widgets = {
+            'doctor': forms.Select(attrs={'class': 'form-control'}),
+            'patient': forms.Select(attrs={'class': 'form-control'}),
+            'appointmentDate': forms.DateInput(attrs={'class': 'form-control', 'type': 'date'}),
+            'appointmentTime': forms.TimeInput(attrs={'class': 'form-control', 'type': 'time'}),
             'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['doctor'].queryset = Doctor.objects.filter(status=True)
+        self.fields['patient'].queryset = Patient.objects.filter(status=True)
+
 
 class PatientAppointmentForm(forms.ModelForm):
-    doctorId = forms.ModelChoiceField(
+    doctor = forms.ModelChoiceField(
         queryset=Doctor.objects.filter(status=True),
         empty_label="Select Doctor",
-        to_field_name="user_id",
+        required=True,
         widget=forms.Select(attrs={'class': 'form-control'})
     )
 
     class Meta:
         model = Appointment
-        fields = ['description']
+        fields = ['doctor', 'appointmentDate', 'appointmentTime', 'description']
         widgets = {
-            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+            'appointmentDate': forms.DateInput(attrs={
+                'class': 'form-control',
+                'type': 'date',
+                'min': date.today().isoformat()
+            }),
+            'appointmentTime': forms.TimeInput(attrs={
+                'class': 'form-control',
+                'type': 'time'
+            }),
+            'description': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Please describe your symptoms or reason for visit'
+            }),
         }
 
 

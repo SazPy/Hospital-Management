@@ -62,13 +62,24 @@ class Patient(BaseModel):  # Changed from models.Model to BaseModel
 
 
 class Appointment(BaseModel):  # Changed from models.Model to BaseModel
-    patientId = models.PositiveIntegerField(null=True)
-    doctorId = models.PositiveIntegerField(null=True)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='appointments', null=True)
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE, related_name='appointments', null=True)
     patientName = models.CharField(max_length=40, null=True)
     doctorName = models.CharField(max_length=40, null=True)
-    appointmentDate = models.DateField(auto_now=True)
+    appointmentDate = models.DateField(null=True)
+    appointmentTime = models.TimeField(null=True)
     description = models.TextField(max_length=500)
-    status = models.BooleanField(default=False)
+    status = models.BooleanField(default=False)  # False for pending, True for approved
+    
+    class Meta:
+        ordering = ['-appointmentDate', '-appointmentTime']
+
+    def save(self, *args, **kwargs):
+        if not self.patientName and self.patient:
+            self.patientName = self.patient.get_name
+        if not self.doctorName and self.doctor:
+            self.doctorName = self.doctor.get_name
+        super().save(*args, **kwargs)
 
 
 class PatientDischargeDetails(BaseModel):  # Changed from models.Model to BaseModel

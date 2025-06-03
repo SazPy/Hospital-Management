@@ -1,44 +1,159 @@
-<!DOCTYPE html>
+{% extends 'hospital/homebase.html' %}
 {% load static %}
-<html lang="en" dir="ltr">
 
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <title>About us</title>
-  <style media="screen">
-    .jumbotron {
-      margin-top: 0px;
-      margin-bottom: 0px;
-    }
+{% block title %}About Us - HMS{% endblock %}
 
-    .jumbotron h1 {
-      text-align: center;
-    }
+{% block content %}
+<!-- Hero Section -->
+<div class="bg-gradient-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="display-4 fw-bold mb-3">About HMS</h1>
+                <p class="lead mb-4">Dedicated to excellence in healthcare since our founding</p>
+            </div>
+        </div>
+    </div>
+</div>
 
-    .alert {
-      margin: 0px;
-    }
-  </style>
-  <title>About us</title>
-</head>
+<!-- Our Story Section -->
+<div class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-8 mx-auto text-center mb-5">
+                <h2 class="fw-bold mb-4">Our Story</h2>
+                <p class="lead text-muted">Founded with a vision to provide exceptional healthcare services, HMS has grown to become a leading healthcare provider in the region.</p>
+            </div>
+        </div>
+        <div class="row g-4 align-items-center">
+            <div class="col-md-6">
+                <img src="{% static 'images/hospital-interior.jpg' %}" alt="Hospital Building" class="img-fluid rounded shadow-lg" onerror="this.src='https://placehold.co/600x400/4f46e5/ffffff?text=HMS+Building'">
+            </div>
+            <div class="col-md-6">
+                <h3 class="mb-4">Excellence in Healthcare</h3>
+                <p class="text-muted">At HMS, we believe in providing comprehensive healthcare services that put our patients first. Our state-of-the-art facilities and experienced medical professionals work together to ensure the best possible care for every patient.</p>
+                <ul class="list-unstyled">
+                    <li class="mb-3"><i class="fas fa-check-circle text-primary me-2"></i> 24/7 Emergency Services</li>
+                    <li class="mb-3"><i class="fas fa-check-circle text-primary me-2"></i> Modern Medical Equipment</li>
+                    <li class="mb-3"><i class="fas fa-check-circle text-primary me-2"></i> Experienced Medical Staff</li>
+                    <li class="mb-3"><i class="fas fa-check-circle text-primary me-2"></i> Patient-Centered Care</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
 
-<body>
-  {% include "hospital/navbar.html" %}
-  <br><br>
-  <center>
-    <h3 class='alert alert-success' style="margin-bottom:0px;">About Us !</h3>
-  </center>
-  <div class="jumbotron" style="margin-bottom: 0px;margin-top: 0px;">
-    <h1 class="display-4">Hello</h1>
-    <p class="lead">A service dedicated to Hospital Admin, Doctor and Patient.</p>
-    <hr class="my-4">
-    <p>Explore our Website.</p>
-    <p class="lead">
-      <a class="btn btn-primary btn-lg" href="/" role="button">HOME</a>
-    </p>
-  </div>
-  {% include "hospital/footer.html" %}
-</body>
+<!-- Our Values Section -->
+<div class="bg-light py-5">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="fw-bold mb-4">Our Values</h2>
+                <p class="text-muted">Our core values guide everything we do at HMS</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon bg-primary-subtle rounded-circle mb-3 mx-auto">
+                            <i class="fas fa-heart text-primary"></i>
+                        </div>
+                        <h4>Compassion</h4>
+                        <p class="text-muted">We treat every patient with kindness, empathy, and respect</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon bg-primary-subtle rounded-circle mb-3 mx-auto">
+                            <i class="fas fa-award text-primary"></i>
+                        </div>
+                        <h4>Excellence</h4>
+                        <p class="text-muted">We strive for excellence in everything we do</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon bg-primary-subtle rounded-circle mb-3 mx-auto">
+                            <i class="fas fa-shield-alt text-primary"></i>
+                        </div>
+                        <h4>Integrity</h4>
+                        <p class="text-muted">We maintain the highest standards of professional ethics</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-</html>
+<!-- Team Section -->
+<div class="py-5">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="fw-bold mb-4">Our Leadership Team</h2>
+                <p class="text-muted">Meet the experts behind our success</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <img src="{% static 'images/doctor.png' %}" alt="Chief Medical Officer" class="rounded-circle mb-3" width="120" height="120" onerror="this.src='https://placehold.co/120/4f46e5/ffffff?text=CMO'">
+                        <h4>Dr. Sarah Johnson</h4>
+                        <p class="text-muted mb-0">Chief Medical Officer</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <img src="{% static 'images/doctor.png' %}" alt="Head of Surgery" class="rounded-circle mb-3" width="120" height="120" onerror="this.src='https://placehold.co/120/4f46e5/ffffff?text=HoS'">
+                        <h4>Dr. Michael Chen</h4>
+                        <p class="text-muted mb-0">Head of Surgery</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <img src="{% static 'images/doctor.png' %}" alt="Head of Research" class="rounded-circle mb-3" width="120" height="120" onerror="this.src='https://placehold.co/120/4f46e5/ffffff?text=HoR'">
+                        <h4>Dr. Emily Brown</h4>
+                        <p class="text-muted mb-0">Head of Research</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.bg-gradient-primary {
+    background: linear-gradient(45deg, #4f46e5, #4338ca);
+}
+
+.feature-icon {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.feature-icon i {
+    font-size: 28px;
+}
+
+.bg-primary-subtle {
+    background-color: rgba(79, 70, 229, 0.1);
+}
+
+.text-primary {
+    color: #4f46e5 !important;
+}
+</style>
+{% endblock content %}

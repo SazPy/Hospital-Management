@@ -1,81 +1,107 @@
 {% extends 'hospital/admin_base.html' %}
+{% load static %}
 {% load widget_tweaks %}
 {% block content %}
 
-<head>
-  <style media="screen">
-    a:link {
-      text-decoration: none;
-    }
-
-    .note {
-      text-align: center;
-      height: 80px;
-      background: -webkit-linear-gradient(left, #0072ff, #8811c5);
-      color: #fff;
-      font-weight: bold;
-      line-height: 80px;
-    }
-
-    .form-content {
-      padding: 5%;
-      border: 1px solid #ced4da;
-      margin-bottom: 2%;
-    }
-
-    .form-control {
-      border-radius: 1.5rem;
-    }
-
-    .btnSubmit {
-      border: none;
-      border-radius: 1.5rem;
-      padding: 1%;
-      width: 20%;
-      cursor: pointer;
-      background: #0062cc;
-      color: #fff;
-    }
-
-    .menu {
-      top: 50px;
-    }
-  </style>
-
-  <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-  <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
-  <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-</head>
-<br><br>
-<!------ add appointment page by admin  ---------->
-<form method="post">
-  {% csrf_token %}
-  <div class="container register-form">
-    <div class="form">
-      <div class="note">
-        <p>Book Appointment Details</p>
-      </div>
-      <div class="form-content">
-        <div class="row">
-          <div class="col-md-12">
-            <div class="form-group">
-              {% render_field appointmentForm.description class="form-control" placeholder="Description" %}
-            </div>
-            <div class="form-group">
-              {% render_field appointmentForm.doctorId class="form-control" placeholder="doctor" %}
-            </div>
-            <div class="form-group">
-              {% render_field appointmentForm.patientId class="form-control" placeholder="patient" %}
-            </div>
-
-          </div>
-
-        </div>
-        <button type="submit" class="btnSubmit">Book</button>
+<!-- Page Header -->
+<div class="page-header">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <h1 class="fw-bold mb-3">Schedule Appointment</h1>
+        <p class="lead mb-0">Create a new appointment for a patient</p>
       </div>
     </div>
   </div>
-</form>
+</div>
 
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4 p-lg-5">
+          <form method="post">
+            {% csrf_token %}
+            
+            <!-- Doctor Selection -->
+            <div class="mb-4">
+              <label class="form-label">Select Doctor</label>
+              {% render_field appointmentForm.doctorId class="form-select" %}
+            </div>
+            
+            <!-- Patient Selection -->
+            <div class="mb-4">
+              <label class="form-label">Select Patient</label>
+              {% render_field appointmentForm.patientId class="form-select" %}
+            </div>
+            
+            <!-- Description -->
+            <div class="mb-4">
+              <label class="form-label">Description</label>
+              {% render_field appointmentForm.description class="form-control" placeholder="Enter appointment details..." %}
+            </div>
+            
+            <!-- Date & Time -->
+            <div class="row g-4 mb-4">
+              <div class="col-md-6">
+                <label class="form-label">Date</label>
+                {% render_field appointmentForm.appointmentDate class="form-control" type="date" %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Time</label>
+                {% render_field appointmentForm.appointmentTime class="form-control" type="time" %}
+              </div>
+            </div>
+            
+            <!-- Submit Button -->
+            <div class="text-end">
+              <button type="submit" class="btn btn-primary px-4 py-2">
+                <i class="fas fa-calendar-plus me-2"></i>Schedule Appointment
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.page-header {
+  background: linear-gradient(45deg, #4f46e5, #4338ca);
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.form-label {
+  font-weight: 500;
+  color: #4b5563;
+  margin-bottom: 0.5rem;
+}
+
+.form-control,
+.form-select {
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e5e7eb;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 0.25rem rgba(79, 70, 229, 0.25);
+}
+
+.btn-primary {
+  background-color: #4f46e5;
+  border-color: #4f46e5;
+}
+
+.btn-primary:hover {
+  background-color: #4338ca;
+  border-color: #4338ca;
+}
+</style>
 
 {% endblock content %}
