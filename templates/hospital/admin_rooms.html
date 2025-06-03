@@ -1,0 +1,60 @@
+{% extends "hospital/admin_base.html" %}
+{% block content %}
+{%load static%}
+
+<div class="container">
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      <h2 class="panel-title">Room Management</h2>
+    </div>
+    <div class="panel-body">
+      <div class="row">
+        <div class="col-md-12">
+          <a href="{% url 'admin-add-room' %}" class="btn btn-primary" style="float: right;">Add New Room</a>
+        </div>
+      </div>
+      <table class="table table-hover" id="dev-table">
+        <thead>
+          <tr>
+            <th>Room Number</th>
+            <th>Type</th>
+            <th>Capacity</th>
+            <th>Status</th>
+            <th>Current Patient</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for room in rooms %}
+          <tr>
+            <td>{{ room.room_number }}</td>
+            <td>{{ room.get_room_type_display }}</td>
+            <td>{{ room.capacity }}</td>
+            <td>
+              {% if room.is_occupied %}
+                <span class="label label-danger">Occupied</span>
+              {% else %}
+                <span class="label label-success">Available</span>
+              {% endif %}
+            </td>
+            <td>
+              {% if room.current_patient %}
+                <a href="{% url 'admin-view-patient-detail' room.current_patient %}">View Patient</a>
+              {% else %}
+                None
+              {% endif %}
+            </td>
+            <td>
+              <a class="btn btn-info btn-xs" href="{% url 'admin-room-details' room.id %}">
+                <span class="glyphicon glyphicon-eye-open"></span>
+              </a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}

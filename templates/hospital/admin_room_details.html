@@ -1,0 +1,77 @@
+{% extends "hospital/admin_base.html" %}
+{% block content %}
+{%load static%}
+
+<div class="container">
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      <h2 class="panel-title">Room Details</h2>
+    </div>
+    <div class="panel-body">
+      <div class="row">
+        <div class="col-md-6">
+          <h4>Room Information</h4>
+          <table class="table">
+            <tr>
+              <th>Room Number</th>
+              <td>{{ room.room_number }}</td>
+            </tr>
+            <tr>
+              <th>Type</th>
+              <td>{{ room.get_room_type_display }}</td>
+            </tr>
+            <tr>
+              <th>Capacity</th>
+              <td>{{ room.capacity }}</td>
+            </tr>
+            <tr>
+              <th>Status</th>
+              <td>
+                {% if room.is_occupied %}
+                  <span class="label label-danger">Occupied</span>
+                {% else %}
+                  <span class="label label-success">Available</span>
+                {% endif %}
+              </td>
+            </tr>
+          </table>
+        </div>
+        <div class="col-md-6">
+          <h4>Current Patient</h4>
+          {% if patient %}
+          <table class="table">
+            <tr>
+              <th>Name</th>
+              <td><a href="{% url 'admin-view-patient-detail' pk=patient.id %}">{{ patient.get_name }}</a></td>
+            </tr>
+            <tr>
+              <th>Admit Date</th>
+              <td>{{ patient.admitDate }}</td>
+            </tr>
+            <tr>
+              <th>Symptoms</th>
+              <td>{{ patient.symptoms }}</td>
+            </tr>
+            <tr>
+              <th>Actions</th>
+              <td>
+                <a href="{% url 'admin-change-room' patient.id %}" class="btn btn-warning btn-xs">Change Room</a>
+                <a href="{% url 'admin-discharge-from-room' patient.id %}" class="btn btn-danger btn-xs">Discharge</a>
+              </td>
+            </tr>
+          </table>
+          {% else %}
+          <p>No patient currently assigned to this room.</p>
+          {% endif %}
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-12">
+          <a href="{% url 'admin-rooms' %}" class="btn btn-default">Back to Rooms</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}

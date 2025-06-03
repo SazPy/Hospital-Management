@@ -1,0 +1,41 @@
+{% extends "hospital/admin_base.html" %}
+{% block content %}
+<div class="container">
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      <h6 class="panel-title">Patient Details</h6>
+    </div>
+    <div class="panel-body">
+      <table class="table">
+        <tr>
+          <th>Name</th>
+          <td>{{ patient.get_name }}</td>
+        </tr>
+        <tr>
+          <th>Symptoms</th>
+          <td>{{ patient.symptoms }}</td>
+        </tr>
+        <tr>
+          <th>Mobile</th>
+          <td>{{ patient.mobile }}</td>
+        </tr>
+        <tr>
+          <th>Address</th>
+          <td>{{ patient.address }}</td>
+        </tr>
+        <tr>
+          <th>Room</th>
+          <td>
+            {% if patient.room %}
+              {{ patient.room.room_number }} ({{ patient.room.get_room_type_display }})
+            {% else %}
+              Not assigned
+            {% endif %}
+          </td>
+        </tr>
+      </table>
+      <a href="{% url 'admin-view-patient-list' %}" class="btn btn-primary">Back to Patients List</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

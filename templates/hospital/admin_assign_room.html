@@ -1,0 +1,32 @@
+{% extends "hospital/admin_base.html" %}
+{% block content %}
+{%load static%}
+
+<div class="container">
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      <h2 class="panel-title">Assign Room to Patient</h2>
+    </div>
+    <div class="panel-body">
+      <h4>Patient: {{ patient.get_name }}</h4>
+      <form method="post">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="room_id">Select Room</label>
+          <select class="form-control" id="room_id" name="room_id" required>
+            {% for room in rooms %}
+            <option value="{{ room.id }}">
+              {{ room.room_number }} ({{ room.get_room_type_display }}) - 
+              Capacity: {{ room.capacity }}
+            </option>
+            {% endfor %}
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Assign Room</button>
+        <a href="{% url 'admin-view-patient-detail' pk=patient.id %}" class="btn btn-default">Cancel</a>
+      </form>
+    </div>
+  </div>
+</div>
+
+{% endblock content %}

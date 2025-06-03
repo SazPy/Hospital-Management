@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en" dir="ltr">
+
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Contact Us!</title>
+
+  <style>
+    /* Centering content using CSS */
+    .center-content {
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+
+  {% include "hospital/navbar.html" %}
+  <br><br>
+
+  <!-- Use CSS class for centering -->
+  <div class="center-content">
+    <h3 class="alert alert-success">Send Us Your Valuable Feedback!</h3>
+
+    <form method="POST">
+      <!-- Very Important csrf Token -->
+      {% csrf_token %}
+      <div class="form-group">
+        <p>
+          <h3>{{ form.as_p }}</h3>
+        </p>
+        <br>
+        <input type="submit" value="Send Message" style="background-color: #3c3c50; color: white; padding: 12px 25px; border-radius: 5px; border: none; cursor: pointer;">
+      </div>
+    </form>
+  </div>
+  <br>
+  {% include "hospital/footer.html" %}
+</body>
+
+</html>

@@ -1,0 +1,212 @@
+{% extends 'hospital/patient_base.html' %}
+{% load static %}
+
+{% block title %}Patient Dashboard - HMS{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+  <div class="col">
+    <h2 class="mb-4">
+      <i class="fas fa-columns me-2"></i>Patient Dashboard
+    </h2>
+  </div>
+</div>
+
+<!-- Messages -->
+{% if messages %}
+<div class="row mb-4">
+  <div class="col">
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+
+<!-- Info Cards -->
+<div class="row g-4 mb-4">
+  <!-- Doctor Info -->
+  <div class="col-md-6 col-xl-3">
+    <div class="card h-100 border-0 shadow-sm dashboard-card">
+      <div class="card-body">
+        <div class="d-flex align-items-center">
+          <div class="flex-shrink-0">
+            <div class="avatar-circle bg-primary-subtle">
+              <i class="fas fa-user-md"></i>
+            </div>
+          </div>
+          <div class="flex-grow-1 ms-3">
+            <h6 class="card-subtitle mb-1 text-muted">Your Doctor</h6>
+            <h5 class="card-title mb-0">{{ doctorName }}</h5>
+          </div>
+        </div>
+        <div class="mt-3">
+          <p class="mb-1"><i class="fas fa-stethoscope me-2"></i>{{ doctorDepartment }}</p>
+          <p class="mb-0"><i class="fas fa-phone me-2"></i>{{ doctorMobile }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Contact Info -->
+  <div class="col-md-6 col-xl-3">
+    <div class="card h-100 border-0 shadow-sm dashboard-card">
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-3">
+          <div class="flex-shrink-0">
+            <div class="avatar-circle bg-success-subtle">
+              <i class="fas fa-map-marker-alt"></i>
+            </div>
+          </div>
+          <div class="flex-grow-1 ms-3">
+            <h6 class="card-subtitle mb-1 text-muted">Doctor's Location</h6>
+            <h5 class="card-title mb-0">Contact Details</h5>
+          </div>
+        </div>
+        <p class="card-text">{{ doctorAddress }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Medical Info -->
+  <div class="col-md-6 col-xl-3">
+    <div class="card h-100 border-0 shadow-sm dashboard-card">
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-3">
+          <div class="flex-shrink-0">
+            <div class="avatar-circle bg-warning-subtle">
+              <i class="fas fa-notes-medical"></i>
+            </div>
+          </div>
+          <div class="flex-grow-1 ms-3">
+            <h6 class="card-subtitle mb-1 text-muted">Medical Status</h6>
+            <h5 class="card-title mb-0">Health Info</h5>
+          </div>
+        </div>
+        <p class="card-text">{{ symptoms }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Admission Info -->
+  <div class="col-md-6 col-xl-3">
+    <div class="card h-100 border-0 shadow-sm dashboard-card">
+      <div class="card-body">
+        <div class="d-flex align-items-center mb-3">
+          <div class="flex-shrink-0">
+            <div class="avatar-circle bg-info-subtle">
+              <i class="fas fa-calendar-check"></i>
+            </div>
+          </div>
+          <div class="flex-grow-1 ms-3">
+            <h6 class="card-subtitle mb-1 text-muted">Patient Since</h6>
+            <h5 class="card-title mb-0">Admission Info</h5>
+          </div>
+        </div>
+        <p class="card-text">{{ admitDate }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+  <div class="col-12">
+    <div class="card border-0 shadow-sm">
+      <div class="card-header bg-white border-0">
+        <h5 class="card-title mb-0">
+          <i class="fas fa-bolt me-2"></i>Quick Actions
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row g-3">
+          <div class="col-sm-6 col-lg-3">
+            <a href="{% url 'patient-appointment' %}" class="btn btn-light w-100 p-4 text-start">
+              <i class="fas fa-calendar-plus text-primary me-2"></i>Book Appointment
+            </a>
+          </div>
+          <div class="col-sm-6 col-lg-3">
+            <a href="{% url 'patient-view-appointment' %}" class="btn btn-light w-100 p-4 text-start">
+              <i class="fas fa-calendar-alt text-success me-2"></i>View Appointments
+            </a>
+          </div>
+          <div class="col-sm-6 col-lg-3">
+            <a href="{% url 'patient-discharge' %}" class="btn btn-light w-100 p-4 text-start">
+              <i class="fas fa-file-medical text-warning me-2"></i>Discharge Summary
+            </a>
+          </div>
+          <div class="col-sm-6 col-lg-3">
+            <a href="{% url 'patient-view-doctor' %}" class="btn btn-light w-100 p-4 text-start">
+              <i class="fas fa-user-md text-info me-2"></i>Find Doctors
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.dashboard-card {
+  transition: transform 0.2s ease-in-out;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+}
+
+.avatar-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-circle i {
+  font-size: 24px;
+  color: #4f46e5;
+}
+
+.bg-primary-subtle {
+  background-color: rgba(79, 70, 229, 0.1);
+}
+
+.bg-success-subtle {
+  background-color: rgba(0, 200, 81, 0.1);
+}
+
+.bg-warning-subtle {
+  background-color: rgba(255, 171, 0, 0.1);
+}
+
+.bg-info-subtle {
+  background-color: rgba(0, 186, 199, 0.1);
+}
+
+.btn-light {
+  background-color: #f8f9fa;
+  border-color: #e9ecef;
+  transition: all 0.2s;
+}
+
+.btn-light:hover {
+  background-color: #e9ecef;
+  border-color: #dee2e6;
+  transform: translateY(-2px);
+}
+
+.card-header {
+  padding: 1rem 1.25rem;
+}
+
+.text-primary { color: #4f46e5 !important; }
+.text-success { color: #00c851 !important; }
+.text-warning { color: #ffab00 !important; }
+.text-info { color: #00bac7 !important; }
+</style>
+{% endblock content %}

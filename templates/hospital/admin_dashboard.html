@@ -1,0 +1,335 @@
+{% extends 'hospital/admin_base.html' %}
+{% load static %}
+
+{% block title %}Admin Dashboard - HMS{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Page Header -->
+  <div class="row mb-4">
+    <div class="col">
+      <h2 class="mb-4">
+        <i class="fas fa-columns me-2"></i>Admin Dashboard
+      </h2>
+    </div>
+  </div>
+
+  <!-- Info Cards -->
+  <div class="row g-4 mb-4">
+    <!-- Doctor Stats -->
+    <div class="col-md-6 col-xl-3">
+      <div class="card h-100 border-0 shadow-sm dashboard-card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-shrink-0">
+              <div class="avatar-circle bg-primary-subtle">
+                <i class="fas fa-user-md"></i>
+              </div>
+            </div>
+            <div class="flex-grow-1 ms-3">
+              <h6 class="card-subtitle mb-1 text-muted">Total Doctors</h6>
+              <h3 class="card-title mb-0">{{ doctorcount }}</h3>
+            </div>
+          </div>
+          <div class="mt-3 pt-2 border-top">
+            <p class="mb-0 text-warning">
+              <i class="fas fa-clock me-1"></i>
+              Pending Approval: {{ pendingdoctorcount }}
+            </p>
+          </div>
+        </div>
+        <div class="card-footer bg-transparent border-0">
+          <a href="{% url 'admin-doctor' %}" class="btn btn-link text-primary p-0">
+            <i class="fas fa-arrow-right me-1"></i>Manage Doctors
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Patient Stats -->
+    <div class="col-md-6 col-xl-3">
+      <div class="card h-100 border-0 shadow-sm dashboard-card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-shrink-0">
+              <div class="avatar-circle bg-success-subtle">
+                <i class="fas fa-procedures"></i>
+              </div>
+            </div>
+            <div class="flex-grow-1 ms-3">
+              <h6 class="card-subtitle mb-1 text-muted">Total Patients</h6>
+              <h3 class="card-title mb-0">{{ patientcount }}</h3>
+            </div>
+          </div>
+          <div class="mt-3 pt-2 border-top">
+            <p class="mb-0 text-warning">
+              <i class="fas fa-clock me-1"></i>
+              Pending Admission: {{ pendingpatientcount }}
+            </p>
+          </div>
+        </div>
+        <div class="card-footer bg-transparent border-0">
+          <a href="{% url 'admin-patient' %}" class="btn btn-link text-success p-0">
+            <i class="fas fa-arrow-right me-1"></i>Manage Patients
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Appointment Stats -->
+    <div class="col-md-6 col-xl-3">
+      <div class="card h-100 border-0 shadow-sm dashboard-card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-shrink-0">
+              <div class="avatar-circle bg-warning-subtle">
+                <i class="fas fa-calendar-check"></i>
+              </div>
+            </div>
+            <div class="flex-grow-1 ms-3">
+              <h6 class="card-subtitle mb-1 text-muted">Total Appointments</h6>
+              <h3 class="card-title mb-0">{{ appointmentcount }}</h3>
+            </div>
+          </div>
+          <div class="mt-3 pt-2 border-top">
+            <p class="mb-0 text-warning">
+              <i class="fas fa-clock me-1"></i>
+              Pending Approval: {{ pendingappointmentcount }}
+            </p>
+          </div>
+        </div>
+        <div class="card-footer bg-transparent border-0">
+          <a href="{% url 'admin-appointment' %}" class="btn btn-link text-warning p-0">
+            <i class="fas fa-arrow-right me-1"></i>Manage Appointments
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Room Stats -->
+    <div class="col-md-6 col-xl-3">
+      <div class="card h-100 border-0 shadow-sm dashboard-card">
+        <div class="card-body">
+          <div class="d-flex align-items-center">
+            <div class="flex-shrink-0">
+              <div class="avatar-circle bg-info-subtle">
+                <i class="fas fa-bed"></i>
+              </div>
+            </div>
+            <div class="flex-grow-1 ms-3">
+              <h6 class="card-subtitle mb-1 text-muted">Total Rooms</h6>
+              <h3 class="card-title mb-0">{{ rooms.count }}</h3>
+            </div>
+          </div>
+          <div class="mt-3 pt-2 border-top">
+            <p class="mb-0 text-success">
+              <i class="fas fa-check-circle me-1"></i>
+              Available: {{ rooms|length }}
+            </p>
+          </div>
+        </div>
+        <div class="card-footer bg-transparent border-0">
+          <a href="{% url 'admin-rooms' %}" class="btn btn-link text-info p-0">
+            <i class="fas fa-arrow-right me-1"></i>Manage Rooms
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Activity Cards -->
+  <div class="row g-4">
+    <!-- Recent Doctors -->
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white py-3">
+          <div class="d-flex align-items-center">
+            <h5 class="card-title mb-0">
+              <i class="fas fa-user-md me-2 text-primary"></i>Recent Doctors
+            </h5>
+            <a href="{% url 'admin-doctor' %}" class="btn btn-sm btn-outline-primary ms-auto">View All</a>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="bg-light">
+                <tr>
+                  <th>Name</th>
+                  <th>Department</th>
+                  <th>Mobile</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for d in doctors %}
+                <tr>
+                  <td>{{ d.get_name }}</td>
+                  <td>{{ d.department }}</td>
+                  <td>{{ d.mobile }}</td>
+                  <td>
+                    {% if d.status %}
+                    <span class="badge bg-primary">Permanent</span>
+                    {% else %}
+                    <span class="badge bg-warning">On Hold</span>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Patients -->
+    <div class="col-md-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-header bg-white py-3">
+          <div class="d-flex align-items-center">
+            <h5 class="card-title mb-0">
+              <i class="fas fa-procedures me-2 text-success"></i>Recent Patients
+            </h5>
+            <a href="{% url 'admin-patient' %}" class="btn btn-sm btn-outline-success ms-auto">View All</a>
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead class="bg-light">
+                <tr>
+                  <th>Name</th>
+                  <th>Mobile</th>
+                  <th>Room</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for p in patients %}
+                <tr>
+                  <td>{{ p.get_name }}</td>
+                  <td>{{ p.mobile }}</td>
+                  <td>
+                    {% if p.room %}
+                      {{ p.room.room_number }}
+                    {% else %}
+                      Not assigned
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if p.status %}
+                    <span class="badge bg-primary">Admitted</span>
+                    {% else %}
+                    <span class="badge bg-warning">On Hold</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    {% if p.status %}
+                      {% if p.room %}
+                        <div class="btn-group btn-group-sm">
+                          <a href="{% url 'admin-change-room' p.id %}" class="btn btn-warning">
+                            <i class="fas fa-exchange-alt"></i>
+                          </a>
+                          <a href="{% url 'admin-discharge-from-room' p.id %}" class="btn btn-danger">
+                            <i class="fas fa-door-open"></i>
+                          </a>
+                        </div>
+                      {% else %}
+                        <a href="{% url 'admin-assign-room' p.id %}" class="btn btn-sm btn-info">
+                          <i class="fas fa-bed"></i> Assign
+                        </a>
+                      {% endif %}
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.dashboard-card {
+  transition: transform 0.2s ease-in-out;
+}
+
+.dashboard-card:hover {
+  transform: translateY(-5px);
+}
+
+.avatar-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-circle i {
+  font-size: 24px;
+  color: #4f46e5;
+}
+
+.bg-primary-subtle {
+  background-color: rgba(79, 70, 229, 0.1);
+}
+
+.bg-success-subtle {
+  background-color: rgba(0, 200, 81, 0.1);
+}
+
+.bg-warning-subtle {
+  background-color: rgba(255, 171, 0, 0.1);
+}
+
+.bg-info-subtle {
+  background-color: rgba(0, 186, 199, 0.1);
+}
+
+.btn-link {
+  text-decoration: none;
+}
+
+.btn-link:hover {
+  text-decoration: underline;
+}
+
+.table > :not(caption) > * > * {
+  padding: 1rem;
+}
+
+.bg-light {
+  background-color: #f8f9fa !important;
+}
+
+.badge {
+  font-weight: 500;
+  padding: 0.5em 0.75em;
+}
+
+.btn-group-sm > .btn {
+  padding: 0.25rem 0.5rem;
+}
+
+.card {
+  margin-bottom: 1.5rem;
+}
+
+.card-header {
+  border-bottom: 1px solid rgba(0,0,0,.05);
+}
+
+.table-responsive {
+  min-height: 300px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+</style>
+{% endblock content %}
