@@ -50,7 +50,7 @@
             <div>
               <h4 class="mb-1">Available</h4>
               <div class="d-flex align-items-baseline">
-                <h2 class="mb-0">{{ rooms|selectattr:"is_occupied"|rejectattr|length }}</h2>
+                <h2 class="mb-0">{{ available_count }}</h2>
                 <span class="text-muted ms-2">rooms</span>
               </div>
             </div>
@@ -68,7 +68,7 @@
             <div>
               <h4 class="mb-1">Occupied</h4>
               <div class="d-flex align-items-baseline">
-                <h2 class="mb-0">{{ rooms|selectattr:"is_occupied"|length }}</h2>
+                <h2 class="mb-0">{{ occupied_count }}</h2>
                 <span class="text-muted ms-2">rooms</span>
               </div>
             </div>
@@ -82,7 +82,7 @@
   <div class="card border-0 shadow-sm">
     <div class="card-body p-0">
       <div class="table-responsive">
-        <table class="table table-hover align-middle mb-0">
+        <table class="table table-hover mb-0">
           <thead class="bg-light">
             <tr>
               <th class="px-4 py-3">Room</th>
@@ -103,7 +103,7 @@
                   </div>
                   <div>
                     <div class="fw-medium">Room {{ room.room_number }}</div>
-                    <div class="text-muted small">Floor {{ room.room_number|divisibleby:100 }}</div>
+                    <div class="text-muted small">Floor {{ room.floor }}</div>
                   </div>
                 </div>
               </td>
@@ -202,14 +202,15 @@
   width: 8px;
   height: 8px;
   border-radius: 50%;
+  display: inline-block;
 }
 
 .bg-success {
-  background-color: #10b981 !important;
+  background-color: #10b981;
 }
 
 .bg-danger {
-  background-color: #dc2626 !important;
+  background-color: #dc2626;
 }
 
 .action-buttons .btn {

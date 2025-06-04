@@ -8,7 +8,8 @@ Updated: 2025-06-02
 • All template `{% url %}` names now resolve
 """
 
-from datetime import date
+from datetime import date, timedelta
+from django.utils import timezone
 from io import BytesIO
 
 from django.conf import settings
@@ -186,6 +187,11 @@ def afterlogin_view(request):
 @login_required(login_url="adminlogin")
 @user_passes_test(is_admin)
 def admin_dashboard_view(request):
+    # Get appointments from the last 7 days and upcoming
+    recent_appointments = models.Appointment.objects.filter(
+        appointmentDate__gte=timezone.now().date() - timedelta(days=7)
+    ).order_by('-appointmentDate', '-appointmentTime')[:5]
+
     stats = {
         "doctors": models.Doctor.objects.all().order_by("-id"),
         "patients": models.Patient.objects.all().order_by("-id"),
@@ -194,10 +200,11 @@ def admin_dashboard_view(request):
         "pendingdoctorcount": models.Doctor.objects.filter(status=False).count(),
         "patientcount": models.Patient.objects.filter(status=True).count(),
         "pendingpatientcount": models.Patient.objects.filter(status=False).count(),
-        "appointmentcount": models.Appointment.objects.filter(status=True).count(),
+        "appointmentcount": models.Appointment.objects.all().count(),
         "pendingappointmentcount": models.Appointment.objects.filter(status=False).count(),
         "roomcount": models.Room.objects.count(),
         "availableroomcount": models.Room.objects.filter(is_occupied=False).count(),
+        "appointments": recent_appointments,
     }
     return render(request, "hospital/admin_dashboard.html", stats)
 
@@ -205,9 +212,18 @@ def admin_dashboard_view(request):
 @login_required(login_url="adminlogin")
 @user_passes_test(is_admin)
 def admin_doctor_views(request, action=None, pk=None):
+    # Get base stats that are needed across actions
+    doctor_stats = {
+        "doctors": models.Doctor.objects.all().order_by("-id"),
+        "doctorcount": models.Doctor.objects.filter(status=True).count(),
+        "pendingdoctorcount": models.Doctor.objects.filter(status=False).count(),
+        "departments": models.Doctor.objects.values_list('department', flat=True).distinct(),
+        "appointmentcount": models.Appointment.objects.all().count(),
+    }
+
     if action == "view":
-        docs = models.Doctor.objects.filter(status=True)
-        return render(request, "hospital/admin_view_doctor.html", {"doctors": docs})
+        return render(request, "hospital/admin_view_doctor.html", 
+                     {"doctors": models.Doctor.objects.filter(status=True)})
 
     if action == "delete":
         doc = get_object_or_404(models.Doctor, id=pk)
@@ -215,7 +231,7 @@ def admin_doctor_views(request, action=None, pk=None):
         return redirect("admin-view-doctor")
 
     if action == "update":
-        doc  = get_object_or_404(models.Doctor, id=pk)
+        doc = get_object_or_404(models.Doctor, id=pk)
         user = doc.user
         if request.method == "POST":
             uform = forms.DoctorUserForm(request.POST, instance=user)
@@ -262,7 +278,8 @@ def admin_doctor_views(request, action=None, pk=None):
         return render(request, "hospital/admin_view_doctor_specialisation.html",
                       {"doctors": docs})
 
-    return render(request, "hospital/admin_doctor.html")
+    # Default view (admin_doctor.html)
+    return render(request, "hospital/admin_doctor.html", doctor_stats)
 
 # -- Patient CRUD ----------------------------------------------------------- #
 @login_required(login_url="adminlogin")
@@ -336,7 +353,25 @@ def admin_patient_views(request, action=None, pk=None):
     if action == "discharge-patient":
         return handle_discharge_patient(request, pk)
 
-    return render(request, "hospital/admin_patient.html")
+    # Default view - admin_patient.html
+    context = {
+        # Patient statistics
+        'total_patients': models.Patient.objects.filter(status=True).count(),
+        'pending_patients': models.Patient.objects.filter(status=False).count(),
+        'total_appointments': models.Appointment.objects.filter(status=True).count(),
+        'discharged_patients': models.PatientDischargeDetails.objects.count(),
+        
+        # Room statistics
+        'total_rooms': models.Room.objects.count(),
+        'available_rooms': models.Room.objects.filter(is_occupied=False).count(),
+        'occupied_rooms': models.Room.objects.filter(is_occupied=True).count(),
+        
+        # Recent patients (last 10 admitted)
+        'recent_patients': models.Patient.objects.filter(status=True)\
+            .select_related('room', 'user')\
+            .order_by('-admitDate')[:10]
+    }
+    return render(request, "hospital/admin_patient.html", context)
 
 # --------------------------------------------------------------------------- #
 # Discharge helper
@@ -444,7 +479,13 @@ def admin_appointment_views(request, action=None, pk=None):
 def admin_room_management(request, action=None, room_id=None, patient_id=None):
     if action == "view":
         rooms = models.Room.objects.all().order_by("room_number")
-        return render(request, "hospital/admin_rooms.html", {"rooms": rooms})
+        available_count = rooms.filter(is_occupied=False).count()
+        occupied_count = rooms.filter(is_occupied=True).count()
+        return render(request, "hospital/admin_rooms.html", {
+            "rooms": rooms,
+            "available_count": available_count,
+            "occupied_count": occupied_count
+        })
 
     if action == "add":
         if request.method == "POST":
@@ -796,3 +837,76 @@ def download_pdf_view(request, pk):
         "total": det.total,
     }
     return render_to_pdf("hospital/download_bill.html", ctx)
+
+# --------------------------------------------------------------------------- #
+# Admin Profile
+# --------------------------------------------------------------------------- #
+@login_required(login_url="adminlogin")
+@user_passes_test(is_admin)
+def admin_profile_view(request):
+    admin = request.user
+    context = {
+        'admin': admin,
+        'total_doctors': models.Doctor.objects.filter(status=True).count(),
+        'total_patients': models.Patient.objects.filter(status=True).count(),
+        'total_appointments': models.Appointment.objects.filter(status=True).count(),
+        'total_rooms': models.Room.objects.count(),
+        'pending_approvals': {
+            'doctors': models.Doctor.objects.filter(status=False).count(),
+            'patients': models.Patient.objects.filter(status=False).count(),
+            'appointments': models.Appointment.objects.filter(status=False).count(),
+        }
+    }
+    return render(request, "hospital/admin_profile.html", context)
+
+# --------------------------------------------------------------------------- #
+# Doctor Profile
+# --------------------------------------------------------------------------- #
+@login_required(login_url="doctorlogin")
+@user_passes_test(is_doctor)
+def doctor_profile_view(request):
+    doctor = models.Doctor.objects.get(user_id=request.user.id)
+    context = {
+        'doctor': doctor,
+        'total_patients': models.Patient.objects.filter(status=True, assignedDoctorId=request.user.id).count(),
+        'total_appointments': models.Appointment.objects.filter(status=True, doctorId=request.user.id).count(),
+        'total_discharged': models.PatientDischargeDetails.objects.filter(assignedDoctorName=request.user.first_name).count(),
+        'pending_appointments': models.Appointment.objects.filter(status=False, doctorId=request.user.id).count(),
+        'recent_appointments': models.Appointment.objects.filter(
+            status=True,
+            doctorId=request.user.id,
+            appointmentDate__gte=timezone.now().date()
+        ).order_by('appointmentDate', 'appointmentTime')[:5],
+    }
+    return render(request, "hospital/doctor_profile.html", context)
+
+# --------------------------------------------------------------------------- #
+# Patient Profile
+# --------------------------------------------------------------------------- #
+@login_required(login_url="patientlogin")
+@user_passes_test(is_patient)
+def patient_profile_view(request):
+    patient = models.Patient.objects.get(user_id=request.user.id)
+    assigned_doctor = None
+    if patient.assignedDoctorId:
+        try:
+            assigned_doctor = models.Doctor.objects.get(user_id=patient.assignedDoctorId)
+        except models.Doctor.DoesNotExist:
+            pass
+
+    context = {
+        'patient': patient,
+        'doctor': assigned_doctor,
+        'total_appointments': models.Appointment.objects.filter(patientId=request.user.id).count(),
+        'upcoming_appointments': models.Appointment.objects.filter(
+            patientId=request.user.id,
+            appointmentDate__gte=timezone.now().date()
+        ).count(),
+        'recent_appointments': models.Appointment.objects.filter(
+            patientId=request.user.id
+        ).order_by('-appointmentDate', '-appointmentTime')[:5],
+        'discharge_details': models.PatientDischargeDetails.objects.filter(
+            patientId=patient.id
+        ).order_by('-id').first()
+    }
+    return render(request, "hospital/patient_profile.html", context)

@@ -109,8 +109,8 @@
           <div class="text-center py-4">
             <img src="{% static 'images/empty-room.png' %}" alt="Empty Room" class="mb-3" width="120" onerror="this.src='https://placehold.co/120x120/4f46e5/ffffff?text=Empty+Room'">
             <h5 class="text-muted mb-3">Room is Available</h5>
-            <a href="{% url 'admin-assign-room' %}" class="btn btn-primary">
-              <i class="fas fa-user-plus me-2"></i>Assign Patient
+            <a href="{% url 'admin-view-patient' %}" class="btn btn-primary">
+              <i class="fas fa-user-plus me-2"></i>Select Patient to Assign
             </a>
           </div>
           {% endif %}

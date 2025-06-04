@@ -1,0 +1,256 @@
+{% extends 'hospital/doctor_base.html' %}
+{% load static %}
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <h1 class="fw-bold mb-3">Your Profile</h1>
+        <p class="lead mb-0">Manage your account information</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container py-4">
+  <div class="row g-4">
+    <!-- Profile Information -->
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          {% if doctor.profile_pic %}
+            <img src="{{ doctor.profile_pic.url }}" alt="Profile" class="rounded-circle mb-4" width="100" height="100">
+          {% else %}
+            <div class="avatar-placeholder rounded-circle bg-primary-subtle mx-auto mb-4">
+              <i class="fas fa-user-md fa-2x"></i>
+            </div>
+          {% endif %}
+          <h5 class="mb-1">Dr. {{ doctor.get_name }}</h5>
+          <p class="text-muted mb-2">{{ doctor.department }}</p>
+          <div class="d-grid gap-2">
+            <button class="btn btn-outline-primary" disabled>
+              <i class="fas fa-camera me-2"></i>Change Photo
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Account Details -->
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="card-title mb-4">Professional Information</h5>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label text-muted">Username</label>
+              <p class="fw-medium mb-0">{{ doctor.user.username }}</p>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-muted">Email Address</label>
+              <p class="fw-medium mb-0">{{ doctor.user.email }}</p>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-muted">Mobile</label>
+              <p class="fw-medium mb-0">{{ doctor.mobile }}</p>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-muted">Department</label>
+              <p class="fw-medium mb-0">{{ doctor.department }}</p>
+            </div>
+            <div class="col-12">
+              <label class="form-label text-muted">Address</label>
+              <p class="fw-medium mb-0">{{ doctor.address }}</p>
+            </div>
+            <div class="col-12">
+              <label class="form-label text-muted">Joined On</label>
+              <p class="fw-medium mb-0">{{ doctor.user.date_joined|date:"F d, Y" }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title mb-4">Overview</h5>
+          <div class="row g-4">
+            <div class="col-md-3">
+              <div class="stat-card bg-primary-subtle p-4 rounded-3">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="icon-circle bg-primary text-white me-3">
+                    <i class="fas fa-user-injured"></i>
+                  </div>
+                  <h3 class="h5 mb-0">Patients</h3>
+                </div>
+                <h2 class="mb-0">{{ total_patients }}</h2>
+                <div class="small text-muted mt-2">
+                  Under your care
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-3">
+              <div class="stat-card bg-success-subtle p-4 rounded-3">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="icon-circle bg-success text-white me-3">
+                    <i class="fas fa-calendar-check"></i>
+                  </div>
+                  <h3 class="h5 mb-0">Appointments</h3>
+                </div>
+                <h2 class="mb-0">{{ total_appointments }}</h2>
+                <div class="small text-muted mt-2">
+                  {{ pending_appointments }} pending approval
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-3">
+              <div class="stat-card bg-info-subtle p-4 rounded-3">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="icon-circle bg-info text-white me-3">
+                    <i class="fas fa-file-medical"></i>
+                  </div>
+                  <h3 class="h5 mb-0">Discharged</h3>
+                </div>
+                <h2 class="mb-0">{{ total_discharged }}</h2>
+                <div class="small text-muted mt-2">
+                  Total discharged patients
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-3">
+              <div class="stat-card bg-warning-subtle p-4 rounded-3">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="icon-circle bg-warning text-white me-3">
+                    <i class="fas fa-clock"></i>
+                  </div>
+                  <h3 class="h5 mb-0">Upcoming</h3>
+                </div>
+                <h2 class="mb-0">{{ recent_appointments.count }}</h2>
+                <div class="small text-muted mt-2">
+                  Next appointments
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Appointments -->
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title mb-4">Recent Appointments</h5>
+          {% if recent_appointments %}
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="bg-light">
+                <tr>
+                  <th class="px-4 py-3">Patient</th>
+                  <th class="px-4 py-3">Date & Time</th>
+                  <th class="px-4 py-3">Description</th>
+                  <th class="px-4 py-3">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for appointment in recent_appointments %}
+                <tr>
+                  <td class="px-4 py-3">{{ appointment.patientName }}</td>
+                  <td class="px-4 py-3">
+                    <div class="fw-medium">{{ appointment.appointmentDate|date:"M d, Y" }}</div>
+                    <div class="text-muted small">{{ appointment.appointmentTime }}</div>
+                  </td>
+                  <td class="px-4 py-3">
+                    <span class="text-wrap">{{ appointment.description|truncatechars:100 }}</span>
+                  </td>
+                  <td class="px-4 py-3">
+                    <span class="badge {% if appointment.status %}bg-success{% else %}bg-warning{% endif %}">
+                      {% if appointment.status %}Confirmed{% else %}Pending{% endif %}
+                    </span>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <p class="text-muted text-center mb-0">No upcoming appointments</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.page-header {
+  background: linear-gradient(45deg, #4f46e5, #4338ca);
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.avatar-placeholder {
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(79, 70, 229, 0.1);
+  color: #4f46e5;
+}
+
+.icon-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-card {
+  height: 100%;
+  transition: transform 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+}
+
+.bg-primary-subtle {
+  background-color: rgba(79, 70, 229, 0.1);
+}
+
+.bg-success-subtle {
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.bg-info-subtle {
+  background-color: rgba(6, 182, 212, 0.1);
+}
+
+.bg-warning-subtle {
+  background-color: rgba(245, 158, 11, 0.1);
+}
+
+.form-label {
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+
+.text-wrap {
+  white-space: normal;
+  word-wrap: break-word;
+  max-width: 300px;
+}
+</style>
+
+{% endblock content %} 

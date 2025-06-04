@@ -51,6 +51,16 @@
             <li><a class="dropdown-item" href="/admin-approve-appointment"><i class="fas fa-check me-2"></i>Approve Appointment</a></li>
           </ul>
         </li>
+
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle {% if 'room' in request.path %}active{% endif %}" href="#" id="roomDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-bed me-2"></i>Rooms
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="roomDropdown">
+            <li><a class="dropdown-item" href="/admin-rooms"><i class="fas fa-list me-2"></i>View Rooms</a></li>
+            <li><a class="dropdown-item" href="/admin-add-room"><i class="fas fa-plus me-2"></i>Add Room</a></li>
+          </ul>
+        </li>
       </ul>
       
       <ul class="navbar-nav ms-auto">

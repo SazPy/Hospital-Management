@@ -27,7 +27,8 @@ urlpatterns = [
 
     path('afterlogin', views.afterlogin_view, name='afterlogin'),
     path('logout', LogoutView.as_view(template_name='hospital/index.html'), name='logout'),
-
+    
+    path('admin-profile', views.admin_profile_view, name='admin-profile'),
     path('admin-dashboard', views.admin_dashboard_view, name='admin-dashboard'),
 
     # Doctor URLs - using consolidated view
@@ -76,11 +77,18 @@ urlpatterns = [
     path('admin-room/<int:patient_id>/change/', views.admin_room_management, {'action': 'change'}, name='admin-change-room'),
     path('admin-room/<int:patient_id>/discharge/', views.admin_room_management, {'action': 'discharge'}, name='admin-discharge-from-room'),
     path('admin-room/<int:room_id>/details/', views.admin_room_management, {'action': 'details'}, name='admin-room-details'),
+
+    # Doctor URLs - using consolidated view
+    path('doctor-profile', views.doctor_profile_view, name='doctor-profile'),
+    path('doctor-dashboard', views.doctor_dashboard_view, name='doctor-dashboard'),
+
+    # Patient URLs
+    path('patient-profile', views.patient_profile_view, name='patient-profile'),
+    path('patient-dashboard', views.patient_dashboard_view, name='patient-dashboard'),
 ]
 
 # ---------FOR DOCTOR RELATED URLS-------------------------------------
 urlpatterns += [
-    path('doctor-dashboard', views.doctor_dashboard_view, name='doctor-dashboard'),
     path('search', views.doctor_patient_views, {'action': 'search'}, name='search'),
 
     path('doctor-patient', views.doctor_patient_views, name='doctor-patient'),
@@ -99,7 +107,6 @@ urlpatterns += [
 
 # ---------FOR PATIENT RELATED URLS-------------------------------------
 urlpatterns += [
-    path('patient-dashboard', views.patient_dashboard_view, name='patient-dashboard'),
     path('patient-appointment', views.patient_appointment_views, name='patient-appointment'),
     path('patient-book-appointment', views.patient_appointment_views, {'action': 'book'},
          name='patient-book-appointment'),

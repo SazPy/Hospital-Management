@@ -1,0 +1,198 @@
+{% extends 'hospital/admin_base.html' %}
+{% load static %}
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <h1 class="fw-bold mb-3">Your Profile</h1>
+        <p class="lead mb-0">Manage your account information</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container py-4">
+  <div class="row g-4">
+    <!-- Profile Information -->
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          <div class="avatar-placeholder rounded-circle bg-primary-subtle mx-auto mb-4">
+            <i class="fas fa-user-shield fa-2x"></i>
+          </div>
+          <h5 class="mb-1">{{ admin.get_full_name }}</h5>
+          <p class="text-muted mb-4">System Administrator</p>
+          <div class="d-grid">
+            <button class="btn btn-outline-primary" disabled>
+              <i class="fas fa-camera me-2"></i>Change Photo
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Account Details -->
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="card-title mb-4">Account Information</h5>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label text-muted">Username</label>
+              <p class="fw-medium mb-0">{{ admin.username }}</p>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-muted">Email Address</label>
+              <p class="fw-medium mb-0">{{ admin.email }}</p>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-muted">First Name</label>
+              <p class="fw-medium mb-0">{{ admin.first_name }}</p>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-muted">Last Name</label>
+              <p class="fw-medium mb-0">{{ admin.last_name }}</p>
+            </div>
+            <div class="col-12">
+              <label class="form-label text-muted">Date Joined</label>
+              <p class="fw-medium mb-0">{{ admin.date_joined|date:"F d, Y" }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Statistics -->
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title mb-4">System Overview</h5>
+          <div class="row g-4">
+            <div class="col-md-3">
+              <div class="stat-card bg-primary-subtle p-4 rounded-3">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="icon-circle bg-primary text-white me-3">
+                    <i class="fas fa-user-md"></i>
+                  </div>
+                  <h3 class="h5 mb-0">Doctors</h3>
+                </div>
+                <h2 class="mb-0">{{ total_doctors }}</h2>
+                <div class="small text-muted mt-2">
+                  {{ pending_approvals.doctors }} pending approval
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-3">
+              <div class="stat-card bg-success-subtle p-4 rounded-3">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="icon-circle bg-success text-white me-3">
+                    <i class="fas fa-user-injured"></i>
+                  </div>
+                  <h3 class="h5 mb-0">Patients</h3>
+                </div>
+                <h2 class="mb-0">{{ total_patients }}</h2>
+                <div class="small text-muted mt-2">
+                  {{ pending_approvals.patients }} pending approval
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-3">
+              <div class="stat-card bg-info-subtle p-4 rounded-3">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="icon-circle bg-info text-white me-3">
+                    <i class="fas fa-calendar-check"></i>
+                  </div>
+                  <h3 class="h5 mb-0">Appointments</h3>
+                </div>
+                <h2 class="mb-0">{{ total_appointments }}</h2>
+                <div class="small text-muted mt-2">
+                  {{ pending_approvals.appointments }} pending approval
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-3">
+              <div class="stat-card bg-warning-subtle p-4 rounded-3">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="icon-circle bg-warning text-white me-3">
+                    <i class="fas fa-bed"></i>
+                  </div>
+                  <h3 class="h5 mb-0">Rooms</h3>
+                </div>
+                <h2 class="mb-0">{{ total_rooms }}</h2>
+                <div class="small text-muted mt-2">
+                  Total capacity
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.page-header {
+  background: linear-gradient(45deg, #4f46e5, #4338ca);
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.avatar-placeholder {
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(79, 70, 229, 0.1);
+  color: #4f46e5;
+}
+
+.icon-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-card {
+  height: 100%;
+  transition: transform 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+}
+
+.bg-primary-subtle {
+  background-color: rgba(79, 70, 229, 0.1);
+}
+
+.bg-success-subtle {
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.bg-info-subtle {
+  background-color: rgba(6, 182, 212, 0.1);
+}
+
+.bg-warning-subtle {
+  background-color: rgba(245, 158, 11, 0.1);
+}
+
+.form-label {
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+</style>
+
+{% endblock content %} 

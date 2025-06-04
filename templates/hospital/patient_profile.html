@@ -1,0 +1,271 @@
+{% extends 'hospital/patient_base.html' %}
+{% load static %}
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <h1 class="fw-bold mb-3">Your Profile</h1>
+        <p class="lead mb-0">View and manage your medical information</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container py-4">
+  <div class="row g-4">
+    <!-- Profile Information -->
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body text-center">
+          {% if patient.profile_pic %}
+            <img src="{{ patient.profile_pic.url }}" alt="Profile" class="rounded-circle mb-4" width="100" height="100">
+          {% else %}
+            <div class="avatar-placeholder rounded-circle bg-primary-subtle mx-auto mb-4">
+              <i class="fas fa-user fa-2x"></i>
+            </div>
+          {% endif %}
+          <h5 class="mb-1">{{ patient.get_name }}</h5>
+          <p class="text-muted mb-2">Patient ID: {{ patient.id }}</p>
+          <div class="d-grid gap-2">
+            <button class="btn btn-outline-primary" disabled>
+              <i class="fas fa-camera me-2"></i>Change Photo
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Medical Information -->
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="card-title mb-4">Medical Information</h5>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label text-muted">Blood Group</label>
+              <p class="fw-medium mb-0">{{ patient.bloodgroup }}</p>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-muted">Mobile</label>
+              <p class="fw-medium mb-0">{{ patient.mobile }}</p>
+            </div>
+            <div class="col-12">
+              <label class="form-label text-muted">Symptoms</label>
+              <p class="fw-medium mb-0">{{ patient.symptoms }}</p>
+            </div>
+            <div class="col-12">
+              <label class="form-label text-muted">Address</label>
+              <p class="fw-medium mb-0">{{ patient.address }}</p>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label text-muted">Admit Date</label>
+              <p class="fw-medium mb-0">{{ patient.admitDate|date:"F d, Y" }}</p>
+            </div>
+            {% if patient.room %}
+            <div class="col-md-6">
+              <label class="form-label text-muted">Room Number</label>
+              <p class="fw-medium mb-0">{{ patient.room.room_number }}</p>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Assigned Doctor -->
+    {% if doctor %}
+    <div class="col-lg-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title mb-4">Assigned Doctor</h5>
+          <div class="d-flex align-items-center">
+            <div class="avatar-placeholder rounded-circle bg-primary-subtle me-3" style="width: 60px; height: 60px;">
+              <i class="fas fa-user-md"></i>
+            </div>
+            <div>
+              <h6 class="mb-1">Dr. {{ doctor.get_name }}</h6>
+              <p class="text-muted small mb-0">{{ doctor.department }}</p>
+            </div>
+          </div>
+          <hr>
+          <div class="row g-3">
+            <div class="col-12">
+              <label class="form-label text-muted small">Contact</label>
+              <p class="mb-1"><i class="fas fa-phone-alt me-2 text-muted"></i>{{ doctor.mobile }}</p>
+              <p class="mb-0"><i class="fas fa-map-marker-alt me-2 text-muted"></i>{{ doctor.address }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endif %}
+
+    <!-- Statistics -->
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title mb-4">Healthcare Summary</h5>
+          <div class="row g-4">
+            <div class="col-md-4">
+              <div class="stat-card bg-primary-subtle p-4 rounded-3">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="icon-circle bg-primary text-white me-3">
+                    <i class="fas fa-calendar-check"></i>
+                  </div>
+                  <h3 class="h5 mb-0">Total</h3>
+                </div>
+                <h2 class="mb-0">{{ total_appointments }}</h2>
+                <div class="small text-muted mt-2">
+                  All appointments
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-4">
+              <div class="stat-card bg-success-subtle p-4 rounded-3">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="icon-circle bg-success text-white me-3">
+                    <i class="fas fa-clock"></i>
+                  </div>
+                  <h3 class="h5 mb-0">Upcoming</h3>
+                </div>
+                <h2 class="mb-0">{{ upcoming_appointments }}</h2>
+                <div class="small text-muted mt-2">
+                  Scheduled visits
+                </div>
+              </div>
+            </div>
+
+            {% if discharge_details %}
+            <div class="col-md-4">
+              <div class="stat-card bg-info-subtle p-4 rounded-3">
+                <div class="d-flex align-items-center mb-3">
+                  <div class="icon-circle bg-info text-white me-3">
+                    <i class="fas fa-file-medical"></i>
+                  </div>
+                  <h3 class="h5 mb-0">Last Visit</h3>
+                </div>
+                <h2 class="mb-0">{{ discharge_details.daySpent }}</h2>
+                <div class="small text-muted mt-2">
+                  Days in hospital
+                </div>
+              </div>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Appointments -->
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title mb-4">Recent Appointments</h5>
+          {% if recent_appointments %}
+          <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+              <thead class="bg-light">
+                <tr>
+                  <th class="px-4 py-3">Doctor</th>
+                  <th class="px-4 py-3">Date & Time</th>
+                  <th class="px-4 py-3">Description</th>
+                  <th class="px-4 py-3">Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for appointment in recent_appointments %}
+                <tr>
+                  <td class="px-4 py-3">
+                    <div class="fw-medium">Dr. {{ appointment.doctorName }}</div>
+                  </td>
+                  <td class="px-4 py-3">
+                    <div class="fw-medium">{{ appointment.appointmentDate|date:"M d, Y" }}</div>
+                    <div class="text-muted small">{{ appointment.appointmentTime }}</div>
+                  </td>
+                  <td class="px-4 py-3">
+                    <span class="text-wrap">{{ appointment.description|truncatechars:100 }}</span>
+                  </td>
+                  <td class="px-4 py-3">
+                    <span class="badge {% if appointment.status %}bg-success{% else %}bg-warning{% endif %}">
+                      {% if appointment.status %}Confirmed{% else %}Pending{% endif %}
+                    </span>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <p class="text-muted text-center mb-0">No recent appointments</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.page-header {
+  background: linear-gradient(45deg, #4f46e5, #4338ca);
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.avatar-placeholder {
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(79, 70, 229, 0.1);
+  color: #4f46e5;
+}
+
+.icon-circle {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-card {
+  height: 100%;
+  transition: transform 0.2s;
+}
+
+.stat-card:hover {
+  transform: translateY(-5px);
+}
+
+.bg-primary-subtle {
+  background-color: rgba(79, 70, 229, 0.1);
+}
+
+.bg-success-subtle {
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.bg-info-subtle {
+  background-color: rgba(6, 182, 212, 0.1);
+}
+
+.form-label {
+  font-size: 0.875rem;
+  margin-bottom: 0.25rem;
+}
+
+.text-wrap {
+  white-space: normal;
+  word-wrap: break-word;
+  max-width: 300px;
+}
+</style>
+
+{% endblock content %} 

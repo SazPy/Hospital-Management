@@ -40,54 +40,68 @@
                   {% render_field userForm.username class="form-control" placeholder="Choose a username" %}
                 </div>
                 <div class="col-md-6">
+                  <label class="form-label">Email</label>
+                  {% render_field userForm.email class="form-control" placeholder="Enter email address" %}
+                </div>
+                <div class="col-md-6">
                   <label class="form-label">Password</label>
-                  {% render_field userForm.password class="form-control" placeholder="Create a password" type="password" %}
+                  {% render_field userForm.password1 class="form-control" placeholder="Create a password" type="password" %}
+                  {% if userForm.password1.help_text %}
+                  <small class="form-text text-muted">{{ userForm.password1.help_text|safe }}</small>
+                  {% endif %}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Confirm Password</label>
+                  {% render_field userForm.password2 class="form-control" placeholder="Confirm password" type="password" %}
+                  {% if userForm.password2.help_text %}
+                  <small class="form-text text-muted">{{ userForm.password2.help_text|safe }}</small>
+                  {% endif %}
                 </div>
               </div>
             </div>
             
-            <!-- Contact Information -->
+            <!-- Professional Information -->
             <div class="mb-5">
-              <h5 class="mb-4">Contact Information</h5>
+              <h5 class="mb-4">Professional Information</h5>
               <div class="row g-4">
+                <div class="col-md-6">
+                  <label class="form-label">Department</label>
+                  {% render_field doctorForm.department class="form-control" %}
+                </div>
                 <div class="col-md-6">
                   <label class="form-label">Mobile</label>
                   {% render_field doctorForm.mobile class="form-control" placeholder="Enter mobile number" %}
                 </div>
-                <div class="col-md-6">
-                  <label class="form-label">Department</label>
-                  {% render_field doctorForm.department class="form-select" %}
-                </div>
                 <div class="col-12">
                   <label class="form-label">Address</label>
-                  {% render_field doctorForm.address class="form-control" placeholder="Enter full address" rows="3" %}
+                  {% render_field doctorForm.address class="form-control" placeholder="Enter address" %}
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Profile Picture</label>
+                  {% render_field doctorForm.profile_pic class="form-control" %}
                 </div>
               </div>
             </div>
-            
-            <!-- Profile Picture -->
-            <div class="mb-5">
-              <h5 class="mb-4">Profile Picture</h5>
-              <div class="d-flex align-items-center">
-                <div class="avatar-preview bg-light rounded-circle me-4" style="width: 100px; height: 100px;">
-                  <img id="preview" src="#" alt="Preview" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 50%;">
-                  <div id="placeholder" class="d-flex align-items-center justify-content-center h-100">
-                    <i class="fas fa-user-md text-muted" style="font-size: 2rem;"></i>
-                  </div>
-                </div>
-                <div>
-                  <label class="btn btn-outline-primary mb-0">
-                    <i class="fas fa-upload me-2"></i>Upload Photo
-                    {% render_field doctorForm.profile_pic class="d-none" id="profile_pic" accept="image/*" %}
-                  </label>
-                  <div class="text-muted small mt-2">Recommended: Square image, at least 300x300px</div>
-                </div>
-              </div>
+
+            <!-- Form Errors -->
+            {% if userForm.errors or doctorForm.errors %}
+            <div class="alert alert-danger">
+              {% for field in userForm %}
+                {% for error in field.errors %}
+                  <div>{{ field.label }}: {{ error }}</div>
+                {% endfor %}
+              {% endfor %}
+              {% for field in doctorForm %}
+                {% for error in field.errors %}
+                  <div>{{ field.label }}: {{ error }}</div>
+                {% endfor %}
+              {% endfor %}
             </div>
-            
+            {% endif %}
+
             <!-- Submit Button -->
-            <div class="text-end">
-              <button type="submit" class="btn btn-primary px-4 py-2">
+            <div class="text-center">
+              <button type="submit" class="btn btn-primary btn-lg px-5">
                 <i class="fas fa-user-plus me-2"></i>Add Doctor
               </button>
             </div>
@@ -108,26 +122,38 @@
 
 .form-label {
   font-weight: 500;
-  color: #4b5563;
+  color: #374151;
   margin-bottom: 0.5rem;
 }
 
-.form-control,
-.form-select {
+.form-control {
   border-radius: 0.5rem;
-  padding: 0.75rem 1rem;
-  border: 1px solid #e5e7eb;
+  border: 1px solid #d1d5db;
+  padding: 0.625rem 1rem;
 }
 
-.form-control:focus,
-.form-select:focus {
+.form-control:focus {
   border-color: #4f46e5;
-  box-shadow: 0 0 0 0.25rem rgba(79, 70, 229, 0.25);
+  box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.1);
+}
+
+.form-text {
+  color: #6b7280;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.alert-danger {
+  border-radius: 0.5rem;
+  background-color: #fee2e2;
+  border: none;
+  color: #991b1b;
 }
 
 .btn-primary {
   background-color: #4f46e5;
   border-color: #4f46e5;
+  font-weight: 500;
 }
 
 .btn-primary:hover {
@@ -135,39 +161,9 @@
   border-color: #4338ca;
 }
 
-.btn-outline-primary {
-  color: #4f46e5;
-  border-color: #4f46e5;
-}
-
-.btn-outline-primary:hover {
-  background-color: #4f46e5;
-  border-color: #4f46e5;
-  color: white;
-}
-
-.avatar-preview {
-  border: 2px dashed #e5e7eb;
+.card {
+  border-radius: 1rem;
 }
 </style>
-
-<script>
-// Preview uploaded image
-document.getElementById('profile_pic').addEventListener('change', function(e) {
-  const preview = document.getElementById('preview');
-  const placeholder = document.getElementById('placeholder');
-  const file = e.target.files[0];
-  
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      preview.src = e.target.result;
-      preview.style.display = 'block';
-      placeholder.style.display = 'none';
-    }
-    reader.readAsDataURL(file);
-  }
-});
-</script>
 
 {% endblock content %}
