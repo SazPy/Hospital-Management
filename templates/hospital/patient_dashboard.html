@@ -140,9 +140,9 @@
           <div class="text-center py-4">
             <img src="{% static 'images/no-appointments.png' %}" alt="No Appointments" class="mb-3" width="120" onerror="this.src='https://placehold.co/120x120/4f46e5/ffffff?text=No+Appointments'">
             <h6 class="text-muted">No upcoming appointments</h6>
-            <button class="btn btn-primary mt-3" data-bs-toggle="modal" data-bs-target="#appointmentModal">
+            <a href="{% url 'patient-book-appointment' %}" class="btn btn-primary mt-3">
               Book Your First Appointment
-            </button>
+            </a>
           </div>
           {% endif %}
         </div>

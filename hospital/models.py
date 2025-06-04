@@ -70,6 +70,9 @@ class Appointment(BaseModel):  # Changed from models.Model to BaseModel
     appointmentTime = models.TimeField(null=True)
     description = models.TextField(max_length=500)
     status = models.BooleanField(default=False)  # False for pending, True for approved
+    room = models.ForeignKey('Room', on_delete=models.SET_NULL, null=True, blank=True)  # For office visits
+    is_admission = models.BooleanField(default=False)  # To distinguish between regular appointments and stays
+    admission_days = models.IntegerField(default=0)  # For tracking length of stay
     
     class Meta:
         ordering = ['-appointmentDate', '-appointmentTime']
@@ -80,6 +83,9 @@ class Appointment(BaseModel):  # Changed from models.Model to BaseModel
         if not self.doctorName and self.doctor:
             self.doctorName = self.doctor.get_name
         super().save(*args, **kwargs)
+
+    def __str__(self):
+        return f"{self.patientName} - Dr. {self.doctorName} on {self.appointmentDate}"
 
 
 class PatientDischargeDetails(BaseModel):  # Changed from models.Model to BaseModel
@@ -99,24 +105,47 @@ class PatientDischargeDetails(BaseModel):  # Changed from models.Model to BaseMo
     total = models.PositiveIntegerField(null=False)
 
 
-class Room(BaseModel):  # Changed from models.Model to BaseModel
+class Room(models.Model):
     ROOM_TYPES = [
-        ('General', 'General Ward'),
-        ('Private', 'Private Room'),
-        ('ICU', 'Intensive Care Unit'),
-        ('CCU', 'Cardiac Care Unit'),
-        ('Pediatric', 'Pediatric Ward'),
+        ('WARD', 'Ward'),
+        ('PRIVATE', 'Private Room'),
+        ('ICU', 'ICU'),
+        ('OFFICE', 'Doctor Office'),
     ]
-
+    
     room_number = models.CharField(max_length=10, unique=True)
-    room_type = models.CharField(max_length=20, choices=ROOM_TYPES, default='General')
-    capacity = models.PositiveIntegerField(default=1)
+    room_type = models.CharField(max_length=10, choices=ROOM_TYPES)
+    capacity = models.IntegerField(default=1)
     is_occupied = models.BooleanField(default=False)
-    current_patient = models.PositiveIntegerField(null=True, blank=True)
-    floor = models.PositiveIntegerField(default=1)
-    wing = models.CharField(max_length=10, blank=True, null=True)
-    maintenance_required = models.BooleanField(default=False)
+    current_patient = models.IntegerField(null=True, blank=True)  # Patient ID if occupied
+    assigned_doctor = models.ForeignKey('Doctor', on_delete=models.SET_NULL, null=True, blank=True)  # For offices
+    description = models.TextField(blank=True)
+    floor = models.CharField(max_length=10, default='1st')
 
     def __str__(self):
-        status = "Occupied" if self.is_occupied else "Available"
-        return f"Room {self.room_number} ({self.room_type}) - {status}"
+        return f"{self.get_room_type_display()} - {self.room_number}"
+
+    class Meta:
+        ordering = ['room_number']
+
+class RoomRequest(models.Model):
+    STATUS_CHOICES = [
+        ('PENDING', 'Pending'),
+        ('APPROVED', 'Approved'),
+        ('DENIED', 'Denied'),
+    ]
+    
+    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+    appointment = models.ForeignKey(Appointment, on_delete=models.CASCADE, related_name='room_requests', null=True, blank=True)
+    requested_room = models.ForeignKey(Room, on_delete=models.CASCADE, related_name='requested_room')
+    assigned_room = models.ForeignKey(Room, on_delete=models.CASCADE, null=True, blank=True, related_name='assigned_room')
+    reason = models.TextField()
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='PENDING')
+    request_date = models.DateTimeField(auto_now_add=True)
+    response_date = models.DateTimeField(null=True, blank=True)
+    response_note = models.TextField(blank=True)
+    expected_duration = models.PositiveIntegerField(help_text='Expected stay duration in days', default=1)
+    
+    def __str__(self):
+        return f"Room request for {self.patient} by Dr. {self.doctor}"

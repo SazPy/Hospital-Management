@@ -1,0 +1,185 @@
+[data-theme="dark"] {
+    /* Base colors */
+    --bg-primary: #1a1a1a;
+    --bg-secondary: #2d2d2d;
+    --text-primary: #ffffff;
+    --text-secondary: #e0e0e0;
+    --border-color: #404040;
+
+    /* Component colors */
+    --card-bg: #2d2d2d;
+    --input-bg: #333333;
+    --input-text: #ffffff;
+    --link-color: #66b3ff;
+    --header-bg: #242424;
+
+    /* Status colors */
+    --success-color: #2eb85c;
+    --danger-color: #e55353;
+    --warning-color: #f9b115;
+    --info-color: #3399ff;
+
+    /* Table colors */
+    --table-header-bg: #333333;
+    --table-stripe-bg: #2a2a2a;
+    --table-hover-bg: #383838;
+
+    /* Shadows */
+    --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Global dark theme styles */
+[data-theme="dark"] {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] body {
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .bg-white,
+[data-theme="dark"] .bg-light {
+    background-color: var(--bg-secondary) !important;
+}
+
+/* Login and role pages */
+[data-theme="dark"] .login-container,
+[data-theme="dark"] .role-section {
+    background: linear-gradient(45deg, rgba(79, 70, 229, 0.03), rgba(67, 56, 202, 0.03));
+}
+
+[data-theme="dark"] .login-card,
+[data-theme="dark"] .role-card {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .login-header {
+    background: linear-gradient(45deg, #4338ca, #312e81);
+}
+
+/* Buttons */
+[data-theme="dark"] .btn-primary {
+    background-color: var(--link-color);
+    border-color: var(--link-color);
+}
+
+[data-theme="dark"] .btn-primary:hover {
+    background-color: #5a9eff;
+    border-color: #5a9eff;
+}
+
+[data-theme="dark"] .btn-outline-primary {
+    color: var(--link-color);
+    border-color: var(--link-color);
+}
+
+[data-theme="dark"] .btn-outline-primary:hover {
+    background-color: var(--link-color);
+    border-color: var(--link-color);
+    color: var(--bg-primary);
+}
+
+/* Navigation */
+[data-theme="dark"] .navbar {
+    background-color: var(--header-bg) !important;
+}
+
+[data-theme="dark"] .navbar-brand,
+[data-theme="dark"] .nav-link {
+    color: var(--text-primary) !important;
+}
+
+[data-theme="dark"] .nav-link:hover {
+    color: var(--link-color) !important;
+}
+
+/* Forms */
+[data-theme="dark"] .form-control {
+    background-color: var(--input-bg);
+    border-color: var(--border-color);
+    color: var(--input-text);
+}
+
+[data-theme="dark"] .form-control:focus {
+    border-color: var(--link-color);
+    box-shadow: 0 0 0 0.25rem rgba(102, 179, 255, 0.25);
+}
+
+/* Tables */
+[data-theme="dark"] .table {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .table thead th {
+    background-color: var(--table-header-bg);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .table-striped tbody tr:nth-of-type(odd) {
+    background-color: var(--table-stripe-bg);
+}
+
+[data-theme="dark"] .table-hover tbody tr:hover {
+    background-color: var(--table-hover-bg);
+}
+
+/* Modals and Cards */
+[data-theme="dark"] .modal-content {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .card {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .list-group-item {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+    color: var(--text-primary);
+}
+
+/* Text and Misc */
+[data-theme="dark"] .text-muted {
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] hr {
+    border-color: var(--border-color);
+}
+
+/* Theme toggle button */
+.theme-toggle {
+    background: none;
+    border: none;
+    padding: 0.5rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    color: inherit;
+}
+
+.theme-toggle i {
+    font-size: 1.2rem;
+    margin-right: 0.5rem;
+}
+
+[data-theme="dark"] .theme-toggle .fa-sun {
+    display: inline-block;
+}
+
+[data-theme="dark"] .theme-toggle .fa-moon {
+    display: none;
+}
+
+.theme-toggle .fa-sun {
+    display: none;
+}
+
+.theme-toggle .fa-moon {
+    display: inline-block;
+} 

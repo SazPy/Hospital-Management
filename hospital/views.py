@@ -187,10 +187,18 @@ def afterlogin_view(request):
 @login_required(login_url="adminlogin")
 @user_passes_test(is_admin)
 def admin_dashboard_view(request):
+    if not request.user.is_authenticated:
+        return redirect('adminlogin')
+    if not is_admin(request.user):
+        return redirect('admin-dashboard')
+        
     # Get appointments from the last 7 days and upcoming
     recent_appointments = models.Appointment.objects.filter(
         appointmentDate__gte=timezone.now().date() - timedelta(days=7)
     ).order_by('-appointmentDate', '-appointmentTime')[:5]
+
+    # Get pending room requests
+    pending_room_requests = models.RoomRequest.objects.filter(status='PENDING')
 
     stats = {
         "doctors": models.Doctor.objects.all().order_by("-id"),
@@ -205,6 +213,8 @@ def admin_dashboard_view(request):
         "roomcount": models.Room.objects.count(),
         "availableroomcount": models.Room.objects.filter(is_occupied=False).count(),
         "appointments": recent_appointments,
+        "room_requests": pending_room_requests,
+        "pending_room_requests": pending_room_requests.count(),
     }
     return render(request, "hospital/admin_dashboard.html", stats)
 
@@ -474,29 +484,58 @@ def admin_appointment_views(request, action=None, pk=None):
 # --------------------------------------------------------------------------- #
 # Room management (admin)
 # --------------------------------------------------------------------------- #
-@login_required(login_url="adminlogin")
+@login_required(login_url='adminlogin')
+@user_passes_test(is_admin)
+def admin_rooms_view(request):
+    if not request.user.is_authenticated:
+        return redirect('adminlogin')
+    if not is_admin(request.user):
+        return redirect('home')
+        
+    rooms = models.Room.objects.all().order_by('room_number')
+    
+    # Count rooms by type
+    room_counts = {
+        'ward_count': rooms.filter(room_type='WARD').count(),
+        'private_count': rooms.filter(room_type='PRIVATE').count(),
+        'icu_count': rooms.filter(room_type='ICU').count(),
+        'office_count': rooms.filter(room_type='OFFICE').count(),
+    }
+    
+    # Get room requests
+    room_requests = models.RoomRequest.objects.filter(status='PENDING')\
+        .select_related('doctor', 'patient', 'requested_room')\
+        .order_by('-request_date')[:5]
+    
+    context = {
+        'rooms': rooms,
+        'available_count': rooms.filter(is_occupied=False).count(),
+        'occupied_count': rooms.filter(is_occupied=True).count(),
+        'room_requests': room_requests,
+        **room_counts
+    }
+    return render(request, 'hospital/admin_rooms.html', context)
+
+@login_required(login_url='adminlogin')
+@user_passes_test(is_admin)
+def admin_add_room_view(request):
+    if request.method == 'POST':
+        form = forms.RoomForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Room added successfully!')
+            return redirect('admin-rooms')
+    else:
+        form = forms.RoomForm()
+    return render(request, 'hospital/admin_add_room.html', {'form': form})
+
+@login_required(login_url='adminlogin')
 @user_passes_test(is_admin)
 def admin_room_management(request, action=None, room_id=None, patient_id=None):
-    if action == "view":
-        rooms = models.Room.objects.all().order_by("room_number")
-        available_count = rooms.filter(is_occupied=False).count()
-        occupied_count = rooms.filter(is_occupied=True).count()
-        return render(request, "hospital/admin_rooms.html", {
-            "rooms": rooms,
-            "available_count": available_count,
-            "occupied_count": occupied_count
-        })
-
-    if action == "add":
-        if request.method == "POST":
-            models.Room.objects.create(
-                room_number=request.POST.get("room_number"),
-                room_type=request.POST.get("room_type"),
-                capacity=request.POST.get("capacity"),
-                is_occupied=False,
-            )
-            return redirect("admin-rooms")
-        return render(request, "hospital/admin_add_room.html")
+    if not request.user.is_authenticated:
+        return redirect('adminlogin')
+    if not is_admin(request.user):
+        return redirect('home')
 
     if action == "assign":
         pat = get_object_or_404(models.Patient, id=patient_id)
@@ -543,9 +582,78 @@ def admin_room_management(request, action=None, room_id=None, patient_id=None):
             pat.room = None; pat.save()
         return redirect("admin-view-patient")
 
-    # default
-    rooms = models.Room.objects.all().order_by("room_number")
-    return render(request, "hospital/admin_rooms.html", {"rooms": rooms})
+    # If no action is specified or action is not recognized, show rooms list
+    return render(request, 'hospital/admin_rooms.html', {
+        'rooms': models.Room.objects.all().order_by('room_number'),
+        'available_count': models.Room.objects.filter(is_occupied=False).count(),
+        'occupied_count': models.Room.objects.filter(is_occupied=True).count(),
+        'room_requests': models.RoomRequest.objects.filter(status='PENDING').order_by('-request_date')[:5],
+        'ward_count': models.Room.objects.filter(room_type='WARD').count(),
+        'private_count': models.Room.objects.filter(room_type='PRIVATE').count(),
+        'icu_count': models.Room.objects.filter(room_type='ICU').count(),
+        'office_count': models.Room.objects.filter(room_type='OFFICE').count(),
+    })
+
+@login_required(login_url='adminlogin')
+@user_passes_test(is_admin)
+def admin_room_requests_view(request):
+    # Get all room requests ordered by date
+    requests = models.RoomRequest.objects.all().order_by('-request_date')
+    return render(request, 'hospital/admin_room_requests.html', {'requests': requests})
+
+@login_required(login_url='adminlogin')
+@user_passes_test(is_admin)
+def admin_approve_room_request(request, pk):
+    room_request = get_object_or_404(models.RoomRequest, id=pk)
+    
+    # Check available rooms
+    available_rooms = models.Room.objects.filter(
+        room_type=room_request.requested_room.room_type,
+        is_occupied=False
+    )
+    
+    if not available_rooms.exists():
+        messages.error(request, f'No available {room_request.requested_room.get_room_type_display()} rooms. Please add more rooms or wait for one to become available.')
+        return redirect('admin-room-requests')
+    
+    if request.method == 'POST':
+        form = forms.RoomAssignmentForm(request.POST, instance=room_request)
+        if form.is_valid():
+            room_request = form.save(commit=False)
+            room_request.status = 'APPROVED'
+            room_request.response_date = timezone.now()
+            room_request.save()
+            
+            # Update room status
+            assigned_room = room_request.assigned_room
+            assigned_room.is_occupied = True
+            assigned_room.current_patient = room_request.patient.id
+            assigned_room.save()
+            
+            messages.success(request, f'Room request approved. {assigned_room.room_number} has been assigned to {room_request.patient.get_name}.')
+            return redirect('admin-room-requests')
+    else:
+        form = forms.RoomAssignmentForm(instance=room_request)
+    
+    context = {
+        'request': room_request,
+        'form': form,
+        'available_rooms': available_rooms,
+    }
+    return render(request, 'hospital/admin_approve_room_request.html', context)
+
+@login_required(login_url='adminlogin')
+@user_passes_test(is_admin)
+def admin_deny_room_request(request, pk):
+    room_request = get_object_or_404(models.RoomRequest, id=pk)
+    if request.method == 'POST':
+        room_request.status = 'DENIED'
+        room_request.response_date = timezone.now()
+        room_request.response_note = request.POST.get('reason', '')
+        room_request.save()
+        messages.success(request, 'Room request has been denied.')
+        return redirect('admin-room-requests')
+    return render(request, 'hospital/admin_deny_room_request.html', {'request': room_request})
 
 # --------------------------------------------------------------------------- #
 # DOCTOR SECTION
@@ -554,22 +662,62 @@ def admin_room_management(request, action=None, room_id=None, patient_id=None):
 @user_passes_test(is_doctor)
 def doctor_dashboard_view(request):
     doc = models.Doctor.objects.get(user_id=request.user.id)
-    pat_cnt = models.Patient.objects.filter(status=True,
-                                          assignedDoctorId=request.user.id).count()
-    app_cnt = models.Appointment.objects.filter(status=True,
-                                              doctor=doc).count()
-    dis_cnt = models.PatientDischargeDetails.objects.filter(
-        assignedDoctorName=request.user.first_name).distinct().count()
-    apps = models.Appointment.objects.filter(status=True,
-                                           doctor=doc).order_by("-id")
-    pats = models.Patient.objects.filter(status=True,
-                                       id__in=apps.values_list("patient", flat=True))
+    
+    # Get today's date for filtering
+    today = timezone.now().date()
+    
+    # Get all appointments for this doctor with room requests
+    appointments = models.Appointment.objects.filter(
+        doctor=doc
+    ).prefetch_related(
+        'room_requests'
+    ).select_related('patient', 'room')
+    
+    # Get pending room requests
+    pending_room_requests = models.RoomRequest.objects.filter(
+        doctor=doc,
+        status='PENDING'
+    ).order_by('-request_date')[:5]
+    
+    # Calculate statistics
+    appointments_today = appointments.filter(
+        appointmentDate=today,
+        status=True
+    ).count()
+    
+    total_patients = models.Patient.objects.filter(
+        status=True,
+        assignedDoctorId=request.user.id
+    ).count()
+    
+    pending_appointments = appointments.filter(
+        status=False
+    ).count()
+    
+    discharge_patients = models.PatientDischargeDetails.objects.filter(
+        assignedDoctorName=request.user.first_name
+    ).count()
+    
+    # Get recent appointments with patients
+    recent_appointments = appointments.filter(
+        status=True
+    ).order_by('-appointmentDate', '-appointmentTime')[:5]
+    
+    # Get recent patients
+    recent_patients = models.Patient.objects.filter(
+        status=True,
+        assignedDoctorId=request.user.id
+    ).order_by('-admitDate')[:5]
+    
     return render(request, "hospital/doctor_dashboard.html", {
-        "patientcount": pat_cnt,
-        "appointmentcount": app_cnt,
-        "patientdischarged": dis_cnt,
-        "appointments": zip(apps, pats),
+        "appointments_today": appointments_today,
+        "total_patients": total_patients,
+        "pending_appointments": pending_appointments,
+        "discharge_patients": discharge_patients,
+        "appointments": recent_appointments,
+        "recent_patients": recent_patients,
         "doctor": doc,
+        "pending_room_requests": pending_room_requests,
     })
 
 
@@ -649,6 +797,61 @@ def doctor_appointment_views(request, action=None, pk=None):
 
     return render(request, "hospital/doctor_appointment.html", {"doctor": doc})
 
+@login_required(login_url='doctorlogin')
+@user_passes_test(is_doctor)
+def doctor_request_room(request):
+    if request.method == 'POST':
+        try:
+            # Get form data
+            appointment_id = request.POST.get('appointment_id')
+            room_type = request.POST.get('room_type')
+            reason = request.POST.get('reason')
+            duration = int(request.POST.get('duration', 1))
+            
+            # Get doctor and appointment
+            doctor = models.Doctor.objects.get(user_id=request.user.id)
+            appointment = get_object_or_404(models.Appointment, id=appointment_id)
+            
+            # Find any room of the requested type
+            room = models.Room.objects.filter(room_type=room_type).first()
+            if not room:
+                messages.error(request, f'No {room_type} rooms exist in the system. Please contact admin.')
+                return redirect('doctor-dashboard')
+            
+            # Create the room request
+            room_request = models.RoomRequest.objects.create(
+                doctor=doctor,
+                patient=appointment.patient,
+                appointment=appointment,  # Set the appointment
+                requested_room=room,
+                reason=reason,
+                expected_duration=duration
+            )
+            
+            messages.success(request, 'Room request has been submitted successfully.')
+            return redirect('doctor-dashboard')
+            
+        except Exception as e:
+            messages.error(request, f'Error creating room request: {str(e)}')
+            return redirect('doctor-dashboard')
+            
+    return redirect('doctor-dashboard')
+
+@login_required(login_url='doctorlogin')
+@user_passes_test(is_doctor)
+def doctor_room_requests_view(request):
+    doctor = models.Doctor.objects.get(user_id=request.user.id)
+    room_requests = models.RoomRequest.objects.filter(doctor=doctor).order_by('-request_date')
+    
+    context = {
+        'doctor': doctor,
+        'room_requests': room_requests,
+        'pending_count': room_requests.filter(status='PENDING').count(),
+        'approved_count': room_requests.filter(status='APPROVED').count(),
+        'denied_count': room_requests.filter(status='DENIED').count(),
+    }
+    return render(request, 'hospital/doctor_room_requests.html', context)
+
 # --------------------------------------------------------------------------- #
 # PATIENT SECTION
 # --------------------------------------------------------------------------- #
@@ -663,6 +866,9 @@ def patient_dashboard_view(request):
         appointmentDate__gte=date.today()
     ).order_by('appointmentDate', 'appointmentTime')
     
+    # Calculate days since admission
+    admission_days = (date.today() - pat.admitDate).days
+    
     # Handle case where patient has no assigned doctor
     if not pat.assignedDoctorId:
         messages.warning(request, "You don't have an assigned doctor yet. Please contact the admin.")
@@ -676,7 +882,9 @@ def patient_dashboard_view(request):
             "admitDate": pat.admitDate,
             "appointments": appointments,
             "upcoming_appointments": appointments.count(),
-            "total_prescriptions": 0  # Add prescription count when feature is implemented
+            "total_prescriptions": 0,  # Add prescription count when feature is implemented
+            "assigned_doctor": "Not Assigned",
+            "admission_days": admission_days
         })
     
     try:
@@ -691,7 +899,9 @@ def patient_dashboard_view(request):
             "admitDate": pat.admitDate,
             "appointments": appointments,
             "upcoming_appointments": appointments.count(),
-            "total_prescriptions": 0  # Add prescription count when feature is implemented
+            "total_prescriptions": 0,  # Add prescription count when feature is implemented
+            "assigned_doctor": f"Dr. {doc.get_name}",
+            "admission_days": admission_days
         })
     except models.Doctor.DoesNotExist:
         messages.error(request, "Assigned doctor not found. Please contact the admin.")
@@ -705,7 +915,9 @@ def patient_dashboard_view(request):
             "admitDate": pat.admitDate,
             "appointments": appointments,
             "upcoming_appointments": appointments.count(),
-            "total_prescriptions": 0  # Add prescription count when feature is implemented
+            "total_prescriptions": 0,  # Add prescription count when feature is implemented
+            "assigned_doctor": "Not Found",
+            "admission_days": admission_days
         })
 
 
@@ -788,7 +1000,18 @@ def patient_appointment_views(request, action=None):
             ctx = {"is_discharged": False, "patient": pat, "patientId": pat.id}
         return render(request, "hospital/patient_discharge.html", ctx)
 
-    return render(request, "hospital/patient_appointment.html", {"patient": pat})
+    # Default view - patient_appointment.html
+    context = {
+        'patient': pat,
+        'upcoming_appointments': models.Appointment.objects.filter(
+            patient=pat,
+            appointmentDate__gte=timezone.now().date(),
+            status=True
+        ).count(),
+        'available_doctors': models.Doctor.objects.filter(status=True).count(),
+        'emergency_contact': getattr(settings, 'HOSPITAL_EMERGENCY_CONTACT', '911'),
+    }
+    return render(request, "hospital/patient_appointment.html", context)
 
 # --------------------------------------------------------------------------- #
 # Misc static pages
@@ -869,12 +1092,12 @@ def doctor_profile_view(request):
     context = {
         'doctor': doctor,
         'total_patients': models.Patient.objects.filter(status=True, assignedDoctorId=request.user.id).count(),
-        'total_appointments': models.Appointment.objects.filter(status=True, doctorId=request.user.id).count(),
+        'total_appointments': models.Appointment.objects.filter(status=True, doctor=doctor).count(),
         'total_discharged': models.PatientDischargeDetails.objects.filter(assignedDoctorName=request.user.first_name).count(),
-        'pending_appointments': models.Appointment.objects.filter(status=False, doctorId=request.user.id).count(),
+        'pending_appointments': models.Appointment.objects.filter(status=False, doctor=doctor).count(),
         'recent_appointments': models.Appointment.objects.filter(
             status=True,
-            doctorId=request.user.id,
+            doctor=doctor,
             appointmentDate__gte=timezone.now().date()
         ).order_by('appointmentDate', 'appointmentTime')[:5],
     }

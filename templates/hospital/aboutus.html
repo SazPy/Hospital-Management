@@ -155,5 +155,42 @@
 .text-primary {
     color: #4f46e5 !important;
 }
+
+/* Dark Theme Styles */
+[data-theme="dark"] .bg-light {
+    background-color: var(--bg-secondary) !important;
+}
+
+[data-theme="dark"] .card {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .text-muted {
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4 {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .bg-primary-subtle {
+    background-color: rgba(79, 70, 229, 0.2);
+}
+
+[data-theme="dark"] .feature-icon i {
+    color: var(--link-color) !important;
+}
+
+[data-theme="dark"] .list-unstyled li {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .fas.fa-check-circle {
+    color: var(--link-color) !important;
+}
 </style>
 {% endblock content %}

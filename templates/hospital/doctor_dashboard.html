@@ -13,9 +13,9 @@
         <p class="lead mb-0">Here's an overview of your appointments and patients</p>
       </div>
       <div class="col-lg-6 text-lg-end">
-        <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#scheduleModal">
+        <a href="{% url 'doctor-appointment' %}" class="btn btn-light">
           <i class="fas fa-calendar-plus me-2"></i>Schedule Appointment
-        </button>
+        </a>
       </div>
     </div>
   </div>
@@ -61,25 +61,25 @@
       <div class="card">
         <div class="card-body">
           <div class="stat-icon">
-            <i class="fas fa-file-medical"></i>
+            <i class="fas fa-door-open"></i>
           </div>
-          <h3 class="fw-bold mb-1">{{ discharge_patients }}</h3>
-          <p class="text-muted mb-0">Discharged Patients</p>
+          <h3 class="fw-bold mb-1">{{ pending_room_requests }}</h3>
+          <p class="text-muted mb-0">Room Requests</p>
         </div>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Appointments and Patients -->
+<!-- Main Content -->
 <div class="container">
   <div class="row g-4">
-    <!-- Today's Appointments -->
+    <!-- Appointments -->
     <div class="col-lg-8">
       <div class="card">
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center mb-4">
-            <h5 class="card-title mb-0">Today's Appointments</h5>
+            <h5 class="card-title mb-0">Recent Appointments</h5>
             <a href="{% url 'doctor-view-appointment' %}" class="btn btn-outline-primary btn-sm">View All</a>
           </div>
           {% if appointments %}
@@ -87,8 +87,9 @@
             <table class="table table-hover">
               <thead>
                 <tr>
-                  <th>Time</th>
+                  <th>Date & Time</th>
                   <th>Patient</th>
+                  <th>Room</th>
                   <th>Status</th>
                   <th>Actions</th>
                 </tr>
@@ -98,13 +99,16 @@
                 <tr>
                   <td>
                     <div class="d-flex align-items-center">
-                      <i class="fas fa-clock text-primary me-2"></i>
-                      {{ appointment.appointmentTime }}
+                      <i class="fas fa-calendar text-primary me-2"></i>
+                      <div>
+                        <div class="fw-medium">{{ appointment.appointmentDate }}</div>
+                        <div class="text-muted small">{{ appointment.appointmentTime }}</div>
+                      </div>
                     </div>
                   </td>
                   <td>
                     <div class="d-flex align-items-center">
-                      <img src="{% static 'images/patient.jpg' %}" alt="Patient" class="rounded-circle me-2" width="32" height="32">
+                      <img src="{% static 'images/patient.png' %}" alt="Patient" class="rounded-circle me-2" width="32" height="32">
                       <div>
                         <div class="fw-medium">{{ appointment.patientName }}</div>
                         <div class="text-muted small">ID: {{ appointment.patientId }}</div>
@@ -112,21 +116,42 @@
                     </div>
                   </td>
                   <td>
-                    <span class="badge bg-{% if appointment.status == 'Pending' %}warning{% elif appointment.status == 'Completed' %}success{% else %}danger{% endif %}">
-                      {{ appointment.status }}
+                    {% if appointment.room %}
+                      <span class="badge bg-info">{{ appointment.room.room_number }}</span>
+                    {% else %}
+                      {% with room_request=appointment.room_requests.first %}
+                        {% if room_request %}
+                          <span class="badge {% if room_request.status == 'PENDING' %}bg-warning{% elif room_request.status == 'APPROVED' %}bg-success{% else %}bg-danger{% endif %}">
+                            {% if room_request.status == 'PENDING' %}Request Pending
+                            {% elif room_request.status == 'APPROVED' %}Room {{ room_request.assigned_room.room_number|default:"Not Assigned" }}
+                            {% else %}Request Denied{% endif %}
+                          </span>
+                        {% else %}
+                          <button class="btn btn-sm btn-outline-primary" onclick="requestRoom('{{ appointment.id }}')">
+                            <i class="fas fa-door-open me-1"></i>Request Room
+                          </button>
+                        {% endif %}
+                      {% endwith %}
+                    {% endif %}
+                  </td>
+                  <td>
+                    <span class="badge {% if appointment.status %}bg-success{% else %}bg-warning{% endif %}">
+                      {% if appointment.status %}Confirmed{% else %}Pending{% endif %}
                     </span>
                   </td>
                   <td>
                     <div class="action-buttons">
-                      <button class="btn btn-sm btn-outline-primary" data-bs-toggle="tooltip" title="View Details">
+                      <a href="#" class="btn btn-sm btn-outline-primary me-2" data-bs-toggle="tooltip" title="View Details">
                         <i class="fas fa-eye"></i>
-                      </button>
-                      <button class="btn btn-sm btn-outline-success" data-bs-toggle="tooltip" title="Mark Complete">
+                      </a>
+                      {% if not appointment.status %}
+                      <a href="{% url 'doctor-approve-appointment' appointment.id %}" class="btn btn-sm btn-outline-success me-2" data-bs-toggle="tooltip" title="Approve">
                         <i class="fas fa-check"></i>
-                      </button>
-                      <button class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Cancel">
+                      </a>
+                      <a href="{% url 'doctor-reject-appointment' appointment.id %}" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Reject">
                         <i class="fas fa-times"></i>
-                      </button>
+                      </a>
+                      {% endif %}
                     </div>
                   </td>
                 </tr>
@@ -136,40 +161,48 @@
           </div>
           {% else %}
           <div class="text-center py-4">
-            <img src="{% static 'images/no-appointments.png' %}" alt="No Appointments" class="mb-3" width="120" onerror="this.src='https://placehold.co/120x120/4f46e5/ffffff?text=No+Appointments'">
-            <h6 class="text-muted">No appointments scheduled for today</h6>
+            <img src="{% static 'images/no-appointments.png' %}" alt="No Appointments" class="mb-3" width="120">
+            <h6 class="text-muted">No appointments found</h6>
           </div>
           {% endif %}
         </div>
       </div>
     </div>
 
-    <!-- Recent Patients -->
+    <!-- Room Requests -->
     <div class="col-lg-4">
-      <div class="card">
+      <div class="card h-100">
         <div class="card-body">
           <div class="d-flex justify-content-between align-items-center mb-4">
-            <h5 class="card-title mb-0">Recent Patients</h5>
-            <a href="{% url 'doctor-patient' %}" class="btn btn-outline-primary btn-sm">View All</a>
+            <h5 class="card-title mb-0">Room Requests</h5>
+            <a href="{% url 'doctor-room-requests' %}" class="btn btn-outline-primary btn-sm">View All</a>
           </div>
-          {% if recent_patients %}
-          <div class="patient-list">
-            {% for patient in recent_patients %}
-            <div class="patient-card mb-3">
-              <div class="d-flex align-items-center p-3">
-                <img src="{% static 'images/patient.jpg' %}" alt="Patient" class="rounded-circle me-3" width="48" height="48">
+          {% if pending_room_requests %}
+          <div class="list-group list-group-flush">
+            {% for request in pending_room_requests %}
+            <div class="list-group-item border rounded mb-2">
+              <div class="d-flex justify-content-between align-items-start">
                 <div>
-                  <h6 class="mb-1">{{ patient.get_name }}</h6>
-                  <div class="text-muted small">Last visit: {{ patient.last_visit }}</div>
+                  <h6 class="mb-1">{{ request.patient.get_name }}</h6>
+                  <p class="text-muted small mb-1">
+                    <i class="fas fa-door-open me-1"></i>Room {{ request.requested_room.room_number }}
+                  </p>
+                  <p class="text-muted small mb-1">
+                    <i class="fas fa-calendar-day me-1"></i>{{ request.expected_duration }} days stay
+                  </p>
+                  <p class="text-muted small mb-0">
+                    <i class="fas fa-clock me-1"></i>{{ request.request_date|timesince }} ago
+                  </p>
                 </div>
+                <span class="badge bg-warning">Pending</span>
               </div>
             </div>
             {% endfor %}
           </div>
           {% else %}
           <div class="text-center py-4">
-            <img src="{% static 'images/no-patients.png' %}" alt="No Patients" class="mb-3" width="120" onerror="this.src='https://placehold.co/120x120/4f46e5/ffffff?text=No+Patients'">
-            <h6 class="text-muted">No recent patients</h6>
+            <img src="{% static 'images/no-requests.png' %}" alt="No Requests" class="mb-3" width="120" onerror="this.src='https://placehold.co/120x120/4f46e5/ffffff?text=No+Requests'">
+            <h6 class="text-muted">No pending room requests</h6>
           </div>
           {% endif %}
         </div>
@@ -178,44 +211,90 @@
   </div>
 </div>
 
-<!-- Schedule Appointment Modal -->
-<div class="modal fade" id="scheduleModal" tabindex="-1">
+<!-- Room Request Modal -->
+<div class="modal fade" id="roomRequestModal" tabindex="-1">
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Schedule New Appointment</h5>
+        <h5 class="modal-title">Request Room Assignment</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
       </div>
       <div class="modal-body">
-        <form>
+        <form id="roomRequestForm" method="post" action="{% url 'doctor-request-room' %}">
+          {% csrf_token %}
+          <input type="hidden" name="appointment_id" id="appointmentId">
           <div class="mb-3">
-            <label class="form-label">Patient</label>
-            <select class="form-select">
-              <option selected disabled>Select Patient</option>
-              {% for patient in all_patients %}
-              <option value="{{ patient.id }}">{{ patient.get_name }}</option>
-              {% endfor %}
+            <label class="form-label">Room Type</label>
+            <select class="form-select" name="room_type" required>
+              <option value="" disabled selected>Select Room Type</option>
+              <option value="WARD">Ward</option>
+              <option value="PRIVATE">Private Room</option>
+              <option value="ICU">ICU</option>
+              <option value="OFFICE">Doctor Office</option>
             </select>
           </div>
           <div class="mb-3">
-            <label class="form-label">Date</label>
-            <input type="date" class="form-control">
+            <label class="form-label">Reason for Room Assignment</label>
+            <textarea class="form-control" name="reason" rows="3" required placeholder="Please provide a detailed reason for the room request"></textarea>
           </div>
           <div class="mb-3">
-            <label class="form-label">Time</label>
-            <input type="time" class="form-control">
-          </div>
-          <div class="mb-3">
-            <label class="form-label">Description</label>
-            <textarea class="form-control" rows="3"></textarea>
+            <label class="form-label">Expected Stay Duration (days)</label>
+            <input type="number" class="form-control" name="duration" min="1" required>
           </div>
         </form>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary">Schedule</button>
+        <button type="submit" form="roomRequestForm" class="btn btn-primary">Submit Request</button>
       </div>
     </div>
   </div>
 </div>
-{% endblock content %}
+
+{% block extra_js %}
+<script>
+function requestRoom(appointmentId) {
+  document.getElementById('appointmentId').value = appointmentId;
+  new bootstrap.Modal(document.getElementById('roomRequestModal')).show();
+}
+</script>
+{% endblock %}
+
+<style>
+.page-header {
+  background: linear-gradient(45deg, #4f46e5, #4338ca);
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(79, 70, 229, 0.1);
+  color: #4f46e5;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+}
+
+.action-buttons .btn {
+  padding: 0.25rem 0.5rem;
+}
+
+.list-group-item {
+  transition: all 0.2s ease;
+  border: 1px solid rgba(0,0,0,0.1);
+}
+
+.list-group-item:hover {
+  background-color: #f8f9fa;
+}
+
+.badge {
+  padding: 0.5em 0.8em;
+}
+</style>
+{% endblock %}

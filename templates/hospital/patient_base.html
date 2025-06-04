@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 
 <head>
@@ -14,6 +15,9 @@
   
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+  
+  <!-- Theme CSS -->
+  <link rel="stylesheet" href="{% static 'css/dark-theme.css' %}">
   
   <style>
     body {
@@ -247,6 +251,9 @@
   
   <!-- Optional: jQuery if needed -->
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+  <!-- Theme JavaScript -->
+  <script src="{% static 'js/theme.js' %}"></script>
   
   {% block extra_js %}{% endblock %}
 

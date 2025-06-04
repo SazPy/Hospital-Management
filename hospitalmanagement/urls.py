@@ -64,11 +64,9 @@ urlpatterns = [
     path('admin-appointment', views.admin_appointment_views, name='admin-appointment'),
     path('admin-view-appointment', views.admin_appointment_views, {'action': 'view'}, name='admin-view-appointment'),
     path('admin-add-appointment', views.admin_appointment_views, {'action': 'add'}, name='admin-add-appointment'),
-    path('admin-approve-appointment', views.admin_appointment_views, {'action': 'approve'},
-         name='admin-approve-appointment'),
-    path('approve-appointment/<int:pk>', views.admin_appointment_views, {'action': 'approve-appointment'},
-         name='approve-appointment'),
-    path('reject-appointment/<int:pk>', views.admin_appointment_views, {'action': 'reject'}, name='reject-appointment'),
+    path('admin-approve-appointment', views.admin_appointment_views, {'action': 'approve'}, name='admin-approve-appointment'),
+    path('admin-approve-appointment/<int:pk>', views.admin_appointment_views, {'action': 'approve-appointment'}, name='admin-approve-appointment'),
+    path('admin-reject-appointment/<int:pk>', views.admin_appointment_views, {'action': 'reject'}, name='admin-reject-appointment'),
 
     # Room Management URLs
     path('admin-rooms/', views.admin_room_management, {'action': 'view'}, name='admin-rooms'),
@@ -77,6 +75,9 @@ urlpatterns = [
     path('admin-room/<int:patient_id>/change/', views.admin_room_management, {'action': 'change'}, name='admin-change-room'),
     path('admin-room/<int:patient_id>/discharge/', views.admin_room_management, {'action': 'discharge'}, name='admin-discharge-from-room'),
     path('admin-room/<int:room_id>/details/', views.admin_room_management, {'action': 'details'}, name='admin-room-details'),
+    path('admin-room-requests/', views.admin_room_requests_view, name='admin-room-requests'),
+    path('admin-approve-room-request/<int:pk>/', views.admin_approve_room_request, name='admin-approve-room-request'),
+    path('admin-deny-room-request/<int:pk>/', views.admin_deny_room_request, name='admin-deny-room-request'),
 
     # Doctor URLs - using consolidated view
     path('doctor-profile', views.doctor_profile_view, name='doctor-profile'),
@@ -103,6 +104,10 @@ urlpatterns += [
     path('doctor-reject-appointment/<int:pk>', views.doctor_appointment_views, {'action': 'reject'}, name='doctor-reject-appointment'),
     path('doctor-delete-appointment', views.doctor_appointment_views, {'action': 'delete'}, name='doctor-delete-appointment'),
     path('doctor-delete-appointment/<int:pk>', views.doctor_appointment_views, {'action': 'delete'}, name='doctor-delete-appointment-pk'),
+
+    # Doctor Room Management URLs
+    path('doctor-request-room/', views.doctor_request_room, name='doctor-request-room'),
+    path('doctor-room-requests/', views.doctor_room_requests_view, name='doctor-room-requests'),
 ]
 
 # ---------FOR PATIENT RELATED URLS-------------------------------------

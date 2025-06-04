@@ -1,82 +1,170 @@
 # Hospital Management System
 
-A comprehensive hospital management system built with Django that helps manage doctors, patients, appointments, and room allocations.
+A comprehensive hospital management system built with Django that streamlines healthcare facility operations by managing doctors, patients, appointments, and room allocations.
 
-## Features
+![Hospital Management System](static/screenshots/dashboard.png)
 
-- User Management (Admin, Doctors, Patients)
-- Appointment Scheduling
-- Patient Records Management
-- Room Management
-- Discharge Summary Generation
-- Doctor Specialization Management
+## 🌟 Key Features
 
-## Setup Instructions
+- **Multi-User System**
+  - Role-based access control (Admin, Doctor, Patient)
+  - Secure authentication and authorization
+  - Custom dashboards for each user type
 
-1. Clone the repository
-2. Create and activate a virtual environment:
+- **Patient Management**
+  - Patient registration and records
+  - Medical history tracking
+  - Appointment scheduling
+  - Discharge management
+  - Digital medical records
+
+- **Doctor Management**
+  - Doctor registration and profiles
+  - Specialization tracking
+  - Appointment management
+  - Patient assignment
+
+- **Appointment System**
+  - Online booking
+  - Approval workflow
+  - Schedule management
+  - Email notifications
+  - Appointment history
+
+- **Room Management**
+  - Room allocation
+  - Occupancy tracking
+  - Room types and capacity
+  - Patient assignment
+
+- **Administrative Tools**
+  - User approval system
+  - Report generation
+  - System monitoring
+  - Settings management
+
+## 📋 Prerequisites
+
+- Python 3.8 or higher
+- Django 5.0 or higher
+- SQLite (default) or PostgreSQL
+- Modern web browser
+
+## 🚀 Quick Start
+
+1. **Clone the repository**
    ```bash
-   python -m venv .venv
-   source .venv/bin/activate  # On Windows use: .venv\Scripts\activate
+   git clone https://github.com/yourusername/hospital-management.git
+   cd hospital-management
    ```
 
-3. Install dependencies:
+2. **Set up a virtual environment**
+   ```bash
+   python -m venv .venv
+   
+   # On Windows
+   .venv\Scripts\activate
+   
+   # On macOS/Linux
+   source .venv/bin/activate
+   ```
+
+3. **Install dependencies**
    ```bash
    pip install -r requirements.txt
    ```
 
-4. Apply database migrations:
+4. **Configure environment**
+   ```bash
+   # Copy example environment file
+   cp .env.example .env
+   
+   # Edit .env with your settings
+   nano .env
+   ```
+
+5. **Initialize database**
    ```bash
    python manage.py makemigrations
    python manage.py migrate
    ```
 
-5. Create a superuser (admin):
+6. **Create admin user**
    ```bash
    python manage.py createsuperuser
    ```
 
-6. Run the development server:
+7. **Run development server**
    ```bash
    python manage.py runserver
    ```
 
-7. Visit http://127.0.0.1:8000/ in your browser
+8. Visit http://127.0.0.1:8000/ in your browser
 
-## User Types
+## 📚 Documentation
 
-1. Admin
-   - Manage doctors and patients
-   - Approve/reject appointments
-   - Manage rooms
-   - Generate discharge summaries
+Detailed documentation is available in the [docs](docs/) directory:
 
-2. Doctors
-   - View assigned patients
-   - Manage appointments
-   - View patient history
+- [User Guide](docs/user-guide.md)
+  - [Admin Manual](docs/admin-guide.md)
+  - [Doctor Manual](docs/doctor-guide.md)
+  - [Patient Manual](docs/patient-guide.md)
+- [Developer Guide](docs/developer-guide.md)
+  - [Setup Guide](docs/setup-guide.md)
+  - [API Documentation](docs/api-docs.md)
+  - [Database Schema](docs/database-schema.md)
+- [Contributing Guide](docs/contributing.md)
+- [Deployment Guide](docs/deployment.md)
 
-3. Patients
-   - Book appointments
-   - View appointment status
-   - View assigned doctors
-   - Access medical records
+## 🏗️ Project Structure
 
-## Project Structure
+```
+hospital-management/
+├── hospital/                 # Main application
+│   ├── models.py            # Database models
+│   ├── views.py             # View logic
+│   ├── forms.py             # Form definitions
+│   └── admin.py             # Admin interface
+├── templates/               # HTML templates
+│   └── hospital/           # App-specific templates
+├── static/                 # Static assets
+│   ├── css/               # Stylesheets
+│   ├── js/                # JavaScript files
+│   └── img/               # Images
+├── docs/                  # Documentation
+├── requirements.txt       # Python dependencies
+└── manage.py             # Django management
+```
 
-- `hospital/` - Main application directory
-  - `models.py` - Database models
-  - `views.py` - View functions
-  - `forms.py` - Form definitions
-  - `admin.py` - Admin interface configuration
-- `templates/` - HTML templates
-- `static/` - Static files (CSS, JS, images)
-- `media/` - User-uploaded files
+## 🔒 Security
 
-## Contributing
+- Built-in Django security features
+- CSRF protection
+- Password hashing
+- Session security
+- XSS prevention
+- SQL injection protection
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guide](docs/contributing.md) for details.
 
 1. Fork the repository
-2. Create a new branch for your feature
+2. Create a feature branch
 3. Commit your changes
 4. Push to your branch
-5. Create a Pull Request 
+5. Create a Pull Request
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👥 Authors
+
+- Your Name - Initial work - [GitHub](https://github.com/yourusername)
+
+## 🙏 Acknowledgments
+
+- Django Team
+- Bootstrap Team
+- All contributors 

@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Doctor, Patient, Appointment  # Direct model imports help with IDEs/autocomplete
+from .models import Doctor, Patient, Appointment, Room, RoomRequest  # Direct model imports help with IDEs/autocomplete
 from datetime import date
 
 
@@ -63,20 +63,12 @@ class PatientUserForm(BaseUserForm):
 
 
 class PatientForm(forms.ModelForm):
-    assignedDoctorId = forms.ModelChoiceField(
-        queryset=Doctor.objects.filter(status=True),
-        empty_label="Select Doctor",
-        to_field_name="user_id",
-        widget=forms.Select(attrs={'class': 'form-control'})
-    )
-
     class Meta:
         model = Patient
-        fields = ['address', 'mobile', 'symptoms', 'profile_pic']
+        fields = ['address', 'mobile', 'profile_pic']
         widgets = {
             'address': forms.TextInput(attrs={'class': 'form-control'}),
             'mobile': forms.TextInput(attrs={'class': 'form-control'}),
-            'symptoms': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
             'profile_pic': forms.FileInput(attrs={'class': 'form-control'}),
         }
 
@@ -141,3 +133,59 @@ class ContactusForm(forms.Form):
         max_length=500,
         widget=forms.Textarea(attrs={'class': 'form-control', 'rows': 3})
     )
+
+
+class RoomForm(forms.ModelForm):
+    class Meta:
+        model = Room
+        fields = ['room_number', 'room_type', 'capacity', 'floor', 'description']
+        widgets = {
+            'room_number': forms.TextInput(attrs={'class': 'form-control'}),
+            'room_type': forms.Select(attrs={'class': 'form-select'}),
+            'capacity': forms.NumberInput(attrs={'class': 'form-control', 'min': '1'}),
+            'floor': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
+        }
+
+
+class RoomAssignmentForm(forms.ModelForm):
+    class Meta:
+        model = RoomRequest
+        fields = ['assigned_room', 'response_note']
+        widgets = {
+            'assigned_room': forms.Select(attrs={
+                'class': 'form-select',
+                'required': True,
+            }),
+            'response_note': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Add any notes about the room assignment...',
+                'required': True,
+            }),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        if self.instance and self.instance.requested_room:
+            print(f"Debug - Form init - Instance: {self.instance}")
+            print(f"Debug - Form init - Requested room type: {self.instance.requested_room.room_type}")
+            
+            # Only show available rooms of the requested type
+            available_rooms = Room.objects.filter(
+                room_type=self.instance.requested_room.room_type,
+                is_occupied=False
+            )
+            print(f"Debug - Form init - Available rooms: {list(available_rooms.values_list('room_number', flat=True))}")
+            
+            self.fields['assigned_room'].queryset = available_rooms
+            self.fields['assigned_room'].empty_label = None  # Remove empty choice
+            self.fields['assigned_room'].label = f"Assign {self.instance.requested_room.get_room_type_display()} Room"
+            
+            # Add help text to show available rooms
+            room_count = available_rooms.count()
+            self.fields['assigned_room'].help_text = f'{room_count} available {self.instance.requested_room.get_room_type_display()} rooms'
+            
+            print(f"Debug - Form init - Final queryset: {list(self.fields['assigned_room'].queryset)}")
+        else:
+            print("Debug - Form init - No instance or no requested room")

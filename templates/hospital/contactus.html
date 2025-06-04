@@ -171,6 +171,49 @@
 .form-floating > textarea.form-control {
     height: 160px;
 }
+
+/* Dark Theme Styles */
+[data-theme="dark"] .bg-light {
+    background-color: var(--bg-secondary) !important;
+}
+
+[data-theme="dark"] .card {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .text-muted {
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .form-control {
+    background-color: var(--input-bg);
+    border-color: var(--border-color);
+    color: var(--input-text);
+}
+
+[data-theme="dark"] .form-control:focus {
+    border-color: var(--link-color);
+    box-shadow: 0 0 0 0.25rem rgba(102, 179, 255, 0.25);
+}
+
+[data-theme="dark"] .form-floating > label {
+    color: var(--text-secondary);
+}
+
+[data-theme="dark"] .form-floating > .form-control:focus ~ label,
+[data-theme="dark"] .form-floating > .form-control:not(:placeholder-shown) ~ label {
+    color: var(--link-color);
+    opacity: 0.65;
+}
+
+[data-theme="dark"] .bg-primary-subtle {
+    background-color: rgba(79, 70, 229, 0.2);
+}
+
+[data-theme="dark"] .feature-icon i {
+    color: var(--link-color) !important;
+}
 </style>
 
 {% endblock content %}
