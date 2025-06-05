@@ -111,7 +111,6 @@ Detailed documentation is available in the [docs](docs/) directory:
   - [Patient Manual](docs/patient-guide.md)
 - [Developer Guide](docs/developer-guide.md)
   - [Setup Guide](docs/setup-guide.md)
-  - [API Documentation](docs/api-docs.md)
   - [Database Schema](docs/database-schema.md)
 - [Contributing Guide](docs/contributing.md)
 - [Deployment Guide](docs/deployment.md)
