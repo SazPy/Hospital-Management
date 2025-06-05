@@ -2,7 +2,7 @@
 {% load static %}
 {% load widget_tweaks %}
 
-{% block title %}Add New Room - HMS{% endblock %}
+{% block title %}Edit Room - HMS{% endblock %}
 
 {% block content %}
 <!-- Page Header -->
@@ -10,8 +10,8 @@
   <div class="container">
     <div class="row align-items-center">
       <div class="col-lg-6">
-        <h1 class="fw-bold mb-3">Add New Room</h1>
-        <p class="lead mb-0">Create a new room in the hospital</p>
+        <h1 class="fw-bold mb-3">Edit Room</h1>
+        <p class="lead mb-0">Modify room {{ room.room_number }} details</p>
       </div>
     </div>
   </div>
@@ -65,7 +65,7 @@
             <!-- Capacity -->
             <div class="mb-4">
               <label for="{{ form.capacity.id_for_label }}" class="form-label">Capacity</label>
-              {% render_field form.capacity class="form-control" min="1" value="1" %}
+              {% render_field form.capacity class="form-control" min="1" %}
               {% if form.capacity.help_text %}
                 <div class="form-text text-muted">{{ form.capacity.help_text }}</div>
               {% endif %}
@@ -79,7 +79,7 @@
             <!-- Floor -->
             <div class="mb-4">
               <label for="{{ form.floor.id_for_label }}" class="form-label">Floor</label>
-              {% render_field form.floor class="form-control" placeholder="Enter floor number/name" value="1st" %}
+              {% render_field form.floor class="form-control" placeholder="Enter floor number/name" %}
               {% if form.floor.help_text %}
                 <div class="form-text text-muted">{{ form.floor.help_text }}</div>
               {% endif %}
@@ -110,7 +110,7 @@
                 <i class="fas fa-times me-2"></i>Cancel
               </a>
               <button type="submit" class="btn btn-primary">
-                <i class="fas fa-plus me-2"></i>Add Room
+                <i class="fas fa-save me-2"></i>Save Changes
               </button>
             </div>
           </form>
@@ -173,4 +173,4 @@
   color: #374151;
 }
 </style>
-{% endblock content %}
+{% endblock content %} 

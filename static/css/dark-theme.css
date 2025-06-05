@@ -444,4 +444,41 @@
 
 [data-theme="dark"] .modal-body .text-muted {
     color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] .room-stats {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .room-stat-item {
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .room-stat-item .fw-medium {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .progress {
+    background-color: var(--bg-secondary);
+}
+
+[data-theme="dark"] .stat-icon-small {
+    background-color: var(--bg-secondary);
+}
+
+[data-theme="dark"] .stat-icon-small.bg-primary-subtle {
+    background-color: rgba(102, 179, 255, 0.1);
+}
+
+[data-theme="dark"] .stat-icon-small.bg-success-subtle {
+    background-color: rgba(46, 184, 92, 0.1);
+}
+
+[data-theme="dark"] .stat-icon-small.bg-danger-subtle {
+    background-color: rgba(229, 83, 83, 0.1);
+}
+
+[data-theme="dark"] .stat-icon-small.bg-info-subtle {
+    background-color: rgba(51, 153, 255, 0.1);
 } 

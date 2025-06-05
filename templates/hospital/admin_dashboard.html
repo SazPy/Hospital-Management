@@ -19,12 +19,12 @@
       </div>
       <div class="col-lg-6 text-lg-end">
         <div class="btn-group">
-          <button class="btn btn-light me-2" data-bs-toggle="modal" data-bs-target="#addDoctorModal">
+          <a href="{% url 'admin-add-doctor' %}" class="btn btn-light me-2">
             <i class="fas fa-user-md me-2"></i>Add Doctor
-          </button>
-          <button class="btn btn-light" data-bs-toggle="modal" data-bs-target="#addPatientModal">
+          </a>
+          <a href="{% url 'admin-add-patient' %}" class="btn btn-light">
             <i class="fas fa-user-plus me-2"></i>Add Patient
-          </button>
+          </a>
         </div>
       </div>
     </div>
@@ -129,7 +129,9 @@
                 <tr>
                   <td>
                     <div class="d-flex align-items-center">
-                      <img src="{% static 'images/patient.png' %}" alt="Patient" class="rounded-circle me-2" width="32" height="32">
+                      <div class="avatar-placeholder rounded-circle bg-info-subtle me-2" style="width: 32px; height: 32px;">
+                        <i class="fas fa-user"></i>
+                      </div>
                       <div>
                         <div class="fw-medium">{{ appointment.patientName }}</div>
                         <div class="text-muted small">ID: {{ appointment.patientId }}</div>
@@ -138,7 +140,9 @@
                   </td>
                   <td>
                     <div class="d-flex align-items-center">
-                      <img src="{% static 'images/doctor.png' %}" alt="Doctor" class="rounded-circle me-2" width="32" height="32">
+                      <div class="avatar-placeholder rounded-circle bg-primary-subtle me-2" style="width: 32px; height: 32px;">
+                        <i class="fas fa-user-md"></i>
+                      </div>
                       <div>
                         <div class="fw-medium">Dr. {{ appointment.doctorName }}</div>
                         <div class="text-muted small">{{ appointment.doctor.department }}</div>
@@ -185,7 +189,9 @@
           </div>
           {% else %}
           <div class="text-center py-4">
-            <img src="{% static 'images/no-appointments.png' %}" alt="No Appointments" class="mb-3" width="120">
+            <div class="mb-3">
+              <i class="fas fa-calendar-times fa-3x text-muted"></i>
+            </div>
             <h6 class="text-muted">No appointments found</h6>
           </div>
           {% endif %}
@@ -205,22 +211,65 @@
           <!-- Room Type Distribution -->
           <div class="mb-4">
             <h6 class="text-muted mb-3">Room Distribution</h6>
-            <div class="room-stats p-3 rounded bg-light">
-              <div class="d-flex justify-content-between align-items-center mb-3">
-                <span class="fw-medium">Wards</span>
-                <span class="badge bg-primary">{{ ward_count }}</span>
+            <div class="room-stats p-4 rounded">
+              <div class="room-stat-item mb-3">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="d-flex align-items-center">
+                    <div class="stat-icon-small bg-primary-subtle me-3">
+                      <i class="fas fa-procedures text-primary"></i>
+                    </div>
+                    <span class="fw-medium">Wards</span>
+                  </div>
+                  <span class="badge bg-primary">{{ ward_count|default:"0" }}</span>
+                </div>
+                <div class="progress mt-2" style="height: 4px;">
+                  <div class="progress-bar bg-primary" role="progressbar" style="width: {% widthratio ward_count|default:0 roomcount|default:1 100 %}%"></div>
+                </div>
               </div>
-              <div class="d-flex justify-content-between align-items-center mb-3">
-                <span class="fw-medium">Private Rooms</span>
-                <span class="badge bg-success">{{ private_count }}</span>
+              
+              <div class="room-stat-item mb-3">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="d-flex align-items-center">
+                    <div class="stat-icon-small bg-success-subtle me-3">
+                      <i class="fas fa-bed text-success"></i>
+                    </div>
+                    <span class="fw-medium">Private Rooms</span>
+                  </div>
+                  <span class="badge bg-success">{{ private_count|default:"0" }}</span>
+                </div>
+                <div class="progress mt-2" style="height: 4px;">
+                  <div class="progress-bar bg-success" role="progressbar" style="width: {% widthratio private_count|default:0 roomcount|default:1 100 %}%"></div>
+                </div>
               </div>
-              <div class="d-flex justify-content-between align-items-center mb-3">
-                <span class="fw-medium">ICU</span>
-                <span class="badge bg-danger">{{ icu_count }}</span>
+              
+              <div class="room-stat-item mb-3">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="d-flex align-items-center">
+                    <div class="stat-icon-small bg-danger-subtle me-3">
+                      <i class="fas fa-heartbeat text-danger"></i>
+                    </div>
+                    <span class="fw-medium">ICU</span>
+                  </div>
+                  <span class="badge bg-danger">{{ icu_count|default:"0" }}</span>
+                </div>
+                <div class="progress mt-2" style="height: 4px;">
+                  <div class="progress-bar bg-danger" role="progressbar" style="width: {% widthratio icu_count|default:0 roomcount|default:1 100 %}%"></div>
+                </div>
               </div>
-              <div class="d-flex justify-content-between align-items-center">
-                <span class="fw-medium">Doctor Offices</span>
-                <span class="badge bg-info">{{ office_count }}</span>
+              
+              <div class="room-stat-item">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="d-flex align-items-center">
+                    <div class="stat-icon-small bg-info-subtle me-3">
+                      <i class="fas fa-user-md text-info"></i>
+                    </div>
+                    <span class="fw-medium">Doctor Offices</span>
+                  </div>
+                  <span class="badge bg-info">{{ office_count|default:"0" }}</span>
+                </div>
+                <div class="progress mt-2" style="height: 4px;">
+                  <div class="progress-bar bg-info" role="progressbar" style="width: {% widthratio office_count|default:0 roomcount|default:1 100 %}%"></div>
+                </div>
               </div>
             </div>
           </div>
@@ -262,7 +311,7 @@
             </div>
             {% else %}
             <div class="text-center py-4">
-              <img src="{% static 'images/no-requests.png' %}" alt="No Requests" class="mb-3" width="120">
+              <i class="fas fa-door-closed fa-3x text-muted mb-3"></i>
               <h6 class="text-muted">No pending room requests</h6>
             </div>
             {% endif %}
@@ -378,6 +427,11 @@
   margin-bottom: 2rem;
 }
 
+.card {
+  border: none;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
 .stat-icon {
   width: 48px;
   height: 48px;
@@ -390,49 +444,120 @@
   margin-bottom: 1rem;
 }
 
+.room-stats {
+  border: 1px solid var(--bs-border-color);
+  transition: all 0.3s ease;
+}
+
+.room-stat-item {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--bs-border-color);
+}
+
+.room-stat-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.stat-icon-small {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+.bg-primary-subtle {
+  background-color: rgba(var(--bs-primary-rgb), 0.1) !important;
+}
+
+.bg-success-subtle {
+  background-color: rgba(var(--bs-success-rgb), 0.1) !important;
+}
+
+.bg-danger-subtle {
+  background-color: rgba(var(--bs-danger-rgb), 0.1) !important;
+}
+
+.bg-info-subtle {
+  background-color: rgba(var(--bs-info-rgb), 0.1) !important;
+}
+
+.progress {
+  background-color: var(--bs-border-color);
+}
+
+[data-bs-theme="dark"] .room-stats {
+  background-color: var(--bs-dark) !important;
+  border-color: var(--bs-border-color-translucent);
+}
+
+[data-bs-theme="dark"] .room-stat-item {
+  border-color: var(--bs-border-color-translucent);
+}
+
+[data-bs-theme="dark"] .progress {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-bs-theme="dark"] .bg-primary-subtle {
+  background-color: rgba(var(--bs-primary-rgb), 0.2) !important;
+}
+
+[data-bs-theme="dark"] .bg-success-subtle {
+  background-color: rgba(var(--bs-success-rgb), 0.2) !important;
+}
+
+[data-bs-theme="dark"] .bg-danger-subtle {
+  background-color: rgba(var(--bs-danger-rgb), 0.2) !important;
+}
+
+[data-bs-theme="dark"] .bg-info-subtle {
+  background-color: rgba(var(--bs-info-rgb), 0.2) !important;
+}
+
+[data-bs-theme="dark"] .text-body {
+  color: var(--bs-body-color) !important;
+}
+
+.badge {
+  padding: 0.5em 0.75em;
+  font-weight: 500;
+}
+
 .action-buttons .btn {
   padding: 0.25rem 0.5rem;
 }
 
-.room-stats {
-  border: 1px solid rgba(0,0,0,0.1);
-  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+.avatar-placeholder {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
 }
 
-.room-stats .badge {
-  font-size: 0.875rem;
-  padding: 0.5em 1em;
-  min-width: 40px;
-  text-align: center;
+.btn-outline-primary {
+  color: #4f46e5;
+  border-color: #4f46e5;
 }
 
-/* Dark theme adjustments */
-@media (prefers-color-scheme: dark) {
-  .room-stats {
-    background-color: rgba(255,255,255,0.05) !important;
-    border-color: rgba(255,255,255,0.1);
-  }
-  
-  .room-stats .fw-medium {
-    color: rgba(255,255,255,0.9);
-  }
-  
-  .badge {
-    border: 1px solid rgba(255,255,255,0.1);
-  }
+.btn-outline-primary:hover {
+  background-color: #4f46e5;
+  border-color: #4f46e5;
+  color: white;
 }
 
-.list-group-item {
-  transition: all 0.2s ease;
-  border: 1px solid rgba(0,0,0,0.1);
+[data-bs-theme="dark"] .card {
+  background-color: var(--bs-dark);
+  border-color: var(--bs-dark-border-subtle);
 }
 
-.list-group-item:hover {
-  background-color: #f8f9fa;
-}
-
-.badge {
-  padding: 0.5em 0.8em;
+[data-bs-theme="dark"] .list-group-item {
+  background-color: var(--bs-dark);
+  border-color: var(--bs-dark-border-subtle);
 }
 </style>
 {% endblock %}

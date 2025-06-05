@@ -199,22 +199,34 @@ def admin_dashboard_view(request):
 
     # Get pending room requests
     pending_room_requests = models.RoomRequest.objects.filter(status='PENDING')
+    
+    # Get all rooms
+    rooms = models.Room.objects.all()
+    
+    # Count rooms by type
+    room_counts = {
+        'ward_count': rooms.filter(room_type='WARD').count(),
+        'private_count': rooms.filter(room_type='PRIVATE').count(),
+        'icu_count': rooms.filter(room_type='ICU').count(),
+        'office_count': rooms.filter(room_type='OFFICE').count(),
+    }
 
     stats = {
         "doctors": models.Doctor.objects.all().order_by("-id"),
         "patients": models.Patient.objects.all().order_by("-id"),
-        "rooms": models.Room.objects.all().order_by("room_number"),
+        "rooms": rooms.order_by("room_number"),
         "doctorcount": models.Doctor.objects.filter(status=True).count(),
         "pendingdoctorcount": models.Doctor.objects.filter(status=False).count(),
         "patientcount": models.Patient.objects.filter(status=True).count(),
         "pendingpatientcount": models.Patient.objects.filter(status=False).count(),
         "appointmentcount": models.Appointment.objects.all().count(),
         "pendingappointmentcount": models.Appointment.objects.filter(status=False).count(),
-        "roomcount": models.Room.objects.count(),
-        "availableroomcount": models.Room.objects.filter(is_occupied=False).count(),
+        "roomcount": rooms.count(),
+        "availableroomcount": rooms.filter(is_occupied=False).count(),
         "appointments": recent_appointments,
         "room_requests": pending_room_requests,
         "pending_room_requests": pending_room_requests.count(),
+        **room_counts  # Add room counts by type
     }
     return render(request, "hospital/admin_dashboard.html", stats)
 
@@ -237,21 +249,38 @@ def admin_doctor_views(request, action=None, pk=None):
 
     if action == "delete":
         doc = get_object_or_404(models.Doctor, id=pk)
-        doc.user.delete(); doc.delete()
+        doc.user.delete()
+        doc.delete()
         return redirect("admin-view-doctor")
 
     if action == "update":
         doc = get_object_or_404(models.Doctor, id=pk)
         user = doc.user
         if request.method == "POST":
-            uform = forms.DoctorUserForm(request.POST, instance=user)
+            uform = forms.DoctorUserUpdateForm(request.POST, instance=user)
             dform = forms.DoctorForm(request.POST, request.FILES, instance=doc)
             if uform.is_valid() and dform.is_valid():
-                usr = uform.save(commit=False); usr.set_password(usr.password); usr.save()
-                dform.save()
-                return redirect("admin-view-doctor")
+                try:
+                    with transaction.atomic():
+                        user = uform.save()
+                        doctor = dform.save(commit=False)
+                        doctor.user = user
+                        doctor.status = True
+                        doctor.save()
+                    messages.success(request, "Doctor information updated successfully!")
+                    return redirect("admin-view-doctor")
+                except Exception as e:
+                    messages.error(request, f"Error updating doctor: {str(e)}")
+            else:
+                for field, errors in uform.errors.items():
+                    for error in errors:
+                        messages.error(request, f"{field}: {error}")
+                for field, errors in dform.errors.items():
+                    for error in errors:
+                        messages.error(request, f"{field}: {error}")
         else:
-            uform, dform = forms.DoctorUserForm(instance=user), forms.DoctorForm(instance=doc)
+            uform = forms.DoctorUserUpdateForm(instance=user)
+            dform = forms.DoctorForm(instance=doc)
         return render(request, "hospital/admin_update_doctor.html",
                       {"userForm": uform, "doctorForm": dform})
 
@@ -308,39 +337,59 @@ def admin_patient_views(request, action=None, pk=None):
         return redirect("admin-view-patient")
 
     if action == "update":
-        pat  = get_object_or_404(models.Patient, id=pk)
+        pat = get_object_or_404(models.Patient, id=pk)
         user = pat.user
         if request.method == "POST":
-            uform = forms.PatientUserForm(request.POST, instance=user)
+            uform = forms.PatientUserUpdateForm(request.POST, instance=user)
             pform = forms.PatientForm(request.POST, request.FILES, instance=pat)
             if uform.is_valid() and pform.is_valid():
-                usr = uform.save(commit=False); usr.set_password(usr.password); usr.save()
-                pat = pform.save(commit=False)
-                pat.status = True
-                pat.assignedDoctorId = request.POST.get("assignedDoctorId")
-                pat.save()
-                return redirect("admin-view-patient")
+                try:
+                    with transaction.atomic():
+                        user = uform.save()
+                        patient = pform.save(commit=False)
+                        patient.user = user
+                        patient.status = True
+                        patient.save()
+                    messages.success(request, "Patient information updated successfully!")
+                    return redirect("admin-view-patient")
+                except Exception as e:
+                    messages.error(request, f"Error updating patient: {str(e)}")
+            else:
+                for field, errors in uform.errors.items():
+                    for error in errors:
+                        messages.error(request, f"{field}: {error}")
+                for field, errors in pform.errors.items():
+                    for error in errors:
+                        messages.error(request, f"{field}: {error}")
         else:
-            uform, pform = forms.PatientUserForm(instance=user), forms.PatientForm(instance=pat)
+            uform = forms.PatientUserUpdateForm(instance=user)
+            pform = forms.PatientForm(instance=pat)
         return render(request, "hospital/admin_update_patient.html",
-                      {"userForm": uform, "patientForm": pform})
+                    {"userForm": uform, "patientForm": pform})
 
     if action == "add":
         if request.method == "POST":
             uform = forms.PatientUserForm(request.POST)
             pform = forms.PatientForm(request.POST, request.FILES)
             if uform.is_valid() and pform.is_valid():
-                usr = uform.save(commit=False); usr.set_password(usr.password); usr.save()
+                usr = uform.save(commit=False)
+                usr.set_password(usr.password)
+                usr.save()
                 pat = pform.save(commit=False)
-                pat.user = usr; pat.status = True
-                pat.assignedDoctorId = request.POST.get("assignedDoctorId")
+                pat.user = usr
+                pat.status = True
+                # Make doctor assignment optional
+                doctor = pform.cleaned_data.get('assignedDoctorId')
+                if doctor:
+                    pat.assignedDoctorId = doctor.id
                 pat.save()
                 Group.objects.get_or_create(name=PATIENT_GROUP)[0].user_set.add(usr)
                 return redirect("admin-view-patient")
         else:
-            uform, pform = forms.PatientUserForm(), forms.PatientForm()
+            uform = forms.PatientUserForm()
+            pform = forms.PatientForm()
         return render(request, "hospital/admin_add_patient.html",
-                      {"userForm": uform, "patientForm": pform})
+                    {"userForm": uform, "patientForm": pform})
 
     if action == "approve":
         pats = models.Patient.objects.filter(status=False)
@@ -348,12 +397,14 @@ def admin_patient_views(request, action=None, pk=None):
 
     if action == "approve-patient":
         pat = get_object_or_404(models.Patient, id=pk)
-        pat.status = True; pat.save()
+        pat.status = True
+        pat.save()
         return redirect("admin-approve-patient")
 
     if action == "reject":
         pat = get_object_or_404(models.Patient, id=pk)
-        pat.user.delete(); pat.delete()
+        pat.user.delete()
+        pat.delete()
         return redirect("admin-approve-patient")
 
     if action == "discharge":
@@ -363,24 +414,33 @@ def admin_patient_views(request, action=None, pk=None):
     if action == "discharge-patient":
         return handle_discharge_patient(request, pk)
 
-    # Default view - admin_patient.html
+    # Default view - add context data for cards
+    total_patients = models.Patient.objects.filter(status=True).count()
+    pending_patients = models.Patient.objects.filter(status=False).count()
+    total_appointments = models.Appointment.objects.filter(status=True).count()
+    discharged_patients = models.PatientDischargeDetails.objects.count()
+    
+    # Room statistics
+    total_rooms = models.Room.objects.count()
+    occupied_rooms = models.Room.objects.filter(is_occupied=True).count()
+    available_rooms = total_rooms - occupied_rooms
+    
+    # Recent patients
+    recent_patients = models.Patient.objects.filter(
+        status=True
+    ).select_related('room').order_by('-admitDate')[:5]
+    
     context = {
-        # Patient statistics
-        'total_patients': models.Patient.objects.filter(status=True).count(),
-        'pending_patients': models.Patient.objects.filter(status=False).count(),
-        'total_appointments': models.Appointment.objects.filter(status=True).count(),
-        'discharged_patients': models.PatientDischargeDetails.objects.count(),
-        
-        # Room statistics
-        'total_rooms': models.Room.objects.count(),
-        'available_rooms': models.Room.objects.filter(is_occupied=False).count(),
-        'occupied_rooms': models.Room.objects.filter(is_occupied=True).count(),
-        
-        # Recent patients (last 10 admitted)
-        'recent_patients': models.Patient.objects.filter(status=True)\
-            .select_related('room', 'user')\
-            .order_by('-admitDate')[:10]
+        'total_patients': total_patients,
+        'pending_patients': pending_patients,
+        'total_appointments': total_appointments,
+        'discharged_patients': discharged_patients,
+        'total_rooms': total_rooms,
+        'occupied_rooms': occupied_rooms,
+        'available_rooms': available_rooms,
+        'recent_patients': recent_patients,
     }
+    
     return render(request, "hospital/admin_patient.html", context)
 
 # --------------------------------------------------------------------------- #
@@ -389,7 +449,8 @@ def admin_patient_views(request, action=None, pk=None):
 def handle_discharge_patient(request, pk):
     pat = get_object_or_404(models.Patient, id=pk)
     if not pat.assignedDoctorId:
-        return redirect("admin-dashboard")
+        messages.error(request, "Cannot discharge patient without an assigned doctor. Please assign a doctor first.")
+        return redirect("admin-discharge-patient")
 
     days = (date.today() - pat.admitDate).days
     doc  = get_object_or_404(User, id=pat.assignedDoctorId)
@@ -437,6 +498,17 @@ def handle_discharge_patient(request, pk):
     return render(request, "hospital/patient_generate_bill.html", ctx)
 
 # --------------------------------------------------------------------------- #
+# Helper functions
+# --------------------------------------------------------------------------- #
+def update_patient_doctor(patient, doctor, request=None):
+    """Update patient's assigned doctor when an appointment is approved."""
+    if patient and doctor:
+        patient.assignedDoctorId = doctor.user.id
+        patient.save()
+        if request:
+            messages.info(request, f"Patient's assigned doctor has been updated to Dr. {doctor.get_name}")
+
+# --------------------------------------------------------------------------- #
 # Appointment admin-side
 # --------------------------------------------------------------------------- #
 @login_required(login_url="adminlogin")
@@ -451,18 +523,23 @@ def admin_appointment_views(request, action=None, pk=None):
         if request.method == "POST":
             form = forms.AppointmentForm(request.POST)
             if form.is_valid():
-                app = form.save(commit=False)
-                app.doctorId  = request.POST.get("doctorId")
-                app.patientId = request.POST.get("patientId")
-                app.doctorName  = User.objects.get(id=app.doctorId).first_name
-                app.patientName = User.objects.get(id=app.patientId).first_name
-                app.status = True
-                app.save()
+                appointment = form.save(commit=False)
+                appointment.status = True  # Auto-approve when admin creates
+                appointment.save()
+                # Update patient's assigned doctor
+                update_patient_doctor(appointment.patient, appointment.doctor, request)
+                messages.success(request, 'Appointment scheduled successfully!')
                 return redirect("admin-view-appointment")
+            else:
+                messages.error(request, 'Please correct the errors below.')
         else:
             form = forms.AppointmentForm()
-        return render(request, "hospital/admin_add_appointment.html",
-                      {"appointmentForm": form})
+        
+        context = {
+            "appointmentForm": form,
+            "today": date.today().isoformat()  # For date input min attribute
+        }
+        return render(request, "hospital/admin_add_appointment.html", context)
 
     if action == "approve":
         apps = models.Appointment.objects.filter(status=False)
@@ -471,15 +548,46 @@ def admin_appointment_views(request, action=None, pk=None):
 
     if action == "approve-appointment":
         app = get_object_or_404(models.Appointment, id=pk)
-        app.status = True; app.save()
+        app.status = True
+        app.save()
+        # Update patient's assigned doctor
+        update_patient_doctor(app.patient, app.doctor, request)
+        messages.success(request, 'Appointment approved successfully!')
         return redirect("admin-approve-appointment")
 
     if action == "reject":
         app = get_object_or_404(models.Appointment, id=pk)
         app.delete()
+        messages.success(request, 'Appointment rejected successfully!')
         return redirect("admin-approve-appointment")
 
-    return render(request, "hospital/admin_appointment.html")
+    if action == "details":
+        app = get_object_or_404(models.Appointment, id=pk)
+        return render(request, "hospital/admin_appointment_details.html",
+                      {"appointment": app})
+
+    if action == "delete":
+        app = get_object_or_404(models.Appointment, id=pk)
+        app.delete()
+        messages.success(request, "Appointment cancelled successfully")
+        return redirect("admin-view-appointment")
+
+    # Default view - add context data for cards
+    context = {
+        'appointmentcount': models.Appointment.objects.filter(status=True).count(),
+        'pendingappointmentcount': models.Appointment.objects.filter(status=False).count(),
+        'doctorcount': models.Doctor.objects.filter(status=True).count(),
+        # Get today's appointments
+        'today_appointments': models.Appointment.objects.filter(
+            appointmentDate=date.today(),
+            status=True
+        ).count(),
+        # Get recent appointments
+        'recent_appointments': models.Appointment.objects.filter(
+            status=True
+        ).order_by('-appointmentDate', '-appointmentTime')[:5]
+    }
+    return render(request, "hospital/admin_appointment.html", context)
 
 # --------------------------------------------------------------------------- #
 # Room management (admin)
@@ -519,14 +627,22 @@ def admin_rooms_view(request):
 @login_required(login_url='adminlogin')
 @user_passes_test(is_admin)
 def admin_add_room_view(request):
+    if not request.user.is_authenticated:
+        return redirect('adminlogin')
+    if not is_admin(request.user):
+        return redirect('home')
+        
     if request.method == 'POST':
         form = forms.RoomForm(request.POST)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Room added successfully!')
+            room = form.save()
+            messages.success(request, f'Room {room.room_number} added successfully!')
             return redirect('admin-rooms')
+        else:
+            messages.error(request, 'Please correct the errors below.')
     else:
         form = forms.RoomForm()
+    
     return render(request, 'hospital/admin_add_room.html', {'form': form})
 
 @login_required(login_url='adminlogin')
@@ -582,17 +698,8 @@ def admin_room_management(request, action=None, room_id=None, patient_id=None):
             pat.room = None; pat.save()
         return redirect("admin-view-patient")
 
-    # If no action is specified or action is not recognized, show rooms list
-    return render(request, 'hospital/admin_rooms.html', {
-        'rooms': models.Room.objects.all().order_by('room_number'),
-        'available_count': models.Room.objects.filter(is_occupied=False).count(),
-        'occupied_count': models.Room.objects.filter(is_occupied=True).count(),
-        'room_requests': models.RoomRequest.objects.filter(status='PENDING').order_by('-request_date')[:5],
-        'ward_count': models.Room.objects.filter(room_type='WARD').count(),
-        'private_count': models.Room.objects.filter(room_type='PRIVATE').count(),
-        'icu_count': models.Room.objects.filter(room_type='ICU').count(),
-        'office_count': models.Room.objects.filter(room_type='OFFICE').count(),
-    })
+    # If no action is specified or action is not recognized, redirect to rooms list
+    return redirect('admin-rooms')
 
 @login_required(login_url='adminlogin')
 @user_passes_test(is_admin)
@@ -654,6 +761,57 @@ def admin_deny_room_request(request, pk):
         messages.success(request, 'Room request has been denied.')
         return redirect('admin-room-requests')
     return render(request, 'hospital/admin_deny_room_request.html', {'request': room_request})
+
+@login_required(login_url='adminlogin')
+@user_passes_test(is_admin)
+def admin_edit_room_view(request, room_id):
+    if not request.user.is_authenticated:
+        return redirect('adminlogin')
+    if not is_admin(request.user):
+        return redirect('home')
+        
+    room = get_object_or_404(models.Room, id=room_id)
+    
+    if request.method == 'POST':
+        form = forms.RoomForm(request.POST, instance=room)
+        if form.is_valid():
+            room = form.save()
+            messages.success(request, f'Room {room.room_number} updated successfully!')
+            return redirect('admin-rooms')
+        else:
+            messages.error(request, 'Please correct the errors below.')
+    else:
+        form = forms.RoomForm(instance=room)
+    
+    return render(request, 'hospital/admin_edit_room.html', {'form': form, 'room': room})
+
+@login_required(login_url='adminlogin')
+@user_passes_test(is_admin)
+def admin_delete_room_view(request, room_id):
+    if not request.user.is_authenticated:
+        return redirect('adminlogin')
+    if not is_admin(request.user):
+        return redirect('home')
+        
+    room = get_object_or_404(models.Room, id=room_id)
+    
+    # Check if room is occupied
+    if room.is_occupied:
+        messages.error(request, f'Cannot delete room {room.room_number} as it is currently occupied.')
+        return redirect('admin-rooms')
+        
+    # Check if room has any pending requests
+    if models.RoomRequest.objects.filter(requested_room=room, status='PENDING').exists():
+        messages.error(request, f'Cannot delete room {room.room_number} as it has pending requests.')
+        return redirect('admin-rooms')
+    
+    try:
+        room.delete()
+        messages.success(request, f'Room {room.room_number} deleted successfully!')
+    except Exception as e:
+        messages.error(request, f'Error deleting room: {str(e)}')
+    
+    return redirect('admin-rooms')
 
 # --------------------------------------------------------------------------- #
 # DOCTOR SECTION
@@ -780,6 +938,8 @@ def doctor_appointment_views(request, action=None, pk=None):
         app = get_object_or_404(models.Appointment, id=pk, doctor=doc)
         app.status = True
         app.save()
+        # Update patient's assigned doctor
+        update_patient_doctor(app.patient, doc, request)
         messages.success(request, "Appointment approved successfully!")
         return redirect("doctor-pending-appointments")
 

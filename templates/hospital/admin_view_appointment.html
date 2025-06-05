@@ -1,6 +1,8 @@
 {% extends 'hospital/admin_base.html' %}
 {% load static %}
 
+{% block title %}View Appointments - HMS{% endblock %}
+
 {% block content %}
 
 <!-- Page Header -->
@@ -63,12 +65,13 @@
               <td class="px-4 py-3">{{a.description|truncatechars:50}}</td>
               <td class="px-4 py-3">
                 <div class="action-buttons">
-                  <button class="btn btn-sm btn-outline-primary me-2" data-bs-toggle="tooltip" title="View Details">
+                  <a href="{% url 'admin-appointment-details' a.id %}" class="btn btn-sm btn-outline-primary me-2" data-bs-toggle="tooltip" title="View Details">
                     <i class="fas fa-eye"></i>
-                  </button>
-                  <button class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Cancel">
+                  </a>
+                  <a href="{% url 'admin-delete-appointment' a.id %}" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Cancel"
+                     onclick="return confirm('Are you sure you want to cancel this appointment?')">
                     <i class="fas fa-times"></i>
-                  </button>
+                  </a>
                 </div>
               </td>
             </tr>
@@ -134,4 +137,14 @@
   color: #4f46e5 !important;
 }
 </style>
+
+<!-- Initialize tooltips -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  })
+});
+</script>
 {% endblock content %}

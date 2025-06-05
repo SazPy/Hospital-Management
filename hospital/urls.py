@@ -14,6 +14,14 @@ urlpatterns = [
     path('admin-approve-room-request/<int:pk>/', views.admin_approve_room_request, name='admin-approve-room-request'),
     path('admin-deny-room-request/<int:pk>/', views.admin_deny_room_request, name='admin-deny-room-request'),
 
+    # Admin Appointment URLs
+    path('admin-appointment/', views.admin_appointment_views, name='admin-appointment'),
+    path('admin-add-appointment/', views.admin_appointment_views, {'action': 'add'}, name='admin-add-appointment'),
+    path('admin-view-appointment/', views.admin_appointment_views, {'action': 'view'}, name='admin-view-appointment'),
+    path('admin-approve-appointment/', views.admin_appointment_views, {'action': 'approve'}, name='admin-approve-appointment'),
+    path('approve-appointment/<int:pk>/', views.admin_appointment_views, {'action': 'approve-appointment'}, name='approve-appointment'),
+    path('reject-appointment/<int:pk>/', views.admin_appointment_views, {'action': 'reject'}, name='reject-appointment'),
+
     # Doctor URLs
     path('doctor-dashboard', views.doctor_dashboard_view, name='doctor-dashboard'),
     path('doctor-appointment', views.doctor_appointment_views, name='doctor-appointment'),
@@ -27,4 +35,9 @@ urlpatterns = [
     # Doctor Room Management URLs
     path('doctor-request-room/', views.doctor_request_room, name='doctor-request-room'),
     path('doctor-room-requests/', views.doctor_room_requests_view, name='doctor-room-requests'),
+    
+    # Discharge URLs
+    path('admin-discharge-patient', views.admin_patient_views, {'action': 'discharge'}, name='admin-discharge-patient'),
+    path('discharge-patient/<int:pk>', views.handle_discharge_patient, name='discharge-patient'),
+    path('download-pdf/<int:pk>/', views.download_pdf_view, name='download-pdf'),
 ] 

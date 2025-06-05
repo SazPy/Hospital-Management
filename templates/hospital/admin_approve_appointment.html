@@ -90,7 +90,9 @@
   </div>
   {% else %}
   <div class="text-center py-5">
-    <img src="{% static 'images/no-appointments.png' %}" alt="No Appointments" class="mb-3" width="120" onerror="this.src='https://placehold.co/120x120/4f46e5/ffffff?text=No+Appointments'">
+    <div class="mb-4">
+      <i class="fas fa-calendar-times fa-4x text-muted"></i>
+    </div>
     <h5 class="text-muted mb-3">No pending appointments</h5>
     <p class="text-muted">There are no appointment requests waiting for approval.</p>
     <a href="{% url 'admin-appointment' %}" class="btn btn-primary">

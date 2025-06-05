@@ -4,227 +4,215 @@
 
 <head>
   <meta charset="utf-8">
-  <title>Bill</title>
+  <title>Generate Bill</title>
 
   <style>
     .invoice-box {
-      max-width: 800px;
-      margin: auto;
-      padding: 30px;
-      border: 1px solid #eee;
-      box-shadow: 0 0 10px rgba(0, 0, 0, .15);
-      font-size: 16px;
-      line-height: 24px;
-      font-family: 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
-      color: #555;
+      max-width: 700px;
+      margin: 1rem auto;
+      padding: 1.5rem;
+      border-radius: 8px;
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      font-size: 14px;
+      line-height: 1.5;
+      font-family: var(--bs-body-font-family);
+      color: var(--text-primary);
     }
 
-    .invoice-box table {
+    .invoice-header {
+      background: linear-gradient(45deg, #4338ca, #312e81);
+      margin: -1.5rem -1.5rem 1.5rem -1.5rem;
+      padding: 1.5rem;
+      border-radius: 8px 8px 0 0;
+      color: white;
+    }
+
+    .invoice-header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 500;
+    }
+
+    .invoice-header p {
+      margin: 0.25rem 0 0 0;
+      opacity: 0.9;
+      font-size: 0.9rem;
+    }
+
+    .info-card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .info-card h5 {
+      color: var(--text-primary);
+      font-size: 0.875rem;
+      font-weight: 500;
+      margin-bottom: 0.75rem;
+      text-transform: uppercase;
+    }
+
+    .info-card p {
+      margin: 0 0 0.5rem 0;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+    }
+
+    .info-card strong {
+      font-weight: 500;
+      color: var(--text-primary);
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1rem;
+    }
+
+    .symptoms-box {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 0.75rem;
+      margin: 0.25rem 0;
+      color: var(--text-primary);
+      font-size: 0.9rem;
+    }
+
+    table.charges-table {
       width: 100%;
-      line-height: inherit;
-      text-align: left;
+      border-collapse: collapse;
+      margin: 1rem 0;
     }
 
-    .invoice-box table td {
-      padding: 5px;
-      vertical-align: top;
+    .charges-table th,
+    .charges-table td {
+      padding: 0.75rem;
+      border-bottom: 1px solid var(--border-color);
+      background-color: var(--card-bg);
+      color: var(--text-primary);
     }
 
-    .invoice-box table tr td:nth-child(2) {
-      text-align: right;
+    .charges-table th {
+      background-color: var(--table-header-bg);
+      font-weight: 500;
+      font-size: 0.875rem;
+      text-transform: uppercase;
     }
 
-    .invoice-box table tr.top table td {
-      padding-bottom: 20px;
+    .form-control {
+      background-color: var(--input-bg);
+      border: 1px solid var(--border-color);
+      color: var(--input-text);
+      border-radius: 4px;
+      padding: 0.5rem;
+      width: 120px;
+      font-size: 0.9rem;
+      transition: all 0.2s;
     }
 
-    .invoice-box table tr.top table td.title {
-      font-size: 45px;
-      line-height: 45px;
-      color: #333;
+    .form-control:focus {
+      border-color: var(--link-color);
+      box-shadow: 0 0 0 2px rgba(102, 179, 255, 0.25);
+      background-color: var(--input-bg);
     }
 
-    .invoice-box table tr.information table td {
-      padding-bottom: 40px;
+    .btn-submit {
+      background: linear-gradient(45deg, #4338ca, #312e81);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 0.5rem 1.5rem;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: all 0.2s;
     }
 
-    .invoice-box table tr.heading td {
-      background: #eee;
-      border-bottom: 1px solid #ddd;
-      font-weight: bold;
-    }
-
-    .invoice-box table tr.details td {
-      padding-bottom: 20px;
-    }
-
-    .invoice-box table tr.item td {
-      border-bottom: 1px solid #eee;
-    }
-
-    .invoice-box table tr.item.last td {
-      border-bottom: none;
-    }
-
-    .invoice-box table tr.total td:nth-child(2) {
-      border-top: 2px solid #eee;
-      font-weight: bold;
-    }
-
-    @media only screen and (max-width: 600px) {
-      .invoice-box table tr.top table td {
-        width: 100%;
-        display: block;
-        text-align: center;
-      }
-
-      .invoice-box table tr.information table td {
-        width: 100%;
-        display: block;
-        text-align: center;
-      }
-    }
-
-    /** RTL **/
-    .rtl {
-      direction: rtl;
-      font-family: Tahoma, 'Helvetica Neue', 'Helvetica', Helvetica, Arial, sans-serif;
-    }
-
-    .rtl table {
-      text-align: right;
-    }
-
-    .rtl table tr td:nth-child(2) {
-      text-align: left;
-    }
-
-    .menu {
-      top: 50px;
+    .btn-submit:hover {
+      opacity: 0.9;
+      transform: translateY(-1px);
     }
   </style>
 </head>
 
-<br><br><br>
-<div class="invoice-box">
-  <table cellpadding="0" cellspacing="0">
-    <tr class="top">
-      <td colspan="2">
-        <table>
-          <tr>
-            <td class="title">
-              <h1>Hospital Management</h1>
-            </td>
+<div class="container py-3">
+  <div class="invoice-box">
+    <div class="invoice-header">
+      <h1>Generate Discharge Bill</h1>
+      <p>Please fill in the charges to generate the final bill</p>
+    </div>
 
-            <td>
+    <div class="info-grid">
+      <div class="info-card">
+        <h5>Patient Details</h5>
+        <p><strong>Name:</strong> {{name}}</p>
+        <p><strong>Mobile:</strong> {{mobile}}</p>
+        <p><strong>Address:</strong> {{address}}</p>
+      </div>
 
-              Admit Date: {{admitDate}}<br>
-              Release Date: {{todayDate}}<br>
-              Days Spent: {{day}}
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
+      <div class="info-card">
+        <h5>Admission Info</h5>
+        <p><strong>Admit Date:</strong> {{admitDate}}</p>
+        <p><strong>Release Date:</strong> {{todayDate}}</p>
+        <p><strong>Days Spent:</strong> {{day}}</p>
+      </div>
+    </div>
 
-    <tr class="information">
-      <td colspan="2">
-        <table>
-          <tr>
-            <td>
-              Patient Name : {{name}}<br>
-              Patient Mobile : {{mobile}}<br>
-              Patient Addres : {{address}}<br>
-            </td>
+    <div class="info-card">
+      <h5>Doctor & Diagnosis</h5>
+      <p><strong>Assigned Doctor:</strong> Dr. {{assignedDoctorName}}</p>
+      <p><strong>Symptoms:</strong></p>
+      <div class="symptoms-box">{{symptoms}}</div>
+    </div>
 
-            <td>
-              Doctor Name :<br>
-              {{assignedDoctorName}}<br>
-
-            </td>
-          </tr>
-        </table>
-      </td>
-    </tr>
-
-    <tr class="heading">
-      <td>
-        Disease and Symptoms
-      </td>
-      <td>
-
-      </td>
-
-    </tr>
-
-    <tr class="details">
-      <td>
-        {{symptoms}}
-      </td>
-    </tr>
-    <tr class="heading">
-      <td>
-        Item
-      </td>
-
-      <td>
-        Price
-      </td>
-    </tr>
     <form method="post">
       {% csrf_token %}
+      <table class="charges-table">
+        <thead>
+          <tr>
+            <th>Item</th>
+            <th style="text-align: right; width: 150px;">Amount (SYP)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Room Charge (Per Day)</td>
+            <td style="text-align: right">
+              <input type="number" name="roomCharge" class="form-control" placeholder="SYP" required>
+            </td>
+          </tr>
+          <tr>
+            <td>Doctor Fee</td>
+            <td style="text-align: right">
+              <input type="number" name="doctorFee" class="form-control" placeholder="SYP" required>
+            </td>
+          </tr>
+          <tr>
+            <td>Medicine Cost</td>
+            <td style="text-align: right">
+              <input type="number" name="medicineCost" class="form-control" placeholder="SYP" required>
+            </td>
+          </tr>
+          <tr>
+            <td>Other Charges</td>
+            <td style="text-align: right">
+              <input type="number" name="OtherCharge" class="form-control" placeholder="SYP" required>
+            </td>
+          </tr>
+        </tbody>
+      </table>
 
-      <tr class="item">
-        <td>
-          Room Charge (Per Day)
-        </td>
-
-        <td>
-          <input type="number" name="roomCharge" placeholder="In Rupees" value="">
-        </td>
-      </tr>
-
-      <tr class="item">
-        <td>
-          Doctor Fee
-        </td>
-
-        <td>
-          <input type="number" name="doctorFee" placeholder="In Rupees" value="">
-        </td>
-      </tr>
-
-      <tr class="item">
-        <td>
-          Medicine Cost
-        </td>
-
-        <td>
-          <input type="number" name="medicineCost" placeholder="In Rupees" value="">
-        </td>
-      </tr>
-
-      <tr class="item last">
-        <td>
-          Other Charge
-        </td>
-
-        <td>
-          <input type="number" name="OtherCharge" placeholder="In Rupees" value="">
-        </td>
-      </tr>
-
-      <tr class="total">
-        <td></td>
-
-        <td>
-          <input type="submit" name="submit" value="Generate Bill">
-        </td>
-      </tr>
-
+      <div class="text-end">
+        <button type="submit" class="btn-submit">
+          <i class="fas fa-file-invoice me-2"></i>Generate Bill
+        </button>
+      </div>
     </form>
-  </table>
+  </div>
 </div>
-
 
 {% endblock content %}

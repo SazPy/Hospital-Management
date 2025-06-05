@@ -67,10 +67,14 @@ urlpatterns = [
     path('admin-approve-appointment', views.admin_appointment_views, {'action': 'approve'}, name='admin-approve-appointment'),
     path('admin-approve-appointment/<int:pk>', views.admin_appointment_views, {'action': 'approve-appointment'}, name='admin-approve-appointment'),
     path('admin-reject-appointment/<int:pk>', views.admin_appointment_views, {'action': 'reject'}, name='admin-reject-appointment'),
+    path('admin-appointment-details/<int:pk>', views.admin_appointment_views, {'action': 'details'}, name='admin-appointment-details'),
+    path('admin-delete-appointment/<int:pk>', views.admin_appointment_views, {'action': 'delete'}, name='admin-delete-appointment'),
 
     # Room Management URLs
-    path('admin-rooms/', views.admin_room_management, {'action': 'view'}, name='admin-rooms'),
-    path('admin-add-room/', views.admin_room_management, {'action': 'add'}, name='admin-add-room'),
+    path('admin-add-room/', views.admin_add_room_view, name='admin-add-room'),
+    path('admin-rooms/', views.admin_rooms_view, name='admin-rooms'),
+    path('admin-room/<int:room_id>/edit/', views.admin_edit_room_view, name='admin-edit-room'),
+    path('admin-room/<int:room_id>/delete/', views.admin_delete_room_view, name='admin-delete-room'),
     path('admin-room/<int:patient_id>/assign/', views.admin_room_management, {'action': 'assign'}, name='admin-assign-room'),
     path('admin-room/<int:patient_id>/change/', views.admin_room_management, {'action': 'change'}, name='admin-change-room'),
     path('admin-room/<int:patient_id>/discharge/', views.admin_room_management, {'action': 'discharge'}, name='admin-discharge-from-room'),
