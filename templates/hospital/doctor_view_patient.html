@@ -45,7 +45,7 @@
               <td class="px-4 py-3">
                 <div class="d-flex align-items-center">
                   {% if p.profile_pic %}
-                    <img src="{% static p.profile_pic.url %}" alt="Profile Pic" class="rounded-circle me-3" width="40" height="40">
+                    <img src="{{ p.profile_pic.url }}" alt="Profile Pic" class="rounded-circle me-3" width="40" height="40">
                   {% else %}
                     <div class="avatar-placeholder rounded-circle bg-primary-subtle me-3">
                       <i class="fas fa-user"></i>
@@ -75,15 +75,12 @@
               </td>
               <td class="px-4 py-3">
                 <div class="action-buttons">
-                  <button class="btn btn-sm btn-outline-primary me-2" data-bs-toggle="tooltip" title="View Details">
+                  <a href="{% url 'doctor-view-patient-detail' p.id %}" class="btn btn-sm btn-outline-primary me-2" data-bs-toggle="tooltip" title="View Details">
                     <i class="fas fa-eye"></i>
-                  </button>
-                  <button class="btn btn-sm btn-outline-success me-2" data-bs-toggle="tooltip" title="Update Records">
-                    <i class="fas fa-edit"></i>
-                  </button>
-                  <button class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip" title="Message">
-                    <i class="fas fa-comment-medical"></i>
-                  </button>
+                  </a>
+                  <a href="{% url 'doctor-update-record' p.id %}" class="btn btn-sm btn-outline-success" data-bs-toggle="tooltip" title="Update Records">
+                    <i class="fas fa-notes-medical"></i>
+                  </a>
                 </div>
               </td>
             </tr>

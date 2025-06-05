@@ -161,7 +161,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 👥 Authors
 
-- Your Name - Initial work - [GitHub](https://github.com/yourusername)
+- SazPy - [GitHub](https://github.com/sazpy)
 
 ## 🙏 Acknowledgments
 

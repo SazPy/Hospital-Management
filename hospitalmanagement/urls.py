@@ -10,8 +10,8 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home_view, name=''),
 
-    path('aboutus', views.aboutus_view),
-    path('contactus', views.contactus_view),
+    path('aboutus', views.aboutus_view, name='aboutus'),
+    path('contactus', views.contactus_view, name='contactus'),
 
     path('adminclick', views.adminclick_view),
     path('doctorclick', views.doctorclick_view),
@@ -30,6 +30,9 @@ urlpatterns = [
     
     path('admin-profile', views.admin_profile_view, name='admin-profile'),
     path('admin-dashboard', views.admin_dashboard_view, name='admin-dashboard'),
+    path('admin-messages', views.admin_messages_view, name='admin-messages'),
+    path('admin-mark-message-read/<int:pk>/', views.admin_mark_message_read, name='admin-mark-message-read'),
+    path('admin-delete-message/<int:pk>/', views.admin_delete_message, name='admin-delete-message'),
 
     # Doctor URLs - using consolidated view
     path('admin-doctor', views.admin_doctor_views, name='admin-doctor'),
@@ -96,10 +99,11 @@ urlpatterns = [
 urlpatterns += [
     path('search', views.doctor_patient_views, {'action': 'search'}, name='search'),
 
-    path('doctor-patient', views.doctor_patient_views, name='doctor-patient'),
-    path('doctor-view-patient', views.doctor_patient_views, {'action': 'view'}, name='doctor-view-patient'),
+    path('doctor-patient', views.doctor_patient_views, {'action': 'view'}, name='doctor-patient'),
+    path('doctor-patient/<int:pk>/', views.doctor_patient_views, {'action': 'detail'}, name='doctor-view-patient-detail'),
     path('doctor-view-discharge-patient', views.doctor_patient_views, {'action': 'discharged'},
          name='doctor-view-discharge-patient'),
+    path('doctor-update-record/<int:pk>/', views.doctor_patient_views, {'action': 'update_record'}, name='doctor-update-record'),
 
     path('doctor-appointment', views.doctor_appointment_views, name='doctor-appointment'),
     path('doctor-view-appointment', views.doctor_appointment_views, {'action': 'view'}, name='doctor-view-appointment'),

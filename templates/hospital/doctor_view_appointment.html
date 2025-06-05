@@ -44,7 +44,7 @@
                   <td class="px-4 py-3">
                     <div class="d-flex align-items-center">
                       {% if pat.profile_pic %}
-                        <img src="{% static pat.profile_pic.url %}" alt="{{ pat.get_name }}" class="rounded-circle me-3" width="48" height="48">
+                        <img src="{{ pat.profile_pic.url }}" alt="{{ pat.get_name }}" class="rounded-circle me-3" width="48" height="48">
                       {% else %}
                         <div class="avatar-placeholder rounded-circle bg-primary-subtle me-3">
                           <i class="fas fa-user"></i>

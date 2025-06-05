@@ -40,4 +40,11 @@ urlpatterns = [
     path('admin-discharge-patient', views.admin_patient_views, {'action': 'discharge'}, name='admin-discharge-patient'),
     path('discharge-patient/<int:pk>', views.handle_discharge_patient, name='discharge-patient'),
     path('download-pdf/<int:pk>/', views.download_pdf_view, name='download-pdf'),
+
+    # Doctor Patient Management URLs
+    path('doctor-patient/', views.doctor_patient_views, name='doctor-patient'),
+    path('doctor-view-patient/', views.doctor_patient_views, name='doctor-view-patient'),
+    path('doctor-view-patient/search/', views.doctor_patient_views, {'action': 'search'}, name='doctor-search-patient'),
+    path('doctor-view-patient/discharged/', views.doctor_patient_views, {'action': 'discharged'}, name='doctor-discharged-patients'),
+    path('doctor-update-record/<int:pk>/', views.doctor_patient_views, {'action': 'update_record'}, name='doctor-update-record'),
 ] 

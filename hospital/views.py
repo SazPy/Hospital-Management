@@ -875,19 +875,25 @@ def doctor_dashboard_view(request):
         "appointments": recent_appointments,
         "recent_patients": recent_patients,
         "doctor": doc,
-        "pending_room_requests": pending_room_requests,
+        "pending_room_requests": pending_room_requests.count(),
     })
 
 
 @login_required(login_url="doctorlogin")
 @user_passes_test(is_doctor)
-def doctor_patient_views(request, action=None):
+def doctor_patient_views(request, action=None, pk=None):
     doc = models.Doctor.objects.get(user_id=request.user.id)
 
-    if action == "view":
+    if action == "view" or action is None:  # Handle both view and default case
         pats = models.Patient.objects.filter(status=True, assignedDoctorId=request.user.id)
         return render(request, "hospital/doctor_view_patient.html",
                       {"patients": pats, "doctor": doc})
+
+    if action == "detail":
+        patient = get_object_or_404(models.Patient, id=pk, assignedDoctorId=request.user.id)
+        medical_records = models.PatientRecord.objects.filter(patient=patient).order_by('-date')
+        return render(request, "hospital/doctor_view_patient_detail.html",
+                     {"patient": patient, "doctor": doc, "medical_records": medical_records})
 
     if action == "search":
         q = request.GET.get("query", "")
@@ -902,7 +908,32 @@ def doctor_patient_views(request, action=None):
         return render(request, "hospital/doctor_view_discharge_patient.html",
                       {"dischargedpatients": dis, "doctor": doc})
 
-    return render(request, "hospital/doctor_patient.html", {"doctor": doc})
+    if action == "update_record":
+        patient = get_object_or_404(models.Patient, id=pk, assignedDoctorId=request.user.id)
+        if request.method == 'POST':
+            form = forms.PatientRecordForm(request.POST, request.FILES)
+            if form.is_valid():
+                record = form.save(commit=False)
+                record.patient = patient
+                record.doctor = doc
+                record.save()
+                messages.success(request, "Patient record updated successfully.")
+                return redirect('doctor-patient')
+        else:
+            form = forms.PatientRecordForm()
+        
+        context = {
+            "doctor": doc,
+            "patient": patient,
+            "form": form,
+            "medical_records": models.PatientRecord.objects.filter(patient=patient).order_by('-created_at')
+        }
+        return render(request, "hospital/doctor_update_record.html", context)
+
+    # If no action matches, show the patient list
+    pats = models.Patient.objects.filter(status=True, assignedDoctorId=request.user.id)
+    return render(request, "hospital/doctor_view_patient.html",
+                  {"patients": pats, "doctor": doc})
 
 
 @login_required(login_url="doctorlogin")
@@ -1181,18 +1212,43 @@ def aboutus_view(request):
 
 
 def contactus_view(request):
-    if request.method == "POST":
-        form = forms.ContactusForm(request.POST)
+    if request.method == 'POST':
+        form = forms.ContactMessageForm(request.POST)
         if form.is_valid():
-            name = form.cleaned_data["Name"]
-            email = form.cleaned_data["Email"]
-            msg   = form.cleaned_data["Message"]
-            send_mail(f"{name} || {email}", msg,
-                      settings.EMAIL_HOST_USER, [settings.EMAIL_RECEIVING_USER])
-            return render(request, "hospital/contactussuccess.html")
+            form.save()
+            messages.success(request, 'Your message has been sent successfully!')
+            return redirect('contactus')
     else:
-        form = forms.ContactusForm()
-    return render(request, "hospital/contactus.html", {"form": form})
+        form = forms.ContactMessageForm()
+    return render(request, 'hospital/contactus.html', {'form': form})
+
+@login_required(login_url="adminlogin")
+@user_passes_test(is_admin)
+def admin_messages_view(request):
+    contact_messages = models.ContactMessage.objects.all()
+    context = {
+        'contact_messages': contact_messages,
+        'total_messages': contact_messages.count(),
+        'unread_messages': contact_messages.filter(is_read=False).count()
+    }
+    return render(request, 'hospital/admin_contact_messages.html', context)
+
+@login_required(login_url="adminlogin")
+@user_passes_test(is_admin)
+def admin_mark_message_read(request, pk):
+    message = get_object_or_404(models.ContactMessage, id=pk)
+    message.is_read = True
+    message.save()
+    messages.success(request, 'Message marked as read.')
+    return redirect('admin-messages')
+
+@login_required(login_url="adminlogin")
+@user_passes_test(is_admin)
+def admin_delete_message(request, pk):
+    message = get_object_or_404(models.ContactMessage, id=pk)
+    message.delete()
+    messages.success(request, 'Message deleted successfully.')
+    return redirect('admin-messages')
 
 # --------------------------------------------------------------------------- #
 # PDF download after discharge
@@ -1293,3 +1349,10 @@ def patient_profile_view(request):
         ).order_by('-id').first()
     }
     return render(request, "hospital/patient_profile.html", context)
+
+def admin_context_processor(request):
+    """Add unread messages count to admin templates context"""
+    if request.user.is_authenticated and is_admin(request.user):
+        unread_messages_count = models.ContactMessage.objects.filter(is_read=False).count()
+        return {'unread_messages_count': unread_messages_count}
+    return {}

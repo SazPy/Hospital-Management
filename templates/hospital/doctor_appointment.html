@@ -69,18 +69,19 @@
 }
 
 .feature-card {
-  background: white;
+  background: var(--card-bg, white);
   border-radius: 1rem;
   padding: 2rem;
   text-align: center;
   height: 100%;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--box-shadow, 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06));
   transition: all 0.3s ease;
+  border: 1px solid var(--border-color, transparent);
 }
 
 .feature-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--box-shadow, 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05));
 }
 
 .feature-icon {
@@ -92,34 +93,34 @@
   justify-content: center;
   font-size: 1.5rem;
   border-radius: 1rem;
-  color: #4f46e5;
-  background-color: #eff6ff;
+  color: var(--link-color, #4f46e5);
+  background-color: rgba(79, 70, 229, 0.1);
 }
 
 .feature-icon.pending {
-  color: #f59e0b;
-  background-color: #fef3c7;
+  color: var(--warning-color, #f59e0b);
+  background-color: rgba(245, 158, 11, 0.1);
 }
 
 .feature-icon.delete {
-  color: #ef4444;
-  background-color: #fee2e2;
+  color: var(--danger-color, #ef4444);
+  background-color: rgba(239, 68, 68, 0.1);
 }
 
 .feature-card h3 {
   font-size: 1.25rem;
   margin-bottom: 1rem;
-  color: #1f2937;
+  color: var(--text-primary, #1f2937);
 }
 
 .feature-card p {
-  color: #6b7280;
+  color: var(--text-secondary, #6b7280);
   margin-bottom: 1.5rem;
 }
 
 .btn-warning {
-  background-color: #f59e0b;
-  border-color: #f59e0b;
+  background-color: var(--warning-color, #f59e0b);
+  border-color: var(--warning-color, #f59e0b);
   color: white;
 }
 
@@ -130,13 +131,30 @@
 }
 
 .btn-danger {
-  background-color: #ef4444;
-  border-color: #ef4444;
+  background-color: var(--danger-color, #ef4444);
+  border-color: var(--danger-color, #ef4444);
 }
 
 .btn-danger:hover {
   background-color: #dc2626;
   border-color: #dc2626;
+}
+
+[data-theme="dark"] .feature-card {
+  background-color: var(--card-bg);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .feature-icon {
+  background-color: rgba(102, 179, 255, 0.1);
+}
+
+[data-theme="dark"] .feature-icon.pending {
+  background-color: rgba(249, 177, 21, 0.1);
+}
+
+[data-theme="dark"] .feature-icon.delete {
+  background-color: rgba(229, 83, 83, 0.1);
 }
 </style>
 

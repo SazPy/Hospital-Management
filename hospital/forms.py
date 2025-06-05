@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
-from .models import Doctor, Patient, Appointment, Room, RoomRequest  # Direct model imports help with IDEs/autocomplete
+from .models import Doctor, Patient, Appointment, Room, RoomRequest, PatientRecord, ContactMessage  # Direct model imports help with IDEs/autocomplete
 from datetime import date
 
 
@@ -376,3 +376,40 @@ class RoomAssignmentForm(forms.ModelForm):
             print(f"Debug - Form init - Final queryset: {list(self.fields['assigned_room'].queryset)}")
         else:
             print("Debug - Form init - No instance or no requested room")
+
+
+class PatientRecordForm(forms.ModelForm):
+    class Meta:
+        model = PatientRecord
+        fields = ['diagnosis', 'prescription', 'notes', 'images']
+        widgets = {
+            'diagnosis': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'Enter diagnosis details'
+            }),
+            'prescription': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 4,
+                'placeholder': 'Enter prescription details'
+            }),
+            'notes': forms.Textarea(attrs={
+                'class': 'form-control',
+                'rows': 3,
+                'placeholder': 'Enter any additional notes'
+            }),
+            'images': forms.FileInput(attrs={
+                'class': 'form-control',
+                'accept': 'image/*'
+            })
+        }
+
+class ContactMessageForm(forms.ModelForm):
+    class Meta:
+        model = ContactMessage
+        fields = ['name', 'email', 'message']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Your Name'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Your Email'}),
+            'message': forms.Textarea(attrs={'class': 'form-control', 'placeholder': 'Your Message', 'rows': 5}),
+        }

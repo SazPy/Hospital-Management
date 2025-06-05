@@ -149,3 +149,33 @@ class RoomRequest(models.Model):
     
     def __str__(self):
         return f"Room request for {self.patient} by Dr. {self.doctor}"
+
+class PatientRecord(models.Model):
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE, related_name='medical_records')
+    doctor = models.ForeignKey(Doctor, on_delete=models.SET_NULL, null=True, related_name='patient_records')
+    date = models.DateField(auto_now_add=True)
+    diagnosis = models.TextField()
+    prescription = models.TextField()
+    notes = models.TextField(blank=True)
+    images = models.ImageField(upload_to='patient_records/', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Record for {self.patient.get_name} by Dr. {self.doctor.get_name} on {self.date}"
+
+class ContactMessage(models.Model):
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    message = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-created_at']
+
+    def __str__(self):
+        return f"Message from {self.name} ({self.email})"
