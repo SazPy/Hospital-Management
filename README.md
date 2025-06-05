@@ -89,18 +89,20 @@ A comprehensive hospital management system built with Django that streamlines he
    python manage.py migrate
    ```
 
-6. **Admin Login Credentials**
-   ```
-   Username: hospitaladmin
-   Password: Admin@123
-   ```
-
-7. **Run development server**
+6. **Run development server**
    ```bash
    python manage.py runserver
    ```
 
-8. Visit http://127.0.0.1:8000/ in your browser
+7. Visit http://127.0.0.1:8000/ in your browser
+
+8. **Admin Login Credentials**
+   ```
+   Username: hospitaladmin
+   Password: Admin@123
+   http://127.0.0.1:8000/adminclick to login
+   ```
+
 
 ## 📚 Documentation
 
