@@ -49,50 +49,62 @@ graph TD
 
 ```mermaid
 graph TD
-    subgraph External Entities
-        P[Patient]
-        D[Doctor]
-        A[Admin]
-        E[Email System]
-        SMS[SMS Gateway]
-        PAY[Payment Gateway]
-    end
+    %% External Entities
+    P((Patient))
+    D((Doctor))
+    A((Admin))
+    E[Email System]
+    SMS[SMS Gateway]
+    PAY[Payment Gateway]
     
-    subgraph System
-        HMS((Hospital Management System))
-    end
+    %% Central System
+    HMS[Hospital Management System]
     
-    subgraph Data Stores
-        DB[(Database)]
-        FS[File Storage]
-    end
+    %% Data Stores
+    DB[(Database)]
+    FS[(File Storage)]
     
-    P -->|1. Registration/Login| HMS
-    P -->|2. Appointment Requests| HMS
-    P -->|3. Contact Messages| HMS
-    P -->|4. Payments| HMS
+    %% Patient Flows
+    P -->|"Register/Login"| HMS
+    P -->|"Book Appointments"| HMS
+    P -->|"View Medical Records"| HMS
+    P -->|"Make Payments"| HMS
+    P -->|"Download Documents"| HMS
     
-    D -->|5. Patient Updates| HMS
-    D -->|6. Appointment Responses| HMS
-    D -->|7. Medical Records| HMS
+    %% Doctor Flows
+    D -->|"Update Patient Records"| HMS
+    D -->|"Manage Appointments"| HMS
+    D -->|"View Schedule"| HMS
+    D -->|"Request Resources"| HMS
     
-    A -->|8. System Configuration| HMS
-    A -->|9. Approval Actions| HMS
-    A -->|10. Reports Generation| HMS
+    %% Admin Flows
+    A -->|"Manage Users"| HMS
+    A -->|"Configure System"| HMS
+    A -->|"Generate Reports"| HMS
+    A -->|"Monitor Resources"| HMS
     
-    HMS -->|11. Store Data| DB
-    HMS -->|12. Store Files| FS
-    HMS -->|13. Send Emails| E
-    HMS -->|14. Send SMS| SMS
-    HMS -->|15. Process Payment| PAY
+    %% System to Storage Flows
+    HMS -->|"Store/Retrieve Data"| DB
+    HMS -->|"Store/Access Files"| FS
     
-    DB -->|16. Query Results| HMS
-    FS -->|17. File Access| HMS
+    %% External System Flows
+    HMS -->|"Send Notifications"| E
+    HMS -->|"Send Alerts"| SMS
+    HMS -->|"Process Transactions"| PAY
     
-    HMS -->|18. Notifications| P
-    HMS -->|19. Medical Records| P
-    HMS -->|20. Appointment Status| D
-    HMS -->|21. System Reports| A
+    %% Return Flows
+    HMS -->|"Notifications/Updates"| P
+    HMS -->|"Alerts/Schedule"| D
+    HMS -->|"Reports/Analytics"| A
+
+    %% Styling
+    classDef external fill:#f9f,stroke:#333,stroke-width:2px
+    classDef system fill:#bbf,stroke:#333,stroke-width:4px
+    classDef storage fill:#dfd,stroke:#333,stroke-width:2px
+    
+    class P,D,A external
+    class HMS system
+    class DB,FS storage
 ```
 
 ## Data Flow Diagram (Level 1)

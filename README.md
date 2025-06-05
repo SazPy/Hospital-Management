@@ -89,9 +89,10 @@ A comprehensive hospital management system built with Django that streamlines he
    python manage.py migrate
    ```
 
-6. **Create admin user**
-   ```bash
-   python manage.py createsuperuser
+6. **Admin Login Credentials**
+   ```
+   Username: hospitaladmin
+   Password: Admin@123
    ```
 
 7. **Run development server**
@@ -105,13 +106,30 @@ A comprehensive hospital management system built with Django that streamlines he
 
 Detailed documentation is available in the [docs](docs/) directory:
 
+### System Documentation
+- [System Requirements](docs/system-requirements.md)
+- [System Architecture](docs/system-diagrams.md)
+  - Context Diagram
+  - Data Flow Diagrams
+  - UI Navigation Tree
+- [Use Cases and Sequence Diagrams](docs/use-cases.md)
+  - User Management Flows
+  - Patient Use Cases
+  - Doctor Use Cases
+  - Admin Use Cases
+  - System Processes
+
+### User Documentation
 - [User Guide](docs/user-guide.md)
   - [Admin Manual](docs/admin-guide.md)
   - [Doctor Manual](docs/doctor-guide.md)
   - [Patient Manual](docs/patient-guide.md)
+
+### Technical Documentation
 - [Developer Guide](docs/developer-guide.md)
   - [Setup Guide](docs/setup-guide.md)
   - [Database Schema](docs/database-schema.md)
+  - [API Documentation](docs/api-docs.md)
 - [Contributing Guide](docs/contributing.md)
 - [Deployment Guide](docs/deployment.md)
 
@@ -131,11 +149,14 @@ hospital-management/
 │   ├── js/                # JavaScript files
 │   └── img/               # Images
 ├── docs/                  # Documentation
+│   ├── system-diagrams.md # System architecture
+│   ├── use-cases.md      # Use cases & flows
+│   └── api-docs.md       # API documentation
 ├── requirements.txt       # Python dependencies
 └── manage.py             # Django management
 ```
 
-## 🔒 Security
+## 🔒 Security Features
 
 - Built-in Django security features
 - CSRF protection
@@ -143,6 +164,10 @@ hospital-management/
 - Session security
 - XSS prevention
 - SQL injection protection
+- Role-based access control
+- Audit logging
+- Password policies
+- Rate limiting
 
 ## 🤝 Contributing
 
