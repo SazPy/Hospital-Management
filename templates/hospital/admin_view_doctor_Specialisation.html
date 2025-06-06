@@ -92,13 +92,9 @@
                 {% for doctor in department.list %}
                 <tr>
                   <td style="width: 48px">
-                    {% if doctor.profile_pic %}
-                      <img src="{% static doctor.profile_pic.url %}" alt="Profile" class="rounded-circle" width="40" height="40">
-                    {% else %}
-                      <div class="avatar-placeholder rounded-circle bg-primary-subtle d-flex align-items-center justify-content-center" style="width: 40px; height: 40px">
-                        <i class="fas fa-user-md text-primary"></i>
-                      </div>
-                    {% endif %}
+                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                      <i class="fas fa-user-md text-primary"></i>
+                    </div>
                   </td>
                   <td>
                     <div class="fw-medium">Dr. {{ doctor.get_name }}</div>
