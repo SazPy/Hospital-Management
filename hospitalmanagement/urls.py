@@ -12,6 +12,8 @@ urlpatterns = [
 
     path('aboutus', views.aboutus_view, name='aboutus'),
     path('contactus', views.contactus_view, name='contactus'),
+    path('privacy-policy', views.privacy_policy_view, name='privacy-policy'),
+    path('terms', views.terms_view, name='terms'),
 
     path('adminclick', views.adminclick_view),
     path('doctorclick', views.doctorclick_view),
@@ -127,6 +129,8 @@ urlpatterns += [
          name='patient-view-appointment'),
     path('patient-view-doctor', views.patient_appointment_views, {'action': 'view-doctors'},
          name='patient-view-doctor'),
+    path('patient-doctor-specialisation', views.patient_appointment_views, {'action': 'view-doctors', 'view_type': 'specialisation'},
+         name='patient-doctor-specialisation'),
     path('searchdoctor', views.patient_appointment_views, {'action': 'search-doctors'}, name='searchdoctor'),
     path('patient-discharge', views.patient_appointment_views, {'action': 'discharge'}, name='patient-discharge'),
 ]

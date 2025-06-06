@@ -1114,7 +1114,7 @@ def patient_dashboard_view(request):
 
 @login_required(login_url="patientlogin")
 @user_passes_test(is_patient)
-def patient_appointment_views(request, action=None):
+def patient_appointment_views(request, action=None, view_type=None):
     pat = models.Patient.objects.get(user_id=request.user.id)
 
     if action == "book":
@@ -1152,7 +1152,8 @@ def patient_appointment_views(request, action=None):
 
     if action == "view-doctors":
         docs = models.Doctor.objects.filter(status=True).order_by('department')
-        view_type = request.GET.get('view', 'grid')  # Default to grid view
+        # If view_type is not provided in URL, try to get it from GET parameters
+        view_type = view_type or request.GET.get('view', 'grid')
         return render(request, "hospital/patient_view_doctor.html",
                      {"patient": pat, "doctors": docs, "view_type": view_type})
 
@@ -1161,7 +1162,7 @@ def patient_appointment_views(request, action=None):
         docs = models.Doctor.objects.filter(status=True)\
                 .filter(Q(department__icontains=q) | Q(user__first_name__icontains=q))\
                 .order_by('department')
-        view_type = request.GET.get('view', 'grid')  # Default to grid view
+        view_type = view_type or request.GET.get('view', 'grid')  # Maintain view type during search
         return render(request, "hospital/patient_view_doctor.html",
                      {"patient": pat, "doctors": docs, "view_type": view_type})
 
@@ -1221,6 +1222,15 @@ def contactus_view(request):
     else:
         form = forms.ContactMessageForm()
     return render(request, 'hospital/contactus.html', {'form': form})
+
+
+def privacy_policy_view(request):
+    return render(request, "hospital/privacy_policy.html")
+
+
+def terms_view(request):
+    return render(request, "hospital/terms.html")
+
 
 @login_required(login_url="adminlogin")
 @user_passes_test(is_admin)
@@ -1336,13 +1346,13 @@ def patient_profile_view(request):
     context = {
         'patient': patient,
         'doctor': assigned_doctor,
-        'total_appointments': models.Appointment.objects.filter(patientId=request.user.id).count(),
+        'total_appointments': models.Appointment.objects.filter(patient=patient).count(),
         'upcoming_appointments': models.Appointment.objects.filter(
-            patientId=request.user.id,
+            patient=patient,
             appointmentDate__gte=timezone.now().date()
         ).count(),
         'recent_appointments': models.Appointment.objects.filter(
-            patientId=request.user.id
+            patient=patient
         ).order_by('-appointmentDate', '-appointmentTime')[:5],
         'discharge_details': models.PatientDischargeDetails.objects.filter(
             patientId=patient.id

@@ -53,13 +53,9 @@
         <div class="col-md-6 col-lg-4">
           <div class="doctor-card">
             <div class="doctor-header">
-              {% if doctor.profile_pic %}
-                <img src="{% static doctor.profile_pic.url %}" alt="{{ doctor.get_name }}" class="doctor-image">
-              {% else %}
-                <div class="doctor-avatar">
-                  <i class="fas fa-user-md"></i>
-                </div>
-              {% endif %}
+              <div class="doctor-avatar">
+                <i class="fas fa-user-md fa-3x"></i>
+              </div>
               <div class="doctor-status {% if doctor.status %}online{% endif %}"></div>
             </div>
             <div class="doctor-info">
@@ -111,13 +107,9 @@
       <div class="col-md-6 col-lg-4">
         <div class="doctor-card">
           <div class="doctor-header">
-            {% if doctor.profile_pic %}
-              <img src="{% static doctor.profile_pic.url %}" alt="{{ doctor.get_name }}" class="doctor-image">
-            {% else %}
-              <div class="doctor-avatar">
-                <i class="fas fa-user-md"></i>
-              </div>
-            {% endif %}
+            <div class="doctor-avatar">
+              <i class="fas fa-user-md fa-3x"></i>
+            </div>
             <div class="doctor-status {% if doctor.status %}online{% endif %}"></div>
           </div>
           <div class="doctor-info">
