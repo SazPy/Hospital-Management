@@ -2,238 +2,87 @@
 
 ## Core Use Cases
 
-### Admin Use Cases
+### 👨‍💼 Admin Use Cases
 
-#### 1. Doctor Management
-**Pre-conditions:** Admin is logged in
+| Use Case | Preconditions | Actions |
+|----------|---------------|----------|
+| Doctor Management | Admin is logged in | View, add, update, delete doctors; approve/reject registrations; view specializations & departments; track appointments; manage offices |
+| Patient Management | Admin is logged in | View, add, update patients; approve/reject registrations; view details & appointments; manage discharge; track history; assign rooms |
+| Room Management | Admin is logged in | View, add, update rooms; assign/change rooms; process requests; view occupancy; manage room types; track availability; handle maintenance |
+| Appointment Management | Admin is logged in | View, schedule, approve/reject, cancel, reschedule appointments; view details, statistics, history; manage emergency appointments |
+| System Administration | Admin is logged in | Manage user accounts; view statistics & audit logs; handle contact messages; monitor performance; configure departments & system parameters; backup |
+| Billing Management | Admin is logged in | Generate bills; calculate charges; process doctor fees & medicine costs; handle additional charges & refunds; view payment history; generate reports |
 
-**Main Flow:**
-1. View all doctors
-2. Add new doctor
-3. Update doctor information
-4. Approve/reject doctor registrations
-5. View doctor specializations
-6. Delete doctor
-7. View doctor departments
-8. Track doctor appointments
-9. Manage doctor offices
+### 👨‍⚕️ Doctor Use Cases
 
-#### 2. Patient Management
-**Pre-conditions:** Admin is logged in
+| Use Case | Preconditions | Actions |
+|----------|---------------|----------|
+| Patient Management | Doctor is logged in & approved | View/search assigned patients; view details, appointments, history; update medical records; add notes; handle emergencies; request tests |
+| Appointment Management | Doctor is logged in & approved | View, approve/reject, cancel, reschedule appointments; set availability hours; manage follow-ups; view history & set priorities |
+| Room Management | Doctor is logged in & approved | Request room/change for patients; specify room requirements; track request status; view available rooms & occupancy; manage office hours |
+| Medical Records Management | Doctor is logged in & approved | Create/update patient records, diagnoses; prescribe meds; add notes; upload images; document allergies, vitals, lab results, procedures, prescriptions |
+| Profile Management | Doctor is logged in & approved | Update personal info, contact details; manage specializations & working hours; view stats, performance metrics; manage notifications |
 
-**Main Flow:**
-1. View all patients
-2. Add new patient
-3. Update patient information
-4. Approve/reject patient registrations
-5. View patient details
-6. Manage patient discharge
-7. Track patient medical history
-8. View patient appointments
-9. Manage patient room assignments
+### 🧑‍🦽 Patient Use Cases
 
-#### 3. Room Management
-**Pre-conditions:** Admin is logged in
+| Use Case | Preconditions | Actions |
+|----------|---------------|----------|
+| Appointment Management | Patient is logged in & approved | Book, view, cancel, reschedule appointments; search/view doctors; track status; view history; rate doctors; set reminders |
+| Medical Records | Patient is logged in & approved | View medical history, prescriptions, treatment details; access discharge summary; track medications; download reports; view billing history |
+| Room Management | Patient is logged in & approved | View assigned room/details/charges; request room change; track requests; submit feedback |
+| Profile Management | Patient is logged in & approved | Update personal/contact/insurance/emergency info; manage notifications; view medical profile, treatment history, billing status |
+| Communication | Patient is logged in & approved | Contact hospital; submit feedback/issues; request information; view announcements & doctor responses; track message history |
 
-**Main Flow:**
-1. View all rooms
-2. Add new room
-3. Update room information
-4. Assign/change room for patient
-5. Process room requests
-6. View room occupancy
-7. Manage room types (Ward/Private/ICU/Office)
-8. Track room availability
-9. Handle room maintenance
-10. View room request history
+## Use Case Diagram
 
-#### 4. Appointment Management
-**Pre-conditions:** Admin is logged in
+```mermaid
+graph TB
+    subgraph Admin["👨‍💼 Admin"]
+        A1["Doctor Management"]
+        A2["Patient Management"]
+        A3["Room Management"]
+        A4["Appointment Management"]
+        A5["System Administration"]
+        A6["Billing Management"]
+    end
 
-**Main Flow:**
-1. View all appointments
-2. Schedule new appointment
-3. Approve/reject appointments
-4. View appointment details
-5. Cancel appointments
-6. Track appointment history
-7. Manage emergency appointments
-8. View appointment statistics
-9. Handle appointment rescheduling
+    subgraph Doctor["👨‍⚕️ Doctor"]
+        D1["Patient Management"]
+        D2["Appointment Management"]
+        D3["Room Management"]
+        D4["Medical Records Management"]
+        D5["Profile Management"]
+    end
 
-#### 5. System Administration
-**Pre-conditions:** Admin is logged in
+    subgraph Patient["🧑‍🦽 Patient"]
+        P1["Appointment Management"]
+        P2["Medical Records"]
+        P3["Room Management"]
+        P4["Profile Management"]
+        P5["Communication"]
+    end
 
-**Main Flow:**
-1. Manage user accounts
-2. View system statistics
-3. Handle contact messages
-4. Monitor system performance
-5. View audit logs
-6. Manage department settings
-7. Configure system parameters
-8. Generate system reports
-9. Backup system data
+    %% Admin connections
+    A1 --> D5
+    A2 --> P4
+    A3 --> D3
+    A3 --> P3
+    A4 --> D2
+    A4 --> P1
+    A6 --> P2
 
-#### 6. Billing Management
-**Pre-conditions:** Admin is logged in
+    %% Doctor connections
+    D1 --> P2
+    D2 --> P1
+    D3 --> P3
+    D4 --> P2
 
-**Main Flow:**
-1. Generate patient bills
-2. Calculate room charges
-3. Process doctor fees
-4. Handle medicine costs
-5. Manage additional charges
-6. View payment history
-7. Generate financial reports
-8. Process refunds
-9. Track outstanding payments
-
-### Doctor Use Cases
-
-#### 1. Patient Management
-**Pre-conditions:** Doctor is logged in and approved
-
-**Main Flow:**
-1. View assigned patients
-2. Search patients
-3. View patient details
-4. Update medical records
-5. View discharge patients
-6. Track patient history
-7. Add patient notes
-8. View patient appointments
-9. Monitor patient progress
-10. Request patient tests
-11. View patient medications
-12. Handle patient emergencies
-
-#### 2. Appointment Management
-**Pre-conditions:** Doctor is logged in and approved
-
-**Main Flow:**
-1. View appointments
-2. Approve/reject appointment requests
-3. View appointment schedule
-4. Cancel appointments
-5. Reschedule appointments
-6. Handle emergency consultations
-7. Set availability hours
-8. View appointment history
-9. Manage follow-ups
-10. Set appointment priorities
-
-#### 3. Room Management
-**Pre-conditions:** Doctor is logged in and approved
-
-**Main Flow:**
-1. Request room for patient
-2. View room requests status
-3. Specify room requirements
-4. Track request approval
-5. View available rooms
-6. Request room changes
-7. Manage office hours
-8. Handle emergency room requests
-9. View room occupancy
-
-#### 4. Medical Records Management
-**Pre-conditions:** Doctor is logged in and approved
-
-**Main Flow:**
-1. Create patient records
-2. Update diagnoses
-3. Prescribe medications
-4. Add medical notes
-5. Upload medical images
-6. View patient history
-7. Track treatment progress
-8. Record procedures
-9. Manage prescriptions
-10. Document allergies
-11. Record vital signs
-12. Handle lab results
-
-#### 5. Profile Management
-**Pre-conditions:** Doctor is logged in and approved
-
-**Main Flow:**
-1. Update personal information
-2. View appointment statistics
-3. Manage specializations
-4. Set working hours
-5. View patient load
-6. Track performance metrics
-7. Manage notifications
-8. Update contact details
-
-### Patient Use Cases
-
-#### 1. Appointment Management
-**Pre-conditions:** Patient is logged in and approved
-
-**Main Flow:**
-1. Book new appointment
-2. View appointments
-3. View available doctors
-4. Search doctors by department
-5. Track appointment status
-6. Cancel appointments
-7. Request rescheduling
-8. View appointment history
-9. Rate doctor service
-10. Set appointment reminders
-
-#### 2. Medical Records
-**Pre-conditions:** Patient is logged in and approved
-
-**Main Flow:**
-1. View medical history
-2. View assigned doctor
-3. View treatment details
-4. Access discharge summary
-5. View prescriptions
-6. Track medications
-7. View test results
-8. Download medical reports
-9. View billing history
-10. Track treatment progress
-
-#### 3. Room Management
-**Pre-conditions:** Patient is logged in and approved
-
-**Main Flow:**
-1. View assigned room
-2. Request room change
-3. View room details
-4. Track room requests
-5. View room charges
-6. Submit room feedback
-
-#### 4. Profile Management
-**Pre-conditions:** Patient is logged in and approved
-
-**Main Flow:**
-1. Update personal information
-2. View medical profile
-3. Manage emergency contacts
-4. Update insurance information
-5. View treatment history
-6. Manage notifications
-7. Update contact details
-8. View billing status
-
-#### 5. Communication
-**Pre-conditions:** Patient is logged in and approved
-
-**Main Flow:**
-1. Contact hospital
-2. Submit feedback
-3. View announcements
-4. Request information
-5. Report issues
-6. View doctor responses
-7. Track message history
+    %% Patient connections
+    P1 --> D2
+    P2 --> D4
+    P3 --> A3
+    P5 --> A5
+```
 
 ## Sequence Diagrams
 
