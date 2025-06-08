@@ -1,0 +1,166 @@
+{% load static %}
+<!-- Patient Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white">
+  <div class="container">
+    <a class="navbar-brand" href="/patient-dashboard">
+      <i class="fas fa-hospital-alt me-2"></i>HMS Patient
+    </a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#patientNavbar" aria-controls="patientNavbar" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    
+    <div class="collapse navbar-collapse" id="patientNavbar">
+      <ul class="navbar-nav me-auto">
+        <li class="nav-item">
+          <a class="nav-link {% if request.path == '/patient-dashboard' %}active{% endif %}" href="/patient-dashboard">
+            <i class="fas fa-chart-line me-2"></i>Dashboard
+          </a>
+        </li>
+        
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle {% if 'appointment' in request.path %}active{% endif %}" href="#" id="appointmentDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-calendar-check me-2"></i>Appointments
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="appointmentDropdown">
+            <li><a class="dropdown-item" href="/patient-appointment"><i class="fas fa-calendar-plus me-2"></i>Book Appointment</a></li>
+            <li><a class="dropdown-item" href="/patient-view-appointment"><i class="fas fa-list me-2"></i>View Appointments</a></li>
+          </ul>
+        </li>
+        
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle {% if 'doctor' in request.path %}active{% endif %}" href="#" id="doctorDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-user-md me-2"></i>Doctors
+          </a>
+          <ul class="dropdown-menu" aria-labelledby="doctorDropdown">
+            <li><a class="dropdown-item" href="/patient-view-doctor"><i class="fas fa-search me-2"></i>Find Doctors</a></li>
+            <li><a class="dropdown-item" href="/patient-doctor-specialisation"><i class="fas fa-stethoscope me-2"></i>Specialisations</a></li>
+          </ul>
+        </li>
+        
+        <li class="nav-item">
+          <a class="nav-link {% if 'discharge' in request.path %}active{% endif %}" href="/patient-discharge">
+            <i class="fas fa-file-medical me-2"></i>Discharge Summary
+          </a>
+        </li>
+      </ul>
+      
+      <ul class="navbar-nav ms-auto">
+        <li class="nav-item">
+          <button class="theme-toggle nav-link">
+            <i class="fas fa-moon"></i>
+            <span>Dark Mode</span>
+          </button>
+        </li>
+        <li class="nav-item dropdown">
+          <a class="nav-link dropdown-toggle" href="#" id="profileDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="fas fa-user-circle me-2"></i>{{ request.user.first_name }}
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+            <li><a class="dropdown-item" href="/patient-profile"><i class="fas fa-user me-2"></i>Your Profile</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li>
+              <form method="POST" action="{% url 'logout' %}" class="px-0">
+                {% csrf_token %}
+                <button type="submit" class="dropdown-item text-danger">
+                  <i class="fas fa-sign-out-alt me-2"></i>Sign out
+                </button>
+              </form>
+            </li>
+          </ul>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<style>
+.navbar {
+  box-shadow: 0 2px 4px rgba(0,0,0,.1);
+  padding: 1rem 0;
+}
+
+.navbar-brand {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #4f46e5 !important;
+}
+
+.nav-link {
+  color: #4b5563;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  transition: all 0.2s;
+}
+
+.nav-link:hover {
+  color: #4f46e5;
+}
+
+.nav-link.active {
+  color: #4f46e5 !important;
+}
+
+.dropdown-menu {
+  border: none;
+  box-shadow: 0 4px 6px -1px rgba(0,0,0,.1), 0 2px 4px -1px rgba(0,0,0,.06);
+  border-radius: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.dropdown-item {
+  padding: 0.75rem 1rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  color: #4b5563;
+}
+
+.dropdown-item:hover {
+  background-color: #f3f4f6;
+  color: #4f46e5;
+}
+
+.dropdown-item:active {
+  background-color: #4f46e5;
+  color: white;
+}
+
+.dropdown-divider {
+  margin: 0.5rem 0;
+  border-color: #e5e7eb;
+}
+
+form.px-0 {
+  padding: 0;
+  margin: 0;
+}
+
+form.px-0 button {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  padding: 0.75rem 1rem;
+}
+
+@media (max-width: 991.98px) {
+  .navbar-collapse {
+    padding: 1rem 0;
+  }
+  
+  .nav-item {
+    padding: 0.25rem 0;
+  }
+  
+  .dropdown-menu {
+    border: none;
+    box-shadow: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .dropdown-item {
+    padding-left: 2.5rem;
+  }
+}
+</style> 

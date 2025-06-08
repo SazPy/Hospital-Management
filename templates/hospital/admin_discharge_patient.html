@@ -1,0 +1,159 @@
+{% extends 'hospital/admin_base.html' %}
+{% load static %}
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <h1 class="fw-bold mb-3">Patient Discharge Management</h1>
+        <p class="lead mb-0">Process patient discharges and generate bills</p>
+      </div>
+      <div class="col-lg-6">
+        <form class="search-form" method="get">
+          <div class="input-group">
+            <input type="search" class="form-control" placeholder="Search patients..." name="query">
+            <button class="btn btn-primary" type="submit">
+              <i class="fas fa-search"></i>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container py-4">
+  {% if patients %}
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="bg-light">
+            <tr>
+              <th class="px-4 py-3">Patient</th>
+              <th class="px-4 py-3">Admission Date</th>
+              <th class="px-4 py-3">Room</th>
+              <th class="px-4 py-3">Symptoms</th>
+              <th class="px-4 py-3">Contact</th>
+              <th class="px-4 py-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in patients %}
+            <tr>
+              <td class="px-4 py-3">
+                <div class="d-flex align-items-center">
+                  {% if p.profile_pic %}
+                    <img src="{{ p.profile_pic.url }}" alt="{{ p.get_name }}" class="rounded-circle me-3" width="48" height="48">
+                  {% else %}
+                    <div class="avatar-placeholder rounded-circle bg-primary-subtle me-3">
+                      <i class="fas fa-user"></i>
+                    </div>
+                  {% endif %}
+                  <div>
+                    <div class="fw-medium">{{ p.get_name }}</div>
+                    <div class="text-muted small">ID: {{ p.id }}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <div class="fw-medium">{{ p.admitDate|date:"M d, Y" }}</div>
+                <div class="text-muted small">{{ p.admitDate|timesince }} ago</div>
+              </td>
+              <td class="px-4 py-3">
+                {% if p.room %}
+                  <span class="badge bg-success">
+                    <i class="fas fa-bed me-1"></i>Room {{ p.room.room_number }}
+                  </span>
+                {% else %}
+                  <span class="badge bg-warning text-dark">No Room</span>
+                {% endif %}
+              </td>
+              <td class="px-4 py-3">
+                <span class="text-wrap">{{ p.symptoms|truncatechars:50 }}</span>
+              </td>
+              <td class="px-4 py-3">
+                <div class="d-flex flex-column">
+                  <div class="mb-1">
+                    <i class="fas fa-phone text-muted me-2"></i>{{ p.mobile }}
+                  </div>
+                  <div class="text-muted small text-wrap">{{ p.address|truncatechars:30 }}</div>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <a href="{% url 'discharge-patient' p.id %}" class="btn btn-primary btn-sm">
+                  <i class="fas fa-file-medical me-2"></i>Process Discharge
+                </a>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="text-center py-5">
+    <img src="{% static 'images/no-patients.png' %}" alt="No Patients" class="mb-3" width="120" onerror="this.src='https://placehold.co/120x120/4f46e5/ffffff?text=No+Patients'">
+    <h5 class="text-muted mb-3">No Patients to Discharge</h5>
+    <p class="text-muted">There are no admitted patients ready for discharge at this time.</p>
+  </div>
+  {% endif %}
+</div>
+
+<style>
+.page-header {
+  background: linear-gradient(45deg, #4f46e5, #4338ca);
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.search-form {
+  max-width: 400px;
+  margin-left: auto;
+}
+
+.avatar-placeholder {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4f46e5;
+}
+
+.bg-primary-subtle {
+  background-color: rgba(79, 70, 229, 0.1);
+}
+
+.table th {
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.text-wrap {
+  white-space: normal;
+  word-wrap: break-word;
+  max-width: 200px;
+}
+
+.btn-primary {
+  background-color: #4f46e5;
+  border-color: #4f46e5;
+}
+
+.btn-primary:hover {
+  background-color: #4338ca;
+  border-color: #4338ca;
+}
+
+.form-control:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 0.25rem rgba(79, 70, 229, 0.25);
+}
+</style>
+
+{% endblock content %}

@@ -1,0 +1,111 @@
+{% extends 'hospital/doctor_base.html' %}
+{% load static %}
+
+{% block title %}Room Requests - HMS{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0">Room Requests</h1>
+        <div class="stats d-flex gap-3">
+            <div class="stat-item">
+                <span class="badge bg-warning">{{ pending_count }} Pending</span>
+            </div>
+            <div class="stat-item">
+                <span class="badge bg-success">{{ approved_count }} Approved</span>
+            </div>
+            <div class="stat-item">
+                <span class="badge bg-danger">{{ denied_count }} Denied</span>
+            </div>
+        </div>
+    </div>
+
+    {% if room_requests %}
+    <div class="card">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Patient</th>
+                            <th>Room Type</th>
+                            <th>Requested Room</th>
+                            <th>Request Date</th>
+                            <th>Status</th>
+                            <th>Response</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for request in room_requests %}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                        <i class="fas fa-user text-primary"></i>
+                                    </div>
+                                    <div>
+                                        <div class="fw-medium">{{ request.patient.get_name }}</div>
+                                        <div class="text-muted small">ID: {{ request.patient.id }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ request.requested_room_type }}</td>
+                            <td>
+                                {% if request.assigned_room %}
+                                    <span class="badge bg-info">{{ request.assigned_room.room_number }}</span>
+                                {% else %}
+                                    <span class="badge bg-light text-dark">Not Assigned</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div>{{ request.request_date|date:"M d, Y" }}</div>
+                                <div class="text-muted small">{{ request.request_date|time:"H:i" }}</div>
+                            </td>
+                            <td>
+                                <span class="badge bg-{% if request.status == 'APPROVED' %}success{% elif request.status == 'DENIED' %}danger{% else %}warning{% endif %}">
+                                    {{ request.status }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if request.response_note %}
+                                    <button class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip" title="{{ request.response_note }}">
+                                        <i class="fas fa-info-circle"></i> View Note
+                                    </button>
+                                {% else %}
+                                    <span class="text-muted">No response yet</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+        <img src="{% static 'images/no-requests.png' %}" alt="No Requests" class="mb-3" width="120">
+        <h5 class="text-muted">No room requests found</h5>
+        <p class="text-muted">You haven't made any room requests yet.</p>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.stats {
+    display: flex;
+    gap: 1rem;
+}
+
+.stat-item {
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    background-color: #f8f9fa;
+}
+
+.badge {
+    font-size: 0.875rem;
+    padding: 0.5rem 1rem;
+}
+</style>
+{% endblock %} 

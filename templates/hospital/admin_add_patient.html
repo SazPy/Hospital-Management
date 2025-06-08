@@ -1,0 +1,192 @@
+{% extends 'hospital/admin_base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <h1 class="fw-bold mb-3">Add New Patient</h1>
+        <p class="lead mb-0">Admit a new patient to the hospital</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-10">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4 p-lg-5">
+          {% if userForm.errors or patientForm.errors %}
+          <div class="alert alert-danger mb-4">
+            <ul class="mb-0">
+              {% for field in userForm %}
+                {% for error in field.errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              {% endfor %}
+              {% for field in patientForm %}
+                {% for error in field.errors %}
+                  <li>{{ error }}</li>
+                {% endfor %}
+              {% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <!-- Personal Information -->
+            <div class="mb-5">
+              <h5 class="mb-4">Personal Information</h5>
+              <div class="row g-4">
+                <div class="col-md-6">
+                  <label class="form-label">First Name</label>
+                  {% render_field userForm.first_name class="form-control" placeholder="Enter first name" %}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Last Name</label>
+                  {% render_field userForm.last_name class="form-control" placeholder="Enter last name" %}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Username</label>
+                  {% render_field userForm.username class="form-control" placeholder="Choose a username" %}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Email</label>
+                  {% render_field userForm.email class="form-control" placeholder="Enter email address" %}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Password</label>
+                  {% render_field userForm.password1 class="form-control" placeholder="Create a password" type="password" %}
+                  {% if userForm.password1.help_text %}
+                  <small class="form-text text-muted">{{ userForm.password1.help_text|safe }}</small>
+                  {% endif %}
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Confirm Password</label>
+                  {% render_field userForm.password2 class="form-control" placeholder="Confirm password" type="password" %}
+                  {% if userForm.password2.help_text %}
+                  <small class="form-text text-muted">{{ userForm.password2.help_text|safe }}</small>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+
+            <!-- Medical Information -->
+            <div class="mb-5">
+              <h5 class="mb-4">Medical Information</h5>
+              <div class="row g-4">
+                <div class="col-md-6">
+                  <label class="form-label">Mobile Number</label>
+                  {% render_field patientForm.mobile class="form-control" placeholder="Enter mobile number" %}
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Address</label>
+                  {% render_field patientForm.address class="form-control" placeholder="Enter full address" %}
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Symptoms</label>
+                  {% render_field patientForm.symptoms class="form-control" placeholder="Describe patient symptoms" rows="3" %}
+                </div>
+                <div class="col-12">
+                  <label class="form-label">Profile Picture</label>
+                  {% render_field patientForm.profile_pic class="form-control" %}
+                  <small class="form-text text-muted">Upload a profile picture (optional)</small>
+                </div>
+              </div>
+            </div>
+
+            <div class="d-flex justify-content-between align-items-center">
+              <a href="{% url 'admin-view-patient' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Patients
+              </a>
+              <button type="submit" class="btn btn-primary btn-lg px-5">
+                <i class="fas fa-user-plus me-2"></i>Admit Patient
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.page-header {
+  background: linear-gradient(45deg, #4f46e5, #4338ca);
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.form-label {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.form-control,
+.form-select {
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  border-color: #e5e7eb;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 0.25rem rgba(79, 70, 229, 0.1);
+}
+
+.form-text {
+  color: #6b7280;
+  margin-top: 0.25rem;
+}
+
+.alert-danger {
+  border-radius: 0.5rem;
+  border: none;
+  background-color: #fee2e2;
+  color: #991b1b;
+}
+
+.alert-danger ul {
+  padding-left: 1rem;
+}
+
+.btn {
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+}
+
+.btn-lg {
+  padding: 1rem 2rem;
+}
+
+.btn-primary {
+  background-color: #4f46e5;
+  border-color: #4f46e5;
+}
+
+.btn-primary:hover {
+  background-color: #4338ca;
+  border-color: #4338ca;
+}
+
+.btn-outline-secondary {
+  color: #6b7280;
+  border-color: #e5e7eb;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #f3f4f6;
+  border-color: #e5e7eb;
+  color: #374151;
+}
+</style>
+
+{% endblock content %}

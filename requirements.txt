@@ -1,0 +1,51 @@
+# Core
+Django>=4.2.0,<5.0.0
+python-dotenv>=1.0.0  # Environment variable management
+
+# Database
+psycopg2-binary>=2.9.9  # PostgreSQL adapter
+dj-database-url>=2.1.0  # Database URL configuration
+
+# Forms and UI
+django-widget-tweaks>=1.4.12
+django-crispy-forms>=2.0
+Pillow>=10.0.0  # For image handling
+
+# PDF Generation
+reportlab>=4.0.4
+xhtml2pdf>=0.2.11  # For HTML to PDF conversion
+
+# Date/Time handling
+python-dateutil>=2.8.2
+pytz>=2024.1  # Timezone support
+
+# Static Files
+whitenoise>=6.5.0  # Static file serving
+django-compressor>=4.4  # CSS/JS compression
+
+# Security
+django-cors-headers>=4.3.1  # CORS support
+django-ratelimit>=4.1.0  # Rate limiting
+
+# API
+djangorestframework>=3.14.0  # REST API framework
+drf-yasg>=1.21.7  # API documentation
+
+# Monitoring and Logging
+sentry-sdk>=1.40.0  # Error tracking
+django-prometheus>=2.3.1  # Metrics and monitoring
+
+# Caching
+redis>=5.0.1  # Redis cache backend
+django-redis>=5.4.0  # Redis cache integration
+
+# Development and Testing
+black>=24.2.0  # Code formatting
+flake8>=7.0.0  # Code linting
+pytest>=8.0.0  # Testing framework
+pytest-django>=4.8.0  # Django test integration
+coverage>=7.4.1  # Code coverage
+
+# Production
+gunicorn>=21.2.0  # WSGI HTTP Server
+supervisor>=4.2.5  # Process control 

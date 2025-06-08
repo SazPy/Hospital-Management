@@ -1,0 +1,149 @@
+{% extends 'hospital/doctor_base.html' %}
+{% load static %}
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <h1 class="fw-bold mb-3">Pending Appointments</h1>
+        <p class="lead mb-0">Review and manage appointment requests from patients</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container py-4">
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  {% if appointments %}
+    <div class="card border-0 shadow-sm">
+      <div class="card-body p-0">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light">
+              <tr>
+                <th class="px-4 py-3">Patient</th>
+                <th class="px-4 py-3">Date & Time</th>
+                <th class="px-4 py-3">Description</th>
+                <th class="px-4 py-3 text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for app, pat in appointments %}
+                <tr>
+                  <td class="px-4 py-3">
+                    <div class="d-flex align-items-center">
+                      {% if pat.profile_pic %}
+                        <img src="{% static pat.profile_pic.url %}" alt="{{ pat.get_name }}" class="rounded-circle me-3" width="48" height="48">
+                      {% else %}
+                        <div class="avatar-placeholder rounded-circle bg-primary-subtle me-3">
+                          <i class="fas fa-user"></i>
+                        </div>
+                      {% endif %}
+                      <div>
+                        <div class="fw-medium">{{ pat.get_name }}</div>
+                        <div class="text-muted small">
+                          {% if pat.symptoms %}{{ pat.symptoms|truncatechars:30 }}{% endif %}
+                        </div>
+                      </div>
+                    </div>
+                  </td>
+                  <td class="px-4 py-3">
+                    <div class="fw-medium">{{ app.appointmentDate }}</div>
+                    <div class="text-muted small">{{ app.appointmentTime }}</div>
+                  </td>
+                  <td class="px-4 py-3">
+                    <span class="text-wrap">{{ app.description|truncatechars:100 }}</span>
+                  </td>
+                  <td class="px-4 py-3 text-end">
+                    <div class="btn-group">
+                      <a href="{% url 'doctor-approve-appointment' app.id %}" class="btn btn-success btn-sm">
+                        <i class="fas fa-check me-1"></i>Approve
+                      </a>
+                      <a href="{% url 'doctor-reject-appointment' app.id %}" class="btn btn-danger btn-sm" 
+                         onclick="return confirm('Are you sure you want to reject this appointment?')">
+                        <i class="fas fa-times me-1"></i>Reject
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  {% else %}
+    <div class="text-center py-5">
+      <div class="mb-4">
+        <i class="fas fa-calendar-times fa-4x text-muted"></i>
+      </div>
+      <h3 class="h4 mb-2">No Pending Appointments</h3>
+      <p class="text-muted">You don't have any pending appointment requests at the moment.</p>
+    </div>
+  {% endif %}
+</div>
+
+<style>
+.page-header {
+  background: linear-gradient(45deg, #4f46e5, #4338ca);
+  color: white;
+  padding: 3rem 0;
+  margin-bottom: 2rem;
+}
+
+.avatar-placeholder {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: #4f46e5;
+}
+
+.btn-group .btn {
+  padding: 0.5rem 1rem;
+}
+
+.btn-group .btn:first-child {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.btn-group .btn:last-child {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+
+.btn-success {
+  background-color: #10b981;
+  border-color: #10b981;
+}
+
+.btn-success:hover {
+  background-color: #059669;
+  border-color: #059669;
+}
+
+.btn-danger {
+  background-color: #ef4444;
+  border-color: #ef4444;
+}
+
+.btn-danger:hover {
+  background-color: #dc2626;
+  border-color: #dc2626;
+}
+</style>
+
+{% endblock content %} 

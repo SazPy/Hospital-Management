@@ -1,0 +1,211 @@
+{% extends 'hospital/admin_base.html' %}
+{% load static %}
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <h1 class="fw-bold mb-3">Appointment Management</h1>
+        <p class="lead mb-0">Manage and track all hospital appointments</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container py-4">
+  <!-- Statistics Overview -->
+  <div class="row g-4 mb-5">
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center mb-3">
+            <div class="feature-icon bg-primary-subtle rounded-circle me-3">
+              <i class="fas fa-calendar-check text-primary"></i>
+            </div>
+            <div>
+              <h5 class="card-title mb-1">Total Appointments</h5>
+              <h3 class="mb-0">{{ appointmentcount|default:"0" }}</h3>
+            </div>
+          </div>
+          <div class="text-muted small">All scheduled appointments</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center mb-3">
+            <div class="feature-icon bg-warning-subtle rounded-circle me-3">
+              <i class="fas fa-clock text-warning"></i>
+            </div>
+            <div>
+              <h5 class="card-title mb-1">Pending Approvals</h5>
+              <h3 class="mb-0">{{ pendingappointmentcount|default:"0" }}</h3>
+            </div>
+          </div>
+          <div class="text-muted small">Appointments awaiting approval</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center mb-3">
+            <div class="feature-icon bg-success-subtle rounded-circle me-3">
+              <i class="fas fa-user-md text-success"></i>
+            </div>
+            <div>
+              <h5 class="card-title mb-1">Available Doctors</h5>
+              <h3 class="mb-0">{{ doctorcount|default:"0" }}</h3>
+            </div>
+          </div>
+          <div class="text-muted small">Active doctors for appointments</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="row g-4">
+    <!-- View All Appointments -->
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center mb-4">
+            <div class="feature-icon bg-primary-subtle rounded-circle me-3">
+              <i class="fas fa-calendar-alt text-primary"></i>
+            </div>
+            <h5 class="card-title mb-0">View Appointments</h5>
+          </div>
+          <p class="card-text text-muted mb-4">View and manage all scheduled appointments</p>
+          <a href="{% url 'admin-view-appointment' %}" class="btn btn-primary w-100">
+            <i class="fas fa-eye me-2"></i>View All
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Book New Appointment -->
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center mb-4">
+            <div class="feature-icon bg-success-subtle rounded-circle me-3">
+              <i class="fas fa-plus text-success"></i>
+            </div>
+            <h5 class="card-title mb-0">Book Appointment</h5>
+          </div>
+          <p class="card-text text-muted mb-4">Schedule a new appointment for a patient</p>
+          <a href="{% url 'admin-add-appointment' %}" class="btn btn-success w-100">
+            <i class="fas fa-calendar-plus me-2"></i>Book New
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pending Approvals -->
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center mb-4">
+            <div class="feature-icon bg-warning-subtle rounded-circle me-3">
+              <i class="fas fa-clock text-warning"></i>
+            </div>
+            <h5 class="card-title mb-0">Pending Approvals</h5>
+          </div>
+          <p class="card-text text-muted mb-4">Review and approve appointment requests</p>
+          <a href="{% url 'admin-approve-appointment' %}" class="btn btn-warning w-100">
+            <i class="fas fa-check-circle me-2"></i>Review Pending
+            {% if pendingappointmentcount > 0 %}
+            <span class="badge bg-white text-warning ms-2">{{ pendingappointmentcount }}</span>
+            {% endif %}
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.page-header {
+  background: linear-gradient(45deg, #4f46e5, #4338ca);
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.feature-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.bg-primary-subtle {
+  background-color: rgba(79, 70, 229, 0.1);
+}
+
+.bg-warning-subtle {
+  background-color: rgba(245, 158, 11, 0.1);
+}
+
+.bg-success-subtle {
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.text-primary {
+  color: #4f46e5 !important;
+}
+
+.text-warning {
+  color: #f59e0b !important;
+}
+
+.text-success {
+  color: #10b981 !important;
+}
+
+.btn-primary {
+  background-color: #4f46e5;
+  border-color: #4f46e5;
+}
+
+.btn-primary:hover {
+  background-color: #4338ca;
+  border-color: #4338ca;
+}
+
+.btn-warning {
+  color: #fff;
+  background-color: #f59e0b;
+  border-color: #f59e0b;
+}
+
+.btn-warning:hover {
+  color: #fff;
+  background-color: #d97706;
+  border-color: #d97706;
+}
+
+.btn-success {
+  background-color: #10b981;
+  border-color: #10b981;
+}
+
+.btn-success:hover {
+  background-color: #059669;
+  border-color: #059669;
+}
+
+.badge {
+  padding: 0.35em 0.65em;
+  font-size: 0.75em;
+}
+</style>
+
+{% endblock content %}

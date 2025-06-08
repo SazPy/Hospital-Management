@@ -1,0 +1,563 @@
+{% extends 'hospital/admin_base.html' %}
+{% load static %}
+{% load custom_tags %}
+
+{% block title %}Admin Dashboard - HMS{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'styles/admin_dashboard.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <h1 class="fw-bold mb-3">Admin Dashboard</h1>
+        <p class="lead mb-0">Monitor hospital operations and manage system users</p>
+      </div>
+      <div class="col-lg-6 text-lg-end">
+        <div class="btn-group">
+          <a href="{% url 'admin-add-doctor' %}" class="btn btn-light me-2">
+            <i class="fas fa-user-md me-2"></i>Add Doctor
+          </a>
+          <a href="{% url 'admin-add-patient' %}" class="btn btn-light">
+            <i class="fas fa-user-plus me-2"></i>Add Patient
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Stats Overview -->
+<div class="container mb-4">
+  <div class="row g-4">
+    <!-- Doctor Stats -->
+    <div class="col-md-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="stat-icon">
+            <i class="fas fa-user-md"></i>
+          </div>
+          <h3 class="fw-bold mb-1">{{ doctorcount }}</h3>
+          <p class="text-muted mb-0">Active Doctors</p>
+          {% if pendingdoctorcount > 0 %}
+          <span class="badge bg-warning">{{ pendingdoctorcount }} pending</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Patient Stats -->
+    <div class="col-md-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="stat-icon">
+            <i class="fas fa-user"></i>
+          </div>
+          <h3 class="fw-bold mb-1">{{ patientcount }}</h3>
+          <p class="text-muted mb-0">Active Patients</p>
+          {% if pendingpatientcount > 0 %}
+          <span class="badge bg-warning">{{ pendingpatientcount }} pending</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Appointment Stats -->
+    <div class="col-md-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="stat-icon">
+            <i class="fas fa-calendar-check"></i>
+          </div>
+          <h3 class="fw-bold mb-1">{{ appointmentcount }}</h3>
+          <p class="text-muted mb-0">Appointments</p>
+          {% if pendingappointmentcount > 0 %}
+          <span class="badge bg-warning">{{ pendingappointmentcount }} pending</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Room Stats -->
+    <div class="col-md-3">
+      <div class="card">
+        <div class="card-body">
+          <div class="stat-icon">
+            <i class="fas fa-door-open"></i>
+          </div>
+          <h3 class="fw-bold mb-1">{{ roomcount }}</h3>
+          <p class="text-muted mb-0">Total Rooms</p>
+          {% if pending_room_requests > 0 %}
+          <span class="badge bg-warning">{{ pending_room_requests }} requests</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="container">
+  <div class="row g-4">
+    <!-- Recent Appointments -->
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="card-title mb-0">Recent Appointments</h5>
+            <a href="{% url 'admin-view-appointment' %}" class="btn btn-outline-primary btn-sm">View All</a>
+          </div>
+          {% if appointments %}
+          <div class="table-responsive">
+            <table class="table table-hover">
+              <thead>
+                <tr>
+                  <th>Patient</th>
+                  <th>Doctor</th>
+                  <th>Date & Time</th>
+                  <th>Room</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for appointment in appointments %}
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div class="avatar-placeholder rounded-circle bg-info-subtle me-2" style="width: 32px; height: 32px;">
+                        <i class="fas fa-user"></i>
+                      </div>
+                      <div>
+                        <div class="fw-medium">{{ appointment.patientName }}</div>
+                        <div class="text-muted small">ID: {{ appointment.patientId }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <div class="avatar-placeholder rounded-circle bg-primary-subtle me-2" style="width: 32px; height: 32px;">
+                        <i class="fas fa-user-md"></i>
+                      </div>
+                      <div>
+                        <div class="fw-medium">Dr. {{ appointment.doctorName }}</div>
+                        <div class="text-muted small">{{ appointment.doctor.department }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <div>
+                      <div class="fw-medium">{{ appointment.appointmentDate }}</div>
+                      <div class="text-muted small">{{ appointment.appointmentTime }}</div>
+                    </div>
+                  </td>
+                  <td>
+                    {% if appointment.room %}
+                      <span class="badge bg-info">{{ appointment.room.room_number }}</span>
+                    {% else %}
+                      <span class="badge bg-light text-dark">No Room</span>
+                    {% endif %}
+                  </td>
+                  <td>
+                    <span class="badge {% if appointment.status %}bg-success{% else %}bg-warning{% endif %}">
+                      {% if appointment.status %}Confirmed{% else %}Pending{% endif %}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="action-buttons">
+                      <a href="#" class="btn btn-sm btn-outline-primary me-2" data-bs-toggle="tooltip" title="View Details">
+                        <i class="fas fa-eye"></i>
+                      </a>
+                      {% if not appointment.status %}
+                      <a href="{% url 'admin-approve-appointment' pk=appointment.id %}" class="btn btn-sm btn-outline-success me-2" data-bs-toggle="tooltip" title="Approve">
+                        <i class="fas fa-check"></i>
+                      </a>
+                      <a href="{% url 'admin-reject-appointment' pk=appointment.id %}" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Reject">
+                        <i class="fas fa-times"></i>
+                      </a>
+                      {% endif %}
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="text-center py-4">
+            <div class="mb-3">
+              <i class="fas fa-calendar-times fa-3x text-muted"></i>
+            </div>
+            <h6 class="text-muted">No appointments found</h6>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- Room Management -->
+    <div class="col-lg-4">
+      <div class="card h-100">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-4">
+            <h5 class="card-title mb-0">Room Management</h5>
+            <a href="{% url 'admin-rooms' %}" class="btn btn-outline-primary btn-sm">View All</a>
+          </div>
+
+          <!-- Room Type Distribution -->
+          <div class="mb-4">
+            <h6 class="text-muted mb-3">Room Distribution</h6>
+            <div class="room-stats p-4 rounded">
+              <div class="room-stat-item mb-3">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="d-flex align-items-center">
+                    <div class="stat-icon-small bg-primary-subtle me-3">
+                      <i class="fas fa-procedures text-primary"></i>
+                    </div>
+                    <span class="fw-medium">Wards</span>
+                  </div>
+                  <span class="badge bg-primary">{{ ward_count|default:"0" }}</span>
+                </div>
+                <div class="progress mt-2" style="height: 4px;">
+                  <div class="progress-bar bg-primary" role="progressbar" style="width: {% widthratio ward_count|default:0 roomcount|default:1 100 %}%"></div>
+                </div>
+              </div>
+              
+              <div class="room-stat-item mb-3">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="d-flex align-items-center">
+                    <div class="stat-icon-small bg-success-subtle me-3">
+                      <i class="fas fa-bed text-success"></i>
+                    </div>
+                    <span class="fw-medium">Private Rooms</span>
+                  </div>
+                  <span class="badge bg-success">{{ private_count|default:"0" }}</span>
+                </div>
+                <div class="progress mt-2" style="height: 4px;">
+                  <div class="progress-bar bg-success" role="progressbar" style="width: {% widthratio private_count|default:0 roomcount|default:1 100 %}%"></div>
+                </div>
+              </div>
+              
+              <div class="room-stat-item mb-3">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="d-flex align-items-center">
+                    <div class="stat-icon-small bg-danger-subtle me-3">
+                      <i class="fas fa-heartbeat text-danger"></i>
+                    </div>
+                    <span class="fw-medium">ICU</span>
+                  </div>
+                  <span class="badge bg-danger">{{ icu_count|default:"0" }}</span>
+                </div>
+                <div class="progress mt-2" style="height: 4px;">
+                  <div class="progress-bar bg-danger" role="progressbar" style="width: {% widthratio icu_count|default:0 roomcount|default:1 100 %}%"></div>
+                </div>
+              </div>
+              
+              <div class="room-stat-item">
+                <div class="d-flex justify-content-between align-items-center">
+                  <div class="d-flex align-items-center">
+                    <div class="stat-icon-small bg-info-subtle me-3">
+                      <i class="fas fa-user-md text-info"></i>
+                    </div>
+                    <span class="fw-medium">Doctor Offices</span>
+                  </div>
+                  <span class="badge bg-info">{{ office_count|default:"0" }}</span>
+                </div>
+                <div class="progress mt-2" style="height: 4px;">
+                  <div class="progress-bar bg-info" role="progressbar" style="width: {% widthratio office_count|default:0 roomcount|default:1 100 %}%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Room Requests -->
+          <div>
+            <h6 class="text-muted mb-3">Recent Room Requests</h6>
+            {% if room_requests %}
+            <div class="list-group list-group-flush">
+              {% for request in room_requests %}
+              <div class="list-group-item border rounded mb-2">
+                <div class="d-flex justify-content-between align-items-start">
+                  <div>
+                    <h6 class="mb-1">Dr. {{ request.doctor.get_name }}</h6>
+                    <p class="text-muted small mb-1">
+                      <i class="fas fa-user me-1"></i>For: {{ request.patient.get_name }}
+                    </p>
+                    <p class="text-muted small mb-1">
+                      <i class="fas fa-door-open me-1"></i>{{ request.requested_room.get_room_type_display }}
+                    </p>
+                    <p class="text-muted small mb-0">
+                      <i class="fas fa-clock me-1"></i>{{ request.request_date|timesince }} ago
+                    </p>
+                  </div>
+                  <div class="text-end">
+                    <span class="badge bg-warning mb-2 d-block">Pending</span>
+                    <div class="btn-group btn-group-sm">
+                      <a href="{% url 'admin-approve-room-request' pk=request.id %}" class="btn btn-outline-success btn-sm" title="Approve">
+                        <i class="fas fa-check"></i>
+                      </a>
+                      <a href="{% url 'admin-deny-room-request' pk=request.id %}" class="btn btn-outline-danger btn-sm" title="Deny">
+                        <i class="fas fa-times"></i>
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+            {% else %}
+            <div class="text-center py-4">
+              <i class="fas fa-door-closed fa-3x text-muted mb-3"></i>
+              <h6 class="text-muted">No pending room requests</h6>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Doctor Modal -->
+<div class="modal fade" id="addDoctorModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add New Doctor</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">First Name</label>
+              <input type="text" class="form-control">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Last Name</label>
+              <input type="text" class="form-control">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Department</label>
+              <select class="form-select">
+                <option selected disabled>Select Department</option>
+                {% for dept in departments %}
+                <option value="{{ dept.0 }}">{{ dept.1 }}</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Mobile</label>
+              <input type="tel" class="form-control">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-control">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Address</label>
+              <textarea class="form-control" rows="3"></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary">Add Doctor</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Patient Modal -->
+<div class="modal fade" id="addPatientModal" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add New Patient</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <label class="form-label">First Name</label>
+              <input type="text" class="form-control">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Last Name</label>
+              <input type="text" class="form-control">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Mobile</label>
+              <input type="tel" class="form-control">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-control">
+            </div>
+            <div class="col-12">
+              <label class="form-label">Symptoms</label>
+              <textarea class="form-control" rows="3"></textarea>
+            </div>
+            <div class="col-12">
+              <label class="form-label">Address</label>
+              <textarea class="form-control" rows="3"></textarea>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary">Add Patient</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.page-header {
+  background: linear-gradient(45deg, #4f46e5, #4338ca);
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.card {
+  border: none;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
+}
+
+.stat-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(79, 70, 229, 0.1);
+  color: #4f46e5;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+}
+
+.room-stats {
+  border: 1px solid var(--bs-border-color);
+  transition: all 0.3s ease;
+}
+
+.room-stat-item {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--bs-border-color);
+}
+
+.room-stat-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.stat-icon-small {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+.bg-primary-subtle {
+  background-color: rgba(var(--bs-primary-rgb), 0.1) !important;
+}
+
+.bg-success-subtle {
+  background-color: rgba(var(--bs-success-rgb), 0.1) !important;
+}
+
+.bg-danger-subtle {
+  background-color: rgba(var(--bs-danger-rgb), 0.1) !important;
+}
+
+.bg-info-subtle {
+  background-color: rgba(var(--bs-info-rgb), 0.1) !important;
+}
+
+.progress {
+  background-color: var(--bs-border-color);
+}
+
+[data-bs-theme="dark"] .room-stats {
+  background-color: var(--bs-dark) !important;
+  border-color: var(--bs-border-color-translucent);
+}
+
+[data-bs-theme="dark"] .room-stat-item {
+  border-color: var(--bs-border-color-translucent);
+}
+
+[data-bs-theme="dark"] .progress {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-bs-theme="dark"] .bg-primary-subtle {
+  background-color: rgba(var(--bs-primary-rgb), 0.2) !important;
+}
+
+[data-bs-theme="dark"] .bg-success-subtle {
+  background-color: rgba(var(--bs-success-rgb), 0.2) !important;
+}
+
+[data-bs-theme="dark"] .bg-danger-subtle {
+  background-color: rgba(var(--bs-danger-rgb), 0.2) !important;
+}
+
+[data-bs-theme="dark"] .bg-info-subtle {
+  background-color: rgba(var(--bs-info-rgb), 0.2) !important;
+}
+
+[data-bs-theme="dark"] .text-body {
+  color: var(--bs-body-color) !important;
+}
+
+.badge {
+  padding: 0.5em 0.75em;
+  font-weight: 500;
+}
+
+.action-buttons .btn {
+  padding: 0.25rem 0.5rem;
+}
+
+.avatar-placeholder {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.btn-outline-primary {
+  color: #4f46e5;
+  border-color: #4f46e5;
+}
+
+.btn-outline-primary:hover {
+  background-color: #4f46e5;
+  border-color: #4f46e5;
+  color: white;
+}
+
+[data-bs-theme="dark"] .card {
+  background-color: var(--bs-dark);
+  border-color: var(--bs-dark-border-subtle);
+}
+
+[data-bs-theme="dark"] .list-group-item {
+  background-color: var(--bs-dark);
+  border-color: var(--bs-dark-border-subtle);
+}
+</style>
+{% endblock %}

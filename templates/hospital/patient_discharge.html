@@ -1,0 +1,367 @@
+{% extends 'hospital/patient_base.html' %}
+{% load static %}
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <h1 class="fw-bold mb-3">Discharge Summary</h1>
+        <p class="lead mb-0">Your hospitalization details and final bill</p>
+      </div>
+      {% if is_discharged %}
+      <div class="col-lg-6 text-lg-end">
+        <a href="{% url 'download-pdf' %}" class="btn btn-light">
+          <i class="fas fa-download me-2"></i>Download PDF
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<div class="container py-4">
+  {% if is_discharged %}
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-4 p-lg-5">
+      <!-- Hospital Info -->
+      <div class="d-flex align-items-center justify-content-between mb-5">
+        <div>
+          <h2 class="h4 mb-1">Hospital Management System</h2>
+          <p class="text-muted mb-0">123 Healthcare Avenue, City, State</p>
+        </div>
+        <div class="text-end">
+          <div class="fw-medium">Discharge Summary</div>
+          <div class="text-muted">#DS-{{ patientId }}</div>
+        </div>
+      </div>
+
+      <!-- Patient and Doctor Info -->
+      <div class="row g-4 mb-5">
+        <div class="col-md-6">
+          <div class="p-4 bg-light rounded-3">
+            <h3 class="h5 mb-3">Patient Information</h3>
+            <div class="d-flex align-items-center mb-3">
+              {% if patientProfile %}
+                <img src="{{ patientProfile.url }}" alt="Patient" class="rounded-circle me-3" width="48" height="48">
+              {% else %}
+                <div class="avatar-placeholder rounded-circle bg-primary-subtle me-3">
+                  <i class="fas fa-user"></i>
+                </div>
+              {% endif %}
+              <div>
+                <div class="fw-medium">{{ patientName }}</div>
+                <div class="text-muted small">ID: {{ patientId }}</div>
+              </div>
+            </div>
+            <div class="mb-2">
+              <i class="fas fa-phone me-2 text-muted"></i>{{ mobile }}
+            </div>
+            <div>
+              <i class="fas fa-map-marker-alt me-2 text-muted"></i>{{ address }}
+            </div>
+          </div>
+        </div>
+        
+        <div class="col-md-6">
+          <div class="p-4 bg-light rounded-3">
+            <h3 class="h5 mb-3">Doctor Information</h3>
+            <div class="d-flex align-items-center mb-3">
+              {% if doctorProfile %}
+                <img src="{{ doctorProfile.url }}" alt="Doctor" class="rounded-circle me-3" width="48" height="48">
+              {% else %}
+                <div class="avatar-placeholder rounded-circle bg-primary-subtle me-3">
+                  <i class="fas fa-user-md"></i>
+                </div>
+              {% endif %}
+              <div>
+                <div class="fw-medium">Dr. {{ assignedDoctorName }}</div>
+                <div class="text-muted small">{{ doctorDepartment }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stay Information -->
+      <div class="timeline mb-5">
+        <div class="timeline-item">
+          <div class="timeline-icon bg-primary">
+            <i class="fas fa-hospital-user text-white"></i>
+          </div>
+          <div class="timeline-content">
+            <h4 class="mb-1">Admission</h4>
+            <p class="text-muted mb-0">{{ admitDate }}</p>
+          </div>
+        </div>
+        <div class="timeline-item">
+          <div class="timeline-icon bg-success">
+            <i class="fas fa-home text-white"></i>
+          </div>
+          <div class="timeline-content">
+            <h4 class="mb-1">Discharge</h4>
+            <p class="text-muted mb-0">{{ releaseDate }}</p>
+          </div>
+        </div>
+        <div class="timeline-summary bg-light rounded-3 p-3 text-center">
+          <h3 class="h5 mb-1">Total Stay Duration</h3>
+          <p class="mb-0"><strong>{{ daySpent }}</strong> days</p>
+        </div>
+      </div>
+
+      <!-- Medical Details -->
+      <div class="mb-5">
+        <h3 class="h5 mb-4">Medical Details</h3>
+        <div class="bg-light rounded-3 p-4">
+          <h4 class="h6 mb-3">Symptoms & Diagnosis</h4>
+          <p class="mb-0">{{ symptoms }}</p>
+        </div>
+      </div>
+
+      <!-- Doctor & Diagnosis -->
+      <div class="mb-4">
+        <h5 class="fw-bold mb-3">Doctor & Diagnosis</h5>
+        <div class="card border-0 shadow-sm">
+          <div class="card-body">
+            <div class="row mb-3">
+              <div class="col-md-4">
+                <label class="text-muted small">Assigned Doctor</label>
+                <p class="mb-0">Dr. {{ assignedDoctorName }}</p>
+              </div>
+            </div>
+            
+            <div class="medical-records">
+              <h6 class="fw-bold mb-3">Medical Records</h6>
+              {% if patient.medical_records.all %}
+              <div class="timeline">
+                {% for record in patient.medical_records.all %}
+                <div class="timeline-item">
+                  <div class="timeline-marker"></div>
+                  <div class="timeline-content">
+                    <div class="d-flex justify-content-between mb-2">
+                      <h6 class="mb-0">{{ record.date|date:"M d, Y" }}</h6>
+                      <span class="text-muted small">Dr. {{ record.doctor.get_name }}</span>
+                    </div>
+                    {% if record.diagnosis %}
+                    <p class="mb-2"><strong>Diagnosis:</strong> {{ record.diagnosis }}</p>
+                    {% endif %}
+                    {% if record.prescription %}
+                    <p class="mb-2"><strong>Prescription:</strong> {{ record.prescription }}</p>
+                    {% endif %}
+                    {% if record.notes %}
+                    <p class="mb-2"><strong>Notes:</strong> {{ record.notes }}</p>
+                    {% endif %}
+                    {% if record.images %}
+                    <div class="mt-2">
+                      <img src="{{ record.images.url }}" alt="Medical record image" class="img-fluid rounded" style="max-height: 200px;">
+                    </div>
+                    {% endif %}
+                  </div>
+                </div>
+                {% endfor %}
+              </div>
+              {% else %}
+              <p class="text-muted">No medical records available</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Bill Details -->
+      <div>
+        <h3 class="h5 mb-4">Bill Summary</h3>
+        <div class="table-responsive">
+          <table class="table table-borderless mb-0">
+            <thead class="bg-light">
+              <tr>
+                <th>Item</th>
+                <th class="text-end">Amount</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Room Charges ({{ daySpent }} days)</td>
+                <td class="text-end">₹{{ roomCharge }}</td>
+              </tr>
+              <tr>
+                <td>Doctor's Fee</td>
+                <td class="text-end">₹{{ doctorFee }}</td>
+              </tr>
+              <tr>
+                <td>Medicine Cost</td>
+                <td class="text-end">₹{{ medicineCost }}</td>
+              </tr>
+              <tr>
+                <td>Other Charges</td>
+                <td class="text-end">₹{{ OtherCharge }}</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr class="border-top">
+                <td class="fw-bold">Total Amount</td>
+                <td class="text-end fw-bold">₹{{ total }}</td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="text-center py-5">
+    <img src="{% static 'images/not-discharged.png' %}" alt="Not Discharged" class="mb-3" width="120" onerror="this.src='https://placehold.co/120x120/4f46e5/ffffff?text=Not+Discharged'">
+    <h5 class="text-muted mb-3">Not Discharged Yet</h5>
+    <p class="text-muted">You haven't been discharged from the hospital yet.</p>
+  </div>
+  {% endif %}
+</div>
+
+<style>
+.page-header {
+  background: linear-gradient(45deg, #4f46e5, #4338ca);
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.avatar-placeholder {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4f46e5;
+}
+
+.bg-primary-subtle {
+  background-color: rgba(79, 70, 229, 0.1);
+}
+
+.timeline {
+  position: relative;
+  padding: 2rem 0;
+}
+
+.timeline:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 1.5rem;
+  height: 100%;
+  width: 2px;
+  background: #e5e7eb;
+}
+
+.timeline-item {
+  position: relative;
+  padding-left: 4rem;
+  margin-bottom: 2rem;
+}
+
+.timeline-icon {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.timeline-icon i {
+  font-size: 1.25rem;
+}
+
+.timeline-content {
+  background: white;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
+
+.timeline-summary {
+  margin-left: 4rem;
+}
+
+.table thead th {
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.table td, .table th {
+  padding: 1rem;
+}
+
+.table tfoot {
+  font-size: 1.125rem;
+}
+
+.bg-success {
+  background-color: #10b981 !important;
+}
+
+.bg-primary {
+  background-color: #4f46e5 !important;
+}
+
+.timeline {
+  position: relative;
+  padding-left: 3rem;
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: 2rem;
+}
+
+.timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+.timeline-marker {
+  position: absolute;
+  left: -1.5rem;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background-color: var(--link-color, #4f46e5);
+  border: 2px solid var(--card-bg, white);
+}
+
+.timeline-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: -1rem;
+  top: 1rem;
+  bottom: 0;
+  width: 2px;
+  background-color: var(--border-color, #e5e7eb);
+}
+
+.timeline-content {
+  background-color: var(--card-bg, white);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+[data-theme="dark"] .timeline-marker {
+  border-color: var(--card-bg);
+}
+</style>
+
+<script>
+// Enable all tooltips
+document.addEventListener('DOMContentLoaded', function() {
+  var tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+  tooltips.forEach(function(tooltip) {
+    new bootstrap.Tooltip(tooltip);
+  });
+});
+</script>
+
+{% endblock content %}

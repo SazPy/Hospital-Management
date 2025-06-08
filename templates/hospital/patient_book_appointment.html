@@ -1,0 +1,125 @@
+{% extends 'hospital/patient_base.html' %}
+{% load widget_tweaks %}
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-8">
+        <h1 class="fw-bold mb-3">Book an Appointment</h1>
+        <p class="lead mb-0">Schedule a consultation with one of our qualified doctors</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4 p-lg-5">
+          {% if messages %}
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          {% endif %}
+
+          <form method="post" class="appointment-form">
+            {% csrf_token %}
+            
+            <div class="mb-4">
+              <label class="form-label">Doctor</label>
+              {% render_field appointmentForm.doctor class="form-select" placeholder="Select Doctor" %}
+              {% if appointmentForm.doctor.errors %}
+                <div class="text-danger">{{ appointmentForm.doctor.errors|join:", " }}</div>
+              {% endif %}
+            </div>
+
+            <div class="row mb-4">
+              <div class="col-md-6">
+                <label class="form-label">Date</label>
+                {% render_field appointmentForm.appointmentDate class="form-control" %}
+                {% if appointmentForm.appointmentDate.errors %}
+                  <div class="text-danger">{{ appointmentForm.appointmentDate.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Time</label>
+                {% render_field appointmentForm.appointmentTime class="form-control" %}
+                {% if appointmentForm.appointmentTime.errors %}
+                  <div class="text-danger">{{ appointmentForm.appointmentTime.errors|join:", " }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label">Description</label>
+              {% render_field appointmentForm.description class="form-control" placeholder="Please describe your symptoms or reason for visit" rows="4" %}
+              {% if appointmentForm.description.errors %}
+                <div class="text-danger">{{ appointmentForm.description.errors|join:", " }}</div>
+              {% endif %}
+            </div>
+
+            <div class="text-center">
+              <button type="submit" class="btn btn-primary btn-lg px-5">
+                <i class="fas fa-calendar-check me-2"></i>Book Appointment
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.page-header {
+  background: linear-gradient(45deg, #4f46e5, #4338ca);
+  color: white;
+  padding: 3rem 0;
+  margin-bottom: 2rem;
+}
+
+.appointment-form .form-label {
+  font-weight: 500;
+  color: #374151;
+}
+
+.appointment-form .form-control,
+.appointment-form .form-select {
+  padding: 0.75rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+}
+
+.appointment-form .form-control:focus,
+.appointment-form .form-select:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+.btn-primary {
+  background-color: #4f46e5;
+  border-color: #4f46e5;
+}
+
+.btn-primary:hover {
+  background-color: #4338ca;
+  border-color: #4338ca;
+}
+
+.card {
+  border-radius: 1rem;
+}
+
+.text-danger {
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+</style>
+
+{% endblock content %}

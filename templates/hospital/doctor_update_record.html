@@ -1,0 +1,193 @@
+{% extends 'hospital/doctor_base.html' %}
+{% load static %}
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-8">
+        <h1 class="fw-bold mb-3">Update Patient Record</h1>
+        <p class="lead mb-0">Patient: {{ patient.get_name }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container py-4">
+  <div class="row">
+    <!-- Patient Information -->
+    <div class="col-lg-4 mb-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title mb-4">Patient Information</h5>
+          <div class="d-flex align-items-center mb-4">
+            {% if patient.profile_pic %}
+              <img src="{{ patient.profile_pic.url }}" alt="{{ patient.get_name }}" class="rounded-circle me-3" width="64" height="64">
+            {% else %}
+              <div class="avatar-placeholder rounded-circle bg-primary-subtle me-3" style="width: 64px; height: 64px;">
+                <i class="fas fa-user"></i>
+              </div>
+            {% endif %}
+            <div>
+              <h6 class="mb-1">{{ patient.get_name }}</h6>
+              <p class="text-muted mb-0">ID: {{ patient.id }}</p>
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            <label class="text-muted small">Symptoms</label>
+            <p class="mb-0">{{ patient.symptoms }}</p>
+          </div>
+          
+          <div class="mb-3">
+            <label class="text-muted small">Admission Date</label>
+            <p class="mb-0">{{ patient.admitDate }}</p>
+          </div>
+          
+          <div>
+            <label class="text-muted small">Contact</label>
+            <p class="mb-0">{{ patient.mobile }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Update Record Form -->
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title mb-4">Medical Record</h5>
+          
+          <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            
+            <div class="mb-4">
+              <label class="form-label">Diagnosis</label>
+              {{ form.diagnosis }}
+              {% if form.diagnosis.errors %}
+                <div class="text-danger small mt-1">{{ form.diagnosis.errors|join:", " }}</div>
+              {% endif %}
+            </div>
+            
+            <div class="mb-4">
+              <label class="form-label">Prescription</label>
+              {{ form.prescription }}
+              {% if form.prescription.errors %}
+                <div class="text-danger small mt-1">{{ form.prescription.errors|join:", " }}</div>
+              {% endif %}
+            </div>
+            
+            <div class="mb-4">
+              <label class="form-label">Additional Notes</label>
+              {{ form.notes }}
+              {% if form.notes.errors %}
+                <div class="text-danger small mt-1">{{ form.notes.errors|join:", " }}</div>
+              {% endif %}
+            </div>
+            
+            <div class="mb-4">
+              <label class="form-label">Upload Images</label>
+              {{ form.images }}
+              {% if form.images.errors %}
+                <div class="text-danger small mt-1">{{ form.images.errors|join:", " }}</div>
+              {% endif %}
+              <div class="form-text">Upload any relevant medical images (X-rays, reports, etc.)</div>
+            </div>
+            
+            <div class="text-end">
+              <a href="{% url 'doctor-patient' %}" class="btn btn-light me-2">Cancel</a>
+              <button type="submit" class="btn btn-primary">Save Record</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Previous Records -->
+      {% if medical_records %}
+      <div class="card border-0 shadow-sm mt-4">
+        <div class="card-body">
+          <h5 class="card-title mb-4">Previous Records</h5>
+          
+          <div class="timeline">
+            {% for record in medical_records %}
+            <div class="timeline-item">
+              <div class="timeline-marker"></div>
+              <div class="timeline-content">
+                <div class="d-flex justify-content-between mb-2">
+                  <h6 class="mb-0">{{ record.date|date:"M d, Y" }}</h6>
+                  <span class="text-muted small">Dr. {{ record.doctor.get_name }}</span>
+                </div>
+                {% if record.diagnosis %}
+                <p class="mb-2"><strong>Diagnosis:</strong> {{ record.diagnosis }}</p>
+                {% endif %}
+                {% if record.prescription %}
+                <p class="mb-2"><strong>Prescription:</strong> {{ record.prescription }}</p>
+                {% endif %}
+                {% if record.notes %}
+                <p class="mb-2"><strong>Notes:</strong> {{ record.notes }}</p>
+                {% endif %}
+                {% if record.images %}
+                <div class="mt-2">
+                  <img src="{{ record.images.url }}" alt="Medical record image" class="img-fluid rounded" style="max-height: 200px;">
+                </div>
+                {% endif %}
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<style>
+.timeline {
+  position: relative;
+  padding-left: 3rem;
+}
+
+.timeline-item {
+  position: relative;
+  padding-bottom: 2rem;
+}
+
+.timeline-item:last-child {
+  padding-bottom: 0;
+}
+
+.timeline-marker {
+  position: absolute;
+  left: -1.5rem;
+  width: 1rem;
+  height: 1rem;
+  border-radius: 50%;
+  background-color: var(--link-color, #4f46e5);
+  border: 2px solid var(--card-bg, white);
+}
+
+.timeline-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: -1rem;
+  top: 1rem;
+  bottom: 0;
+  width: 2px;
+  background-color: var(--border-color, #e5e7eb);
+}
+
+.timeline-content {
+  background-color: var(--card-bg, white);
+  border: 1px solid var(--border-color, #e5e7eb);
+  border-radius: 0.5rem;
+  padding: 1rem;
+}
+
+[data-theme="dark"] .timeline-marker {
+  border-color: var(--card-bg);
+}
+</style>
+
+{% endblock content %} 

@@ -1,0 +1,199 @@
+{% extends 'hospital/homebase.html' %}
+{% load static %}
+
+{% block title %}About Us - HMS{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="bg-gradient-primary text-white py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-8 mx-auto text-center">
+                <h1 class="display-4 fw-bold mb-3">About HMS</h1>
+                <p class="lead mb-4">Dedicated to excellence in healthcare since our founding</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Our Story Section -->
+<div class="py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-8 mx-auto text-center mb-5">
+                <h2 class="fw-bold mb-4">Our Story</h2>
+                <p class="lead text-muted">Founded with a vision to provide exceptional healthcare services, HMS has grown to become a leading healthcare provider in the region.</p>
+            </div>
+        </div>
+        <div class="row g-4 align-items-center">
+            <div class="col-md-6">
+                <div class="text-center">
+                    <i class="fas fa-hospital-alt fa-5x text-primary mb-3"></i>
+                    <h2 class="display-4 fw-bold text-primary">HMS</h2>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <h3 class="mb-4">Excellence in Healthcare</h3>
+                <p class="text-muted">At HMS, we believe in providing comprehensive healthcare services that put our patients first. Our state-of-the-art facilities and experienced medical professionals work together to ensure the best possible care for every patient.</p>
+                <ul class="list-unstyled">
+                    <li class="mb-3"><i class="fas fa-check-circle text-primary me-2"></i> 24/7 Emergency Services</li>
+                    <li class="mb-3"><i class="fas fa-check-circle text-primary me-2"></i> Modern Medical Equipment</li>
+                    <li class="mb-3"><i class="fas fa-check-circle text-primary me-2"></i> Experienced Medical Staff</li>
+                    <li class="mb-3"><i class="fas fa-check-circle text-primary me-2"></i> Patient-Centered Care</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Our Values Section -->
+<div class="bg-light py-5">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="fw-bold mb-4">Our Values</h2>
+                <p class="text-muted">Our core values guide everything we do at HMS</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon bg-primary-subtle rounded-circle mb-3 mx-auto">
+                            <i class="fas fa-heart text-primary"></i>
+                        </div>
+                        <h4>Compassion</h4>
+                        <p class="text-muted">We treat every patient with kindness, empathy, and respect</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon bg-primary-subtle rounded-circle mb-3 mx-auto">
+                            <i class="fas fa-award text-primary"></i>
+                        </div>
+                        <h4>Excellence</h4>
+                        <p class="text-muted">We strive for excellence in everything we do</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon bg-primary-subtle rounded-circle mb-3 mx-auto">
+                            <i class="fas fa-shield-alt text-primary"></i>
+                        </div>
+                        <h4>Integrity</h4>
+                        <p class="text-muted">We maintain the highest standards of professional ethics</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Team Section -->
+<div class="py-5">
+    <div class="container">
+        <div class="row mb-5">
+            <div class="col-lg-8 mx-auto text-center">
+                <h2 class="fw-bold mb-4">Our Leadership Team</h2>
+                <p class="text-muted">Meet the experts behind our success</p>
+            </div>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <img src="{% static 'images/doctor.png' %}" alt="Chief Medical Officer" class="rounded-circle mb-3" width="120" height="120" onerror="this.src='https://placehold.co/120/4f46e5/ffffff?text=CMO'">
+                        <h4>Dr. Sarah Johnson</h4>
+                        <p class="text-muted mb-0">Chief Medical Officer</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <img src="{% static 'images/doctor.png' %}" alt="Head of Surgery" class="rounded-circle mb-3" width="120" height="120" onerror="this.src='https://placehold.co/120/4f46e5/ffffff?text=HoS'">
+                        <h4>Dr. Michael Chen</h4>
+                        <p class="text-muted mb-0">Head of Surgery</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body text-center p-4">
+                        <img src="{% static 'images/doctor.png' %}" alt="Head of Research" class="rounded-circle mb-3" width="120" height="120" onerror="this.src='https://placehold.co/120/4f46e5/ffffff?text=HoR'">
+                        <h4>Dr. Emily Brown</h4>
+                        <p class="text-muted mb-0">Head of Research</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.bg-gradient-primary {
+    background: linear-gradient(45deg, #4f46e5, #4338ca);
+}
+
+.feature-icon {
+    width: 64px;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.feature-icon i {
+    font-size: 28px;
+}
+
+.bg-primary-subtle {
+    background-color: rgba(79, 70, 229, 0.1);
+}
+
+.text-primary {
+    color: #4f46e5 !important;
+}
+
+/* Dark Theme Styles */
+[data-theme="dark"] .bg-light {
+    background-color: var(--bg-secondary) !important;
+}
+
+[data-theme="dark"] .card {
+    background-color: var(--card-bg);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .text-muted {
+    color: var(--text-secondary) !important;
+}
+
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4 {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .bg-primary-subtle {
+    background-color: rgba(79, 70, 229, 0.2);
+}
+
+[data-theme="dark"] .feature-icon i {
+    color: var(--link-color) !important;
+}
+
+[data-theme="dark"] .list-unstyled li {
+    color: var(--text-primary);
+}
+
+[data-theme="dark"] .fas.fa-check-circle {
+    color: var(--link-color) !important;
+}
+</style>
+{% endblock content %}

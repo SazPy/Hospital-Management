@@ -1,0 +1,188 @@
+{% extends 'hospital/homebase.html' %}
+{% load static %}
+
+{% block title %}Welcome to HMS - Your Trusted Healthcare Partner{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="hero-section bg-gradient-primary text-white py-5">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-8 mx-auto text-center">
+        <i class="fas fa-stethoscope fa-3x mb-4"></i>
+        <h1 class="display-4 fw-bold mb-3">Welcome to HMS</h1>
+        <p class="lead mb-4">Your trusted partner in health, delivering compassionate care with modern excellence</p>
+        <div class="d-flex justify-content-center gap-3">
+          <a href="/aboutus" class="btn btn-outline-light btn-lg px-4">Learn More About Us</a>
+          <a href="/contactus" class="btn btn-light btn-lg px-4">Contact Us</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Why Choose Us Section -->
+<div id="why-choose-us" class="py-5 bg-light">
+  <div class="container">
+    <div class="row mb-5">
+      <div class="col-lg-8 mx-auto text-center">
+        <h2 class="fw-bold mb-3">Why Choose Us?</h2>
+        <p class="text-muted">Experience healthcare excellence with our comprehensive medical services</p>
+      </div>
+    </div>
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body text-center p-4">
+            <div class="feature-icon bg-primary-subtle rounded-circle mb-3 mx-auto">
+              <i class="fas fa-user-md text-primary"></i>
+            </div>
+            <h4 class="mb-3">Expert Care</h4>
+            <p class="text-muted mb-0">Our experienced medical professionals are committed to providing the highest quality healthcare services.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body text-center p-4">
+            <div class="feature-icon bg-primary-subtle rounded-circle mb-3 mx-auto">
+              <i class="fas fa-heart text-primary"></i>
+            </div>
+            <h4 class="mb-3">Patient-Centered</h4>
+            <p class="text-muted mb-0">We focus on personalized treatment plans that put your health and comfort first.</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm">
+          <div class="card-body text-center p-4">
+            <div class="feature-icon bg-primary-subtle rounded-circle mb-3 mx-auto">
+              <i class="fas fa-hospital text-primary"></i>
+            </div>
+            <h4 class="mb-3">Modern Facility</h4>
+            <p class="text-muted mb-0">State-of-the-art technology and facilities to ensure the best possible care and outcomes.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Visual Break Section -->
+<div class="visual-break position-relative py-5">
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-8 mx-auto text-center text-white">
+        <h2 class="display-5 fw-bold mb-4">A Healing Environment</h2>
+        <p class="lead">Where modern medicine meets compassionate care</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Quick Access Section -->
+<div class="py-5">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm quick-access-card">
+          <div class="card-body text-center p-4 d-flex flex-column">
+            <i class="fas fa-users fa-2x text-primary mb-3"></i>
+            <h4>Meet Our Team</h4>
+            <p class="text-muted mb-4">Get to know our dedicated healthcare professionals</p>
+            <div class="mt-auto">
+              <a href="/aboutus" class="btn btn-outline-primary">Learn More</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm quick-access-card">
+          <div class="card-body text-center p-4 d-flex flex-column">
+            <i class="fas fa-map-marker-alt fa-2x text-primary mb-3"></i>
+            <h4>Find Our Location</h4>
+            <p class="text-muted mb-4">Easy access to our world-class facilities</p>
+            <div class="mt-auto">
+              <a href="/contactus#location" class="btn btn-outline-primary">Get Directions</a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card h-100 border-0 shadow-sm quick-access-card">
+          <div class="card-body text-center p-4 d-flex flex-column">
+            <i class="fas fa-user-plus fa-2x text-primary mb-3"></i>
+            <h4>New Patient?</h4>
+            <p class="text-muted mb-4">Register now to access our services</p>
+            <div class="mt-auto">
+              <a href="/patientsignup" class="btn btn-outline-primary">Sign Up</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.bg-gradient-primary {
+  background: linear-gradient(45deg, #4f46e5, #4338ca);
+}
+
+.feature-icon {
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feature-icon i {
+  font-size: 28px;
+}
+
+.visual-break {
+  background: linear-gradient(45deg, #4f46e5, #2563eb);
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+}
+
+.quick-access-card {
+  transition: transform 0.2s ease-in-out;
+}
+
+.quick-access-card:hover {
+  transform: translateY(-5px);
+}
+
+.bg-primary-subtle {
+  background-color: rgba(79, 70, 229, 0.1);
+}
+
+.text-primary {
+  color: #4f46e5 !important;
+}
+
+.btn-primary {
+  background-color: #4f46e5;
+  border-color: #4f46e5;
+}
+
+.btn-primary:hover {
+  background-color: #4338ca;
+  border-color: #4338ca;
+}
+
+.btn-outline-primary {
+  color: #4f46e5;
+  border-color: #4f46e5;
+}
+
+.btn-outline-primary:hover {
+  background-color: #4f46e5;
+  border-color: #4f46e5;
+  color: white;
+}
+</style>
+{% endblock content %}

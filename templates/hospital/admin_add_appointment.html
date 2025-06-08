@@ -1,0 +1,175 @@
+{% extends 'hospital/admin_base.html' %}
+{% load static %}
+{% load widget_tweaks %}
+
+{% block title %}Schedule Appointment - HMS{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<div class="page-header">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <h1 class="fw-bold mb-3">Schedule Appointment</h1>
+        <p class="lead mb-0">Create a new appointment for a patient</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container py-4">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4 p-lg-5">
+          <form method="post">
+            {% csrf_token %}
+            
+            <!-- Doctor Selection -->
+            <div class="mb-4">
+              <label class="form-label">{{ appointmentForm.doctor.label }}</label>
+              {% render_field appointmentForm.doctor class="form-select" %}
+              {% if appointmentForm.doctor.help_text %}
+                <div class="form-text text-muted">{{ appointmentForm.doctor.help_text }}</div>
+              {% endif %}
+              {% if appointmentForm.doctor.errors %}
+                <div class="alert alert-danger mt-2">
+                  {{ appointmentForm.doctor.errors }}
+                </div>
+              {% endif %}
+            </div>
+            
+            <!-- Patient Selection -->
+            <div class="mb-4">
+              <label class="form-label">{{ appointmentForm.patient.label }}</label>
+              {% render_field appointmentForm.patient class="form-select" %}
+              {% if appointmentForm.patient.help_text %}
+                <div class="form-text text-muted">{{ appointmentForm.patient.help_text }}</div>
+              {% endif %}
+              {% if appointmentForm.patient.errors %}
+                <div class="alert alert-danger mt-2">
+                  {{ appointmentForm.patient.errors }}
+                </div>
+              {% endif %}
+            </div>
+            
+            <!-- Date & Time -->
+            <div class="row g-4 mb-4">
+              <div class="col-md-6">
+                <label class="form-label">Appointment Date</label>
+                {% render_field appointmentForm.appointmentDate class="form-control" type="date" min=today %}
+                {% if appointmentForm.appointmentDate.errors %}
+                  <div class="alert alert-danger mt-2">
+                    {{ appointmentForm.appointmentDate.errors }}
+                  </div>
+                {% endif %}
+              </div>
+              <div class="col-md-6">
+                <label class="form-label">Appointment Time</label>
+                {% render_field appointmentForm.appointmentTime class="form-control" type="time" %}
+                {% if appointmentForm.appointmentTime.errors %}
+                  <div class="alert alert-danger mt-2">
+                    {{ appointmentForm.appointmentTime.errors }}
+                  </div>
+                {% endif %}
+              </div>
+            </div>
+            
+            <!-- Description -->
+            <div class="mb-4">
+              <label class="form-label">Description</label>
+              {% render_field appointmentForm.description class="form-control" rows="3" placeholder="Enter appointment details..." %}
+              {% if appointmentForm.description.errors %}
+                <div class="alert alert-danger mt-2">
+                  {{ appointmentForm.description.errors }}
+                </div>
+              {% endif %}
+            </div>
+            
+            <!-- Submit Button -->
+            <div class="text-end">
+              <a href="{% url 'admin-view-appointment' %}" class="btn btn-outline-secondary me-2">
+                <i class="fas fa-times me-2"></i>Cancel
+              </a>
+              <button type="submit" class="btn btn-primary px-4">
+                <i class="fas fa-calendar-plus me-2"></i>Schedule Appointment
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.page-header {
+  background: linear-gradient(45deg, #4f46e5, #4338ca);
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.form-label {
+  font-weight: 500;
+  color: #4b5563;
+  margin-bottom: 0.5rem;
+}
+
+.form-control,
+.form-select {
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #e5e7eb;
+}
+
+.form-control:focus,
+.form-select:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 0.25rem rgba(79, 70, 229, 0.25);
+}
+
+.form-text {
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.btn-primary {
+  background-color: #4f46e5;
+  border-color: #4f46e5;
+}
+
+.btn-primary:hover {
+  background-color: #4338ca;
+  border-color: #4338ca;
+}
+
+.btn-outline-secondary {
+  color: #6b7280;
+  border-color: #d1d5db;
+}
+
+.btn-outline-secondary:hover {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
+  color: #374151;
+}
+</style>
+
+<!-- Initialize Select2 for better dropdown experience -->
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Initialize Select2 for doctor and patient dropdowns
+    $('#id_doctor, #id_patient').select2({
+        theme: 'bootstrap-5',
+        width: '100%',
+        placeholder: function() {
+            return $(this).attr('placeholder');
+        },
+        allowClear: true
+    });
+});
+</script>
+{% endblock content %}

@@ -1,0 +1,110 @@
+{% extends "hospital/homebase.html" %}
+{% load static %}
+
+{% block title %}Pending Approval - HMS{% endblock %}
+
+{% block content %}
+<div class="container-fluid min-vh-100 d-flex align-items-center py-5" style="background: linear-gradient(45deg, rgba(79, 70, 229, 0.1), rgba(67, 56, 202, 0.1));">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="card border-0 shadow-sm text-center p-4 p-lg-5">
+          <div class="mb-4">
+            <div class="display-1 text-primary mb-3">
+              <i class="fas fa-user-clock"></i>
+            </div>
+            <h1 class="display-5 fw-bold mb-3">Hello, {{request.user.first_name}}!</h1>
+            <div class="progress mb-4" style="height: 8px;">
+              <div class="progress-bar progress-bar-striped progress-bar-animated bg-primary" role="progressbar" style="width: 75%"></div>
+            </div>
+            <p class="lead text-muted mb-4">
+              Your account is currently under review. Our medical team is verifying your information to ensure you get the best possible care. You'll gain access to our patient portal once approved.
+            </p>
+          </div>
+
+          <div class="card bg-light border-0 mb-4">
+            <div class="card-body">
+              <h5 class="mb-3">What's happening now?</h5>
+              <div class="row g-4">
+                <div class="col-md-4">
+                  <div class="feature-icon bg-primary-subtle rounded-circle mx-auto mb-3">
+                    <i class="fas fa-user-check text-primary"></i>
+                  </div>
+                  <h6>Profile Review</h6>
+                  <p class="small text-muted mb-0">We're reviewing your details</p>
+                </div>
+                <div class="col-md-4">
+                  <div class="feature-icon bg-primary-subtle rounded-circle mx-auto mb-3">
+                    <i class="fas fa-bell text-primary"></i>
+                  </div>
+                  <h6>Notification</h6>
+                  <p class="small text-muted mb-0">We'll email you when ready</p>
+                </div>
+                <div class="col-md-4">
+                  <div class="feature-icon bg-primary-subtle rounded-circle mx-auto mb-3">
+                    <i class="fas fa-hospital-user text-primary"></i>
+                  </div>
+                  <h6>Portal Access</h6>
+                  <p class="small text-muted mb-0">Book appointments & more</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <p class="text-muted mb-4">You can safely log out and check back later. We'll email you once your account is approved.</p>
+            <form action="{% url 'logout' %}" method="post" class="d-inline-block">
+              {% csrf_token %}
+              <button type="submit" class="btn btn-outline-primary px-4 py-2">
+                <i class="fas fa-sign-out-alt me-2"></i>Logout for now
+              </button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.feature-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto;
+}
+
+.feature-icon i {
+  font-size: 24px;
+}
+
+.bg-primary-subtle {
+  background-color: rgba(79, 70, 229, 0.1);
+}
+
+.text-primary {
+  color: #4f46e5 !important;
+}
+
+.display-1 {
+  font-size: 4rem;
+}
+
+.progress-bar {
+  background-color: #4f46e5;
+}
+
+.btn-outline-primary {
+  color: #4f46e5;
+  border-color: #4f46e5;
+}
+
+.btn-outline-primary:hover {
+  background-color: #4f46e5;
+  border-color: #4f46e5;
+  color: white;
+}
+</style>
+{% endblock content %}

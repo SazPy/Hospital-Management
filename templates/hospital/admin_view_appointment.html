@@ -1,0 +1,150 @@
+{% extends 'hospital/admin_base.html' %}
+{% load static %}
+
+{% block title %}View Appointments - HMS{% endblock %}
+
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <h1 class="fw-bold mb-3">View Appointments</h1>
+        <p class="lead mb-0">Manage and track all appointments</p>
+      </div>
+      <div class="col-lg-6 text-lg-end">
+        <a href="{% url 'admin-add-appointment' %}" class="btn btn-light">
+          <i class="fas fa-plus me-2"></i>Add Appointment
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container py-4">
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+      {% if appointments %}
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="bg-light">
+            <tr>
+              <th class="px-4 py-3">Doctor</th>
+              <th class="px-4 py-3">Patient</th>
+              <th class="px-4 py-3">Date & Time</th>
+              <th class="px-4 py-3">Description</th>
+              <th class="px-4 py-3">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for a in appointments %}
+            <tr>
+              <td class="px-4 py-3">
+                <div class="d-flex align-items-center">
+                  <i class="fas fa-user-md text-primary me-3"></i>
+                  <div>
+                    <div class="fw-medium">Dr. {{a.doctorName}}</div>
+                    <div class="text-muted small">{{a.department}}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <div class="d-flex align-items-center">
+                  <i class="fas fa-user text-primary me-3"></i>
+                  <div>
+                    <div class="fw-medium">{{a.patientName}}</div>
+                    <div class="text-muted small">ID: {{a.patientId}}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <div class="fw-medium">{{a.appointmentDate}}</div>
+                <div class="text-muted small">{{a.appointmentTime}}</div>
+              </td>
+              <td class="px-4 py-3">{{a.description|truncatechars:50}}</td>
+              <td class="px-4 py-3">
+                <div class="action-buttons">
+                  <a href="{% url 'admin-appointment-details' a.id %}" class="btn btn-sm btn-outline-primary me-2" data-bs-toggle="tooltip" title="View Details">
+                    <i class="fas fa-eye"></i>
+                  </a>
+                  <a href="{% url 'admin-delete-appointment' a.id %}" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Cancel"
+                     onclick="return confirm('Are you sure you want to cancel this appointment?')">
+                    <i class="fas fa-times"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="text-center py-5">
+        <div class="mb-3">
+          <i class="fas fa-calendar-times text-muted" style="font-size: 4rem;"></i>
+        </div>
+        <h5 class="text-muted mb-3">No appointments found</h5>
+        <a href="{% url 'admin-add-appointment' %}" class="btn btn-primary">
+          <i class="fas fa-plus me-2"></i>Add New Appointment
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<style>
+.page-header {
+  background: linear-gradient(45deg, #4f46e5, #4338ca);
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.action-buttons .btn {
+  padding: 0.25rem 0.5rem;
+}
+
+.table th {
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.btn-outline-primary {
+  color: #4f46e5;
+  border-color: #4f46e5;
+}
+
+.btn-outline-primary:hover {
+  background-color: #4f46e5;
+  border-color: #4f46e5;
+  color: white;
+}
+
+.btn-outline-danger {
+  color: #dc2626;
+  border-color: #dc2626;
+}
+
+.btn-outline-danger:hover {
+  background-color: #dc2626;
+  border-color: #dc2626;
+  color: white;
+}
+
+.text-primary {
+  color: #4f46e5 !important;
+}
+</style>
+
+<!-- Initialize tooltips -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  })
+});
+</script>
+{% endblock content %}

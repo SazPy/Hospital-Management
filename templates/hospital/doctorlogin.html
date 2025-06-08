@@ -1,0 +1,53 @@
+{% extends 'hospital/login_base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}Doctor Login - HMS{% endblock %}
+
+{% block login_header %}
+<i class="fas fa-user-md"></i>
+<h4 class="mb-0">Doctor Login</h4>
+{% endblock %}
+
+{% block login_form %}
+<form method="post">
+  {% csrf_token %}
+  
+  <div class="mb-4">
+    <label class="form-label">Username</label>
+    {% render_field form.username class="form-control" placeholder="Enter your username" %}
+  </div>
+  
+  <div class="mb-4">
+    <label class="form-label">Password</label>
+    <div class="input-group">
+      {% render_field form.password class="form-control" placeholder="Enter your password" type="password" %}
+      <button class="btn btn-outline-secondary" type="button" id="togglePassword">
+        <i class="far fa-eye"></i>
+      </button>
+    </div>
+  </div>
+  
+  <button type="submit" class="btn btn-primary">
+    <i class="fas fa-sign-in-alt me-2"></i>Login
+  </button>
+  
+  <div class="signup-link">
+    Don't have an account? <a href="doctorsignup">Sign up</a>
+  </div>
+</form>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  // Toggle password visibility
+  const togglePassword = document.querySelector('#togglePassword');
+  const password = document.querySelector('input[type="password"]');
+  
+  togglePassword.addEventListener('click', function () {
+    const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+    password.setAttribute('type', type);
+    this.querySelector('i').classList.toggle('fa-eye');
+    this.querySelector('i').classList.toggle('fa-eye-slash');
+  });
+</script>
+{% endblock %}

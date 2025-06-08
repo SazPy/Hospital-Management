@@ -1,0 +1,202 @@
+{% extends 'hospital/doctor_base.html' %}
+{% load static %}
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <h1 class="fw-bold mb-3">Patient Management</h1>
+        <p class="lead mb-0">Manage and track your patients' records</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container py-4">
+  <div class="row g-4">
+    <!-- Current Patients -->
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center mb-4">
+            <div class="feature-icon bg-primary-subtle rounded-circle me-3">
+              <i class="fas fa-user-injured text-primary"></i>
+            </div>
+            <div>
+              <h4 class="mb-1">Current Patients</h4>
+              <p class="text-muted mb-0">View and manage active patients</p>
+            </div>
+          </div>
+          
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h2 class="mb-0">{{ total_patients }}</h2>
+              <p class="text-muted mb-0">Total patients</p>
+            </div>
+            <a href="/doctor-view-patient" class="btn btn-primary">
+              <i class="fas fa-eye me-2"></i>View Records
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Discharged Patients -->
+    <div class="col-lg-6">
+      <div class="card border-0 shadow-sm h-100">
+        <div class="card-body p-4">
+          <div class="d-flex align-items-center mb-4">
+            <div class="feature-icon bg-danger-subtle rounded-circle me-3">
+              <i class="fas fa-hospital-user text-danger"></i>
+            </div>
+            <div>
+              <h4 class="mb-1">Discharged Patients</h4>
+              <p class="text-muted mb-0">View discharged patient records</p>
+            </div>
+          </div>
+          
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <h2 class="mb-0">{{ discharged_patients }}</h2>
+              <p class="text-muted mb-0">Total discharged</p>
+            </div>
+            <a href="/doctor-view-discharge-patient" class="btn btn-danger">
+              <i class="fas fa-clipboard-list me-2"></i>View Discharged
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Recent Patients -->
+    <div class="col-12">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body p-4">
+          <h4 class="mb-4">Recent Patients</h4>
+          
+          {% if recent_patients %}
+          <div class="table-responsive">
+            <table class="table table-hover mb-0">
+              <thead>
+                <tr>
+                  <th>Patient</th>
+                  <th>Admission Date</th>
+                  <th>Symptoms</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for patient in recent_patients %}
+                <tr>
+                  <td>
+                    <div class="d-flex align-items-center">
+                      <img src="{% static 'images/patient.jpg' %}" alt="Patient" class="rounded-circle me-3" width="40" height="40" onerror="this.src='https://placehold.co/40x40/4f46e5/ffffff?text=P'">
+                      <div>
+                        <div class="fw-medium">{{ patient.get_name }}</div>
+                        <div class="text-muted small">ID: {{ patient.id }}</div>
+                      </div>
+                    </div>
+                  </td>
+                  <td>{{ patient.admitted_date }}</td>
+                  <td>{{ patient.symptoms|truncatechars:30 }}</td>
+                  <td>
+                    <span class="badge bg-{% if patient.status == 'Admitted' %}success{% else %}warning{% endif %}">
+                      {{ patient.status }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="action-buttons">
+                      <button class="btn btn-sm btn-outline-primary me-2" data-bs-toggle="tooltip" title="View Details">
+                        <i class="fas fa-eye"></i>
+                      </button>
+                      <button class="btn btn-sm btn-outline-success" data-bs-toggle="tooltip" title="Update Records">
+                        <i class="fas fa-edit"></i>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% else %}
+          <div class="text-center py-4">
+            <img src="{% static 'images/no-patients.png' %}" alt="No Patients" class="mb-3" width="120" onerror="this.src='https://placehold.co/120x120/4f46e5/ffffff?text=No+Patients'">
+            <h6 class="text-muted">No recent patients</h6>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.page-header {
+  background: linear-gradient(45deg, #4f46e5, #4338ca);
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.feature-icon {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feature-icon i {
+  font-size: 24px;
+}
+
+.bg-primary-subtle {
+  background-color: rgba(79, 70, 229, 0.1);
+}
+
+.bg-danger-subtle {
+  background-color: rgba(220, 38, 38, 0.1);
+}
+
+.text-primary {
+  color: #4f46e5 !important;
+}
+
+.text-danger {
+  color: #dc2626 !important;
+}
+
+.btn-primary {
+  background-color: #4f46e5;
+  border-color: #4f46e5;
+}
+
+.btn-primary:hover {
+  background-color: #4338ca;
+  border-color: #4338ca;
+}
+
+.btn-danger {
+  background-color: #dc2626;
+  border-color: #dc2626;
+}
+
+.btn-danger:hover {
+  background-color: #b91c1c;
+  border-color: #b91c1c;
+}
+
+.action-buttons .btn {
+  padding: 0.25rem 0.5rem;
+}
+
+.table th {
+  font-weight: 600;
+  color: #4b5563;
+}
+</style>
+{% endblock content %}

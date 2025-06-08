@@ -1,0 +1,168 @@
+{% extends 'hospital/admin_base.html' %}
+{% load static %}
+{% block content %}
+
+<!-- Page Header -->
+<div class="page-header">
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6">
+        <h1 class="fw-bold mb-3">Patient Approvals</h1>
+        <p class="lead mb-0">Review and approve patient registration requests</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="container py-4">
+  {% if patients %}
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table class="table table-hover align-middle mb-0">
+          <thead class="bg-light">
+            <tr>
+              <th class="px-4 py-3">Patient</th>
+              <th class="px-4 py-3">Contact</th>
+              <th class="px-4 py-3">Symptoms</th>
+              <th class="px-4 py-3">Status</th>
+              <th class="px-4 py-3 text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for p in patients %}
+            <tr>
+              <td class="px-4 py-3">
+                <div class="d-flex align-items-center">
+                  {% if p.profile_pic %}
+                    <img src="{% static p.profile_pic.url %}" alt="Profile Pic" class="rounded-circle me-3" width="48" height="48">
+                  {% else %}
+                    <div class="avatar-placeholder rounded-circle bg-primary-subtle me-3">
+                      <i class="fas fa-user"></i>
+                    </div>
+                  {% endif %}
+                  <div>
+                    <div class="fw-medium">{{ p.get_name }}</div>
+                    <div class="text-muted small">ID: {{ p.id }}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <div>
+                  <div><i class="fas fa-phone me-2 text-muted"></i>{{ p.mobile }}</div>
+                  <div class="text-muted small">
+                    <i class="fas fa-map-marker-alt me-2"></i>{{ p.address|truncatechars:30 }}
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <span class="text-wrap">{{ p.symptoms|truncatechars:50 }}</span>
+              </td>
+              <td class="px-4 py-3">
+                <span class="badge bg-warning">Pending</span>
+              </td>
+              <td class="px-4 py-3 text-end">
+                <div class="action-buttons">
+                  <a href="{% url 'approve-patient' p.id %}" class="btn btn-sm btn-outline-success me-2" data-bs-toggle="tooltip" title="Approve">
+                    <i class="fas fa-check"></i>
+                  </a>
+                  <a href="{% url 'reject-patient' p.id %}" class="btn btn-sm btn-outline-danger" data-bs-toggle="tooltip" title="Reject">
+                    <i class="fas fa-times"></i>
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  {% else %}
+  <div class="text-center py-5">
+    <img src="{% static 'images/no-requests.png' %}" alt="No Requests" class="mb-3" width="120" onerror="this.src='https://placehold.co/120x120/4f46e5/ffffff?text=No+Requests'">
+    <h5 class="text-muted mb-3">No pending approvals</h5>
+    <p class="text-muted">There are no patient registration requests waiting for approval.</p>
+  </div>
+  {% endif %}
+</div>
+
+<style>
+.page-header {
+  background: linear-gradient(45deg, #4f46e5, #4338ca);
+  color: white;
+  padding: 2rem 0;
+  margin-bottom: 2rem;
+}
+
+.avatar-placeholder {
+  width: 48px;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #4f46e5;
+}
+
+.bg-primary-subtle {
+  background-color: rgba(79, 70, 229, 0.1);
+}
+
+.action-buttons .btn {
+  padding: 0.25rem 0.5rem;
+}
+
+.table th {
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.text-wrap {
+  white-space: normal;
+  word-wrap: break-word;
+  max-width: 200px;
+}
+
+.badge {
+  padding: 0.5em 0.75em;
+  font-weight: 500;
+}
+
+.bg-warning {
+  background-color: #f59e0b !important;
+}
+
+.btn-outline-success {
+  color: #10b981;
+  border-color: #10b981;
+}
+
+.btn-outline-success:hover {
+  background-color: #10b981;
+  border-color: #10b981;
+  color: white;
+}
+
+.btn-outline-danger {
+  color: #dc2626;
+  border-color: #dc2626;
+}
+
+.btn-outline-danger:hover {
+  background-color: #dc2626;
+  border-color: #dc2626;
+  color: white;
+}
+</style>
+
+<script>
+// Enable all tooltips
+document.addEventListener('DOMContentLoaded', function() {
+  var tooltips = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+  tooltips.forEach(function(tooltip) {
+    new bootstrap.Tooltip(tooltip);
+  });
+});
+</script>
+
+{% endblock content %}

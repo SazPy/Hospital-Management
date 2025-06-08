@@ -1,0 +1,155 @@
+{% extends 'hospital/admin_base.html' %}
+{% load static %}
+
+{% block title %}Room Requests - HMS{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Page Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 mb-0">Room Requests</h1>
+      <p class="text-muted">Manage room requests from doctors</p>
+    </div>
+    <div>
+      <a href="{% url 'admin-rooms' %}" class="btn btn-outline-primary">
+        <i class="fas fa-door-open me-2"></i>View All Rooms
+      </a>
+    </div>
+  </div>
+
+  <!-- Request List -->
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-0">
+      {% if requests %}
+      <div class="table-responsive">
+        <table class="table table-hover mb-0">
+          <thead class="bg-light">
+            <tr>
+              <th class="px-4 py-3">Doctor</th>
+              <th class="px-4 py-3">Patient</th>
+              <th class="px-4 py-3">Room Type</th>
+              <th class="px-4 py-3">Duration</th>
+              <th class="px-4 py-3">Status</th>
+              <th class="px-4 py-3">Request Date</th>
+              <th class="px-4 py-3 text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for request in requests %}
+            <tr>
+              <td class="px-4 py-3">
+                <div class="d-flex align-items-center">
+                  <div class="feature-icon bg-primary-subtle rounded-circle me-3" style="width: 40px; height: 40px;">
+                    <i class="fas fa-user-md"></i>
+                  </div>
+                  <div>
+                    <div class="fw-medium">Dr. {{ request.doctor.get_name }}</div>
+                    <div class="text-muted small">{{ request.doctor.department }}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <div class="d-flex align-items-center">
+                  <div class="feature-icon bg-info-subtle rounded-circle me-3" style="width: 40px; height: 40px;">
+                    <i class="fas fa-user"></i>
+                  </div>
+                  <div>
+                    <div class="fw-medium">{{ request.patient.get_name }}</div>
+                    <div class="text-muted small">ID: {{ request.patient.id }}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-4 py-3">
+                <span class="badge bg-info">{{ request.requested_room.get_room_type_display }}</span>
+              </td>
+              <td class="px-4 py-3">{{ request.expected_duration }} days</td>
+              <td class="px-4 py-3">
+                {% if request.status == 'PENDING' %}
+                  <span class="badge bg-warning">Pending</span>
+                {% elif request.status == 'APPROVED' %}
+                  <span class="badge bg-success">Approved</span>
+                {% else %}
+                  <span class="badge bg-danger">Denied</span>
+                {% endif %}
+              </td>
+              <td class="px-4 py-3">
+                <div>{{ request.request_date|date:"M d, Y" }}</div>
+                <div class="text-muted small">{{ request.request_date|time:"H:i" }}</div>
+              </td>
+              <td class="px-4 py-3 text-end">
+                {% if request.status == 'PENDING' %}
+                <div class="btn-group btn-group-sm">
+                  <a href="{% url 'admin-approve-room-request' pk=request.id %}" class="btn btn-outline-success" title="Approve">
+                    <i class="fas fa-check me-1"></i>Approve
+                  </a>
+                  <a href="{% url 'admin-deny-room-request' pk=request.id %}" class="btn btn-outline-danger" title="Deny">
+                    <i class="fas fa-times me-1"></i>Deny
+                  </a>
+                </div>
+                {% else %}
+                <div>
+                  {% if request.response_note %}
+                  <button class="btn btn-sm btn-outline-info" data-bs-toggle="tooltip" title="{{ request.response_note }}">
+                    <i class="fas fa-info-circle me-1"></i>View Note
+                  </button>
+                  {% endif %}
+                </div>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <div class="text-center py-5">
+        <img src="{% static 'images/no-requests.png' %}" alt="No Requests" class="mb-3" width="120">
+        <h5 class="text-muted">No Room Requests</h5>
+        <p class="text-muted mb-0">There are no room requests at the moment.</p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<style>
+.feature-icon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+}
+
+.bg-primary-subtle {
+  background-color: rgba(13, 110, 253, 0.1);
+}
+
+.bg-info-subtle {
+  background-color: rgba(13, 202, 240, 0.1);
+}
+
+.table > :not(caption) > * > * {
+  padding: 1rem;
+}
+
+.btn-group .btn {
+  padding: 0.25rem 0.75rem;
+}
+
+[data-bs-toggle="tooltip"] {
+  cursor: pointer;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
+  var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    return new bootstrap.Tooltip(tooltipTriggerEl)
+  })
+})
+</script>
+{% endblock %} 
