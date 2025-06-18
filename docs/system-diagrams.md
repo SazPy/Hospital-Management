@@ -4,146 +4,298 @@
 
 ```mermaid
 graph TD
-    subgraph External Systems
-        E[Email System]
-        PDF[PDF Generator]
-        PAY[Payment Gateway]
-        SMS[SMS Gateway]
-    end
-    
-    subgraph Core System
-        HMS[Hospital Management System]
-    end
-    
-    subgraph Users
-        P[Patient]
-        D[Doctor]
-        A[Admin]
-    end
-    
-    subgraph Data Stores
-        DB[(Database)]
-        FS[File Storage]
-    end
-    
-    P -->|Register/Login/Book| HMS
-    P -->|View Records| HMS
-    P -->|Make Payments| HMS
-    
+    %% Style Definitions
+    classDef entity fill:,stroke:#333,stroke-width:1.5px;
+    classDef system fill:,stroke:#000,stroke-width:2px;
+    classDef flow font-style: italic, font-size: 12px;
+
+    %% External Entities
+    P[Patient]:::entity
+    D[Doctor]:::entity
+    A[Admin]:::entity
+
+    %% Central System
+    HMS([Hospital Management System]):::system
+
+    %% Data Flows: Patient
+    P -->|Register / Login| HMS
+    P -->|Book Appointment| HMS
+    P -->|View Medical Records| HMS
+    P -->|View Bill / Make Payment| HMS
+    P -->|Contact Messages| HMS
+    HMS -->|Notifications / Confirmations| P
+
+    %% Data Flows: Doctor
     D -->|Manage Patients| HMS
-    D -->|Handle Appointments| HMS
+    D -->|Accept / Reject Appointments| HMS
     D -->|Update Records| HMS
-    
+    HMS -->|Reminders / Schedules| D
+
+    %% Data Flows: Admin
     A -->|System Management| HMS
-    A -->|Generate Reports| HMS
-    
-    HMS -->|Store Data| DB
-    HMS -->|Store Files| FS
-    HMS -->|Send Notifications| E
-    HMS -->|Generate Documents| PDF
-    HMS -->|Process Payments| PAY
-    HMS -->|Send SMS| SMS
+    A -->|Discharge / Assign Rooms| HMS
+    A -->|Generate Reports / Billing| HMS
+    HMS -->|Logs / Notifications| A
+
 ```
 
 
+## Data Flow Diagram (Level 0)
+
+```mermaid
+---
+config:
+  layout: elk
+---
+flowchart TD
+    Patient(("Patient")) -- Register/Login/Update --> P1["1 User Management"]
+    P1 -- User Data/Responses --> Patient & Doctor(("Doctor")) & Admin(("Admin"))
+    Patient -- Search/View/Book Appt --> P2["2 Appointment System"]
+    P2 -- Appt Data/Confirmations --> Patient
+    Patient -- Access Medical Records --> P3["3 Patient Management"]
+    P3 -- Medical Data --> Patient & Doctor & Admin
+    Patient -- Request Room --> P4["4 Room Management"]
+    P4 -- Room Data --> Patient & Admin
+    Patient -- Receive Notifications --> P5["5 Communication Services"]
+    P5 -- Send Notifications --> Patient
+    Patient -- Request Bill --> P6["6 Bill Generating System"]
+    P6 -- Bill Data/Invoice --> Patient
+    Doctor -- Manage Profile/Appointments/Records --> P1
+    Doctor -- View/Manage Appointments --> P2
+    P2 -- Appt Data --> Doctor & Admin
+    Doctor -- Add/View Patient Records --> P3
+    Admin -- Manage Users/Doctors/Patients --> P1
+    Admin -- Manage Appointments --> P2
+    Admin -- Manage Patient Data --> P3
+    Admin -- Manage Rooms --> P4
+    Admin -- Manage Communication --> P5
+    P5 -- Notifications --> Admin
+    Admin -- Manage Bills --> P6
+    P6 -- Billing Data --> Admin
+    P1 <--> DB1[("User DB")]
+    P2 <--> DB2[("Medical DB")]
+    P3 <--> DB2
+    P4 <--> DB2
+    P5 <--> DB4[("Audit Logs")]
+    P6 <--> DB3[("Billing DB")] & FS["File Store"]
+
+```
 ## Data Flow Diagram (Level 1)
+# 1. User Management
+```mermaid
+graph TD
+    Patient((Patient))
+    Doctor((Doctor))
+    Admin((Admin))
+    
+    P1_1[1.1 User Registration]
+    P1_2[1.2 User Login Authentication]
+    P1_3[1.3 Profile Management]
+    P1_4[1.4 Access Control]
+
+    DB1[(User DB)]
+
+    Patient -->|Register| P1_1
+    Doctor -->|Register| P1_1
+    Admin -->|Manage Users| P1_1
+    P1_1 -->|Store User Data| DB1
+    P1_1 -->|Registration Confirmation| Patient
+    P1_1 -->|Registration Confirmation| Doctor
+
+    Patient -->|Login| P1_2
+    Doctor -->|Login| P1_2
+    P1_2 -->|Authenticate| DB1
+    P1_2 -->|Login Response Success/Fail| Patient
+    P1_2 -->|Login Response Success/Fail| Doctor
+
+    Patient -->|Update Profile| P1_3
+    Doctor -->|Update Profile| P1_3
+    P1_3 -->|Update Profile Data| DB1
+    P1_3 -->|Profile Update Confirmation| Patient
+    P1_3 -->|Profile Update Confirmation| Doctor
+
+    P1_4 -->|Verify Permissions| DB1
+
+```
+
+# 2. Appointment System
 
 ```mermaid
 graph TD
-    subgraph User Management
-        UM1[Authentication]
-        UM2[Registration]
-        UM3[Profile Management]
-        UM4[Access Control]
-    end
-    
-    subgraph Appointment System
-        AS1[Booking]
-        AS2[Scheduling]
-        AS3[Notifications]
-        AS4[Calendar]
-    end
-    
-    subgraph Patient Management
-        PM1[Records]
-        PM2[History]
-        PM3[Billing]
-        PM4[Documents]
-    end
-    
-    subgraph Room Management
-        RM1[Allocation]
-        RM2[Tracking]
-        RM3[Maintenance]
-        RM4[Inventory]
-    end
-    
-    subgraph Communication
-        CM1[Email]
-        CM2[SMS]
-        CM3[Notifications]
-    end
-    
-    subgraph Payment System
-        PS1[Billing]
-        PS2[Processing]
-        PS3[Receipts]
-    end
-    
-    subgraph Security
-        SEC1[Authentication]
-        SEC2[Authorization]
-        SEC3[Audit]
-    end
-    
-    subgraph Data Stores
-        DB1[(User DB)]
-        DB2[(Medical DB)]
-        DB3[(Billing DB)]
-        DB4[(Audit DB)]
-        FS[File Store]
-    end
-    
-    %% User Management Flows
-    UM1 -->|Auth Data| DB1
-    UM2 -->|User Data| DB1
-    UM3 -->|Profile Updates| DB1
-    UM4 -->|Access Logs| DB4
-    
-    %% Appointment Flows
-    AS1 -->|Bookings| DB2
-    AS2 -->|Schedule| DB2
-    AS3 -->|Notifications| CM1
-    AS4 -->|Calendar Data| DB2
-    
-    %% Patient Management Flows
-    PM1 -->|Patient Data| DB2
-    PM2 -->|Medical History| DB2
-    PM3 -->|Billing Data| DB3
-    PM4 -->|Documents| FS
-    
-    %% Room Management Flows
-    RM1 -->|Room Data| DB2
-    RM2 -->|Status| DB2
-    RM3 -->|Maintenance| DB2
-    RM4 -->|Inventory| DB2
-    
-    %% Communication Flows
-    CM1 -->|Emails| DB4
-    CM2 -->|SMS| DB4
-    CM3 -->|System Messages| DB4
-    
-    %% Payment Flows
-    PS1 -->|Bills| DB3
-    PS2 -->|Transactions| DB3
-    PS3 -->|Receipts| FS
-    
-    %% Security Flows
-    SEC1 -->|Auth Logs| DB4
-    SEC2 -->|Access Logs| DB4
-    SEC3 -->|Audit Trail| DB4
+    Patient((Patient))
+    Doctor((Doctor))
+    Admin((Admin))
+
+    P2_1[2.1 Choose Doctor]
+    P2_2[2.2 Request Appointment]
+    P2_3[2.3 Admin Schedule Appointment]
+    P2_4[2.4 Doctor Approves/Rejects]
+    P2_5[2.5 Appointment Confirmation Notification]
+
+    DB2[(Medical DB)]
+
+    %% Patient Flow
+    Patient -->|Search/Select| P2_1
+    P2_1 -->|Doctor Info| DB2
+
+    Patient -->|Request Appointment| P2_2
+    P2_2 -->|Store Request| DB2
+    P2_2 -->|Forward Request| P2_4
+
+    %% Admin Flow
+    Admin -->|Create Appointment| P2_3
+    P2_3 -->|Store Appointment| DB2
+    P2_3 -->|Send Confirmation| P2_5
+
+    %% Doctor Flow
+    Doctor -->|Review Request| P2_4
+    P2_4 -->|Update Status| DB2
+    P2_4 -->|Send Response| P2_5
+
+    %% Final Notification
+    P2_5 -->|Notify Patient| Patient
+    P2_5 -->|Notify Doctor| Doctor
+
 ```
 
+# 3. Patient Management
+```memraid
+graph TD
+    Patient((Patient))
+    Doctor((Doctor))
+    Admin((Admin))
+
+    P3_1[3.1 Add/Update Medical Record]
+    P3_2[3.2 View Medical History]
+    P3_3[3.3 Manage Documents]
+    P3_4[3.4 Discharge Patient]
+
+    DB2[(Medical DB)]
+    FS[File Store]
+
+    %% Doctor Activities
+    Doctor -->|Add/Edit Record| P3_1
+    P3_1 -->|Store Record| DB2
+
+    Doctor -->|View History| P3_2
+    P3_2 -->|Fetch History| DB2
+    P3_2 -->|Return Data| Doctor
+
+    Doctor -->|Upload Files| P3_3
+    P3_3 -->|Store Files| FS
+    P3_3 -->|Confirm Upload| Doctor
+
+    %% Patient View
+    Patient -->|View History| P3_2
+    P3_2 -->|Return Data| Patient
+
+    Patient -->|View Documents| P3_3
+    P3_3 -->|Fetch Files| FS
+    P3_3 -->|Return Files| Patient
+
+    %% Admin Discharge
+    Admin -->|Discharge Patient| P3_4
+    P3_4 -->|Update Discharge Info| DB2
+    P3_4 -->|Generate Summary| FS
+    P3_4 -->|Confirm Discharge| Admin
+    P3_4 -->|Notify Patient| Patient
+
+```
+
+# 4. Room Management
+```mermaid
+graph TD
+    Admin((Admin))
+    Doctor((Doctor))
+
+    P4_1[4.1 Allocate/Move Patient to Room]
+    P4_2[4.2 Track Room Status]
+    P4_3[4.3 Maintain Room Inventory]
+    P4_4[4.4 Request Room for Patient]
+
+    DB2[(Medical DB)]
+
+    %% Doctor Requests
+    Doctor -->|Request Room for Patient| P4_4
+    P4_4 -->|Forward Request| P4_1
+
+    %% Admin Allocates or Moves Patients
+    Admin -->|Allocate/Move Patient| P4_1
+    P4_1 -->|Update Room Assignment| DB2
+    P4_1 -->|Room Assignment Confirmation| Admin
+
+    %% Admin Tracks Room Status
+    Admin -->|Track Room Usage| P4_2
+    P4_2 -->|Fetch Room Data| DB2
+    P4_2 -->|Room Status Info| Admin
+
+    %% Admin Manages Room Inventory
+    Admin -->|Update Inventory| P4_3
+    P4_3 -->|Store Inventory Info| DB2
+    P4_3 -->|Inventory Update Confirmation| Admin
+
+```
+
+# 5. Communication Services
+```mermaid
+graph TD
+    Patient((Patient))
+    Doctor((Doctor))
+    Admin((Admin))
+
+    P5[5 Communication Services]
+    ContactUs[Contact Us Message Submission]
+
+    %% Notifications
+    P5 -->|Send Notifications| Patient
+    P5 -->|Send Notifications| Doctor
+    P5 -->|Send Notifications| Admin
+
+    %% Contact Us Message Flow
+    Patient -->|Send Message| ContactUs
+    ContactUs -->|Forward to Admin| P5
+    P5 -->|Deliver Message| Admin
+
+```
+
+# 6. Bill Generating system
+```mermaid
+graph TD
+    %% External Entities
+    Patient((Patient))
+    Admin((Admin))
+
+    %% From Patient Management (external trigger)
+    P3_4[3.4 Discharge Patient]
+
+    %% Billing Subprocesses
+    P6_1[6.1 Generate Bill]
+    P6_2[6.2 Review & Confirm Bill Details]
+    P6_3[6.3 Generate Receipt]
+
+    %% Data Stores
+    DB3[(Billing DB)]
+    FS[File Store]
+
+    %% Trigger from Discharge
+    P3_4 -->|Trigger Billing| P6_1
+
+    %% Patient Flow
+    Patient -->|Request Bill| P6_1
+    P6_1 -->|Store Bill Data| DB3
+    P6_1 -->|Billing Info| Patient
+
+    %% Admin Flow
+    Admin -->|Access Bill| P6_2
+    P6_2 -->|Fetch & Confirm Details| DB3
+    P6_2 -->|Billing Confirmation| Admin
+    P6_2 -->|Trigger Receipt Creation| P6_3
+
+    %% Receipt Generation
+    P6_3 -->|Save Receipt| FS
+    P6_3 -->|Send Receipt| Patient
+
+```
 ## UI Navigation Tree
 
 ```mermaid

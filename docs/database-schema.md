@@ -16,66 +16,58 @@ The system uses a relational database with the following main entities:
 ## Entity Relationship Diagram
 
 ```mermaid
+---
+config:
+  theme: neutral
+---
 erDiagram
     User ||--o| Doctor : has
     User ||--o| Patient : has
     Doctor ||--o{ Appointment : manages
     Patient ||--o{ Appointment : books
     Patient ||--o| Room : occupies
-    Doctor ||--o{ PatientRecord : creates
+    Doctor ||--o{ PatientRecord : writes
     Patient ||--o{ PatientRecord : owns
     Patient ||--o{ PatientDischargeDetails : has
-
+    User ||--o{ Contact : sends
     User {
         int id PK
         string username
-        string password
         string email
-        string first_name
-        string last_name
-        datetime date_joined
-        boolean is_active
+        string password
         boolean is_staff
         boolean is_superuser
     }
-
     Doctor {
         int id PK
         int user_id FK
-        string department
-        string specialty
-        string mobile
-        string address
         string profile_pic
-        boolean status
-        int experience
+        string address
+        string mobile
+        string department
+        string status
     }
-
     Patient {
         int id PK
         int user_id FK
-        string mobile
+        string profile_pic
         string address
+        string mobile
         string symptoms
         date admitDate
         int assignedDoctorId FK
         int room_id FK "nullable"
-        boolean status
+        string status
     }
-
     Appointment {
         int id PK
-        int doctor_id FK
         int patient_id FK
-        string patientName
-        string doctorName
+        int doctor_id FK
         date appointmentDate
         time appointmentTime
         string description
-        boolean status
-        datetime created_at
+        string status
     }
-
     Room {
         int id PK
         string number
@@ -84,7 +76,6 @@ erDiagram
         string status
         decimal cost_per_day
     }
-
     PatientRecord {
         int id PK
         int patient_id FK
@@ -94,10 +85,9 @@ erDiagram
         text notes
         datetime date
     }
-
     PatientDischargeDetails {
         int id PK
-        int patientId FK
+        int patient_id FK
         string patientName
         string assignedDoctorName
         string address
@@ -112,15 +102,16 @@ erDiagram
         decimal otherCharge
         decimal total
     }
-
-    ContactMessage {
+    Contact {
         int id PK
+        int user_id FK
         string name
         string email
         text message
-        datetime created_at
         boolean is_read
+        datetime created_at
     }
+
 ```
 
 ## Table Descriptions
