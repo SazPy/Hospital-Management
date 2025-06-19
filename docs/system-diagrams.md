@@ -15,27 +15,27 @@ graph TD
     A[Admin]:::entity
 
     %% Central System
-    HMS([Hospital Management System]):::system
+    OpenMed([Hospital Information System]):::system
 
     %% Data Flows: Patient
-    P -->|Register / Login| HMS
-    P -->|Book Appointment| HMS
-    P -->|View Medical Records| HMS
-    P -->|View Bill / Make Payment| HMS
-    P -->|Contact Messages| HMS
-    HMS -->|Notifications / Confirmations| P
+    P -->|Register / Login| OpenMed
+    P -->|Book Appointment| OpenMed
+    P -->|View Medical Records| OpenMed
+    P -->|View Bill / Make Payment| OpenMed
+    P -->|Contact Messages| OpenMed
+    OpenMed -->|Notifications / Confirmations| P
 
     %% Data Flows: Doctor
-    D -->|Manage Patients| HMS
-    D -->|Accept / Reject Appointments| HMS
-    D -->|Update Records| HMS
-    HMS -->|Reminders / Schedules| D
+    D -->|Manage Patients| OpenMed
+    D -->|Accept / Reject Appointments| OpenMed
+    D -->|Update Records| OpenMed
+    OpenMed -->|Reminders / Schedules| D
 
     %% Data Flows: Admin
-    A -->|System Management| HMS
-    A -->|Discharge / Assign Rooms| HMS
-    A -->|Generate Reports / Billing| HMS
-    HMS -->|Logs / Notifications| A
+    A -->|System Management| OpenMed
+    A -->|Discharge / Assign Rooms| OpenMed
+    A -->|Generate Reports / Billing| OpenMed
+    OpenMed -->|Logs / Notifications| A
 
 ```
 

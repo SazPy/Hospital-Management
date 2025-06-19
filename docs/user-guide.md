@@ -6,7 +6,7 @@ Welcome to the Hospital Management System! This guide provides comprehensive inf
 
 ## System Overview
 
-The Hospital Management System (HMS) is a web-based application designed to streamline hospital operations. It manages:
+The Hospital Information System (OpenMed) is a web-based application designed to streamline hospital operations. It manages:
 - Patient records and appointments
 - Doctor schedules and specializations
 - Room allocations and availability

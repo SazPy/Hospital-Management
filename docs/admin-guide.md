@@ -2,7 +2,7 @@
 
 ## Overview
 
-This manual provides detailed instructions for hospital administrators on managing the Hospital Management System (HMS).
+This manual provides detailed instructions for hospital administrators on managing the Hospital Information System (OpenMed).
 
 ## Administrative Dashboard
 

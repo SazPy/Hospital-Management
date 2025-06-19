@@ -1,0 +1,150 @@
+{% extends 'hospital/admin_base.html' %}
+{% load static %}
+
+{% block title %}Change Room - OpenMed{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <!-- Page Header -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="h3 mb-0">Change Room</h1>
+      <p class="text-muted">Change room assignment for {{ patient.get_name }}</p>
+    </div>
+    <div>
+      <a href="{% url 'admin-rooms' %}" class="btn btn-outline-primary">
+        <i class="fas fa-door-open me-2"></i>View All Rooms
+      </a>
+    </div>
+  </div>
+
+  <!-- Patient Info Card -->
+  <div class="row mb-4">
+    <div class="col-md-4">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title mb-3">Patient Information</h5>
+          <div class="list-group list-group-flush">
+            <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
+              <span class="text-muted">Name</span>
+              <span class="fw-medium">{{ patient.get_name }}</span>
+            </div>
+            <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
+              <span class="text-muted">Patient ID</span>
+              <span class="fw-medium">#{{ patient.id }}</span>
+            </div>
+            <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
+              <span class="text-muted">Current Room</span>
+              {% if current_room %}
+                <span class="badge bg-info">{{ current_room.room_number }}</span>
+              {% else %}
+                <span class="badge bg-light text-dark">No Room</span>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Available Rooms -->
+    <div class="col-md-8">
+      <div class="card border-0 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title mb-3">Available Rooms</h5>
+          {% if rooms %}
+            <form method="post" class="room-selection-form">
+              {% csrf_token %}
+              <div class="table-responsive">
+                <table class="table table-hover">
+                  <thead class="bg-light">
+                    <tr>
+                      <th class="px-4 py-3">Select</th>
+                      <th class="px-4 py-3">Room Number</th>
+                      <th class="px-4 py-3">Type</th>
+                      <th class="px-4 py-3">Capacity</th>
+                      <th class="px-4 py-3">Floor</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {% for room in rooms %}
+                    <tr>
+                      <td class="px-4 py-3">
+                        <div class="form-check">
+                          <input class="form-check-input" type="radio" name="room_id" value="{{ room.id }}" id="room_{{ room.id }}" {% if current_room.id == room.id %}checked{% endif %} required>
+                          <label class="form-check-label" for="room_{{ room.id }}"></label>
+                        </div>
+                      </td>
+                      <td class="px-4 py-3">
+                        <div class="d-flex align-items-center">
+                          <div class="feature-icon bg-primary-subtle rounded-circle me-3" style="width: 40px; height: 40px;">
+                            <i class="fas fa-door-closed"></i>
+                          </div>
+                          <span>Room {{ room.room_number }}</span>
+                        </div>
+                      </td>
+                      <td class="px-4 py-3">
+                        <span class="badge bg-info">{{ room.get_room_type_display }}</span>
+                      </td>
+                      <td class="px-4 py-3">{{ room.capacity }} beds</td>
+                      <td class="px-4 py-3">Floor {{ room.floor }}</td>
+                    </tr>
+                    {% endfor %}
+                  </tbody>
+                </table>
+              </div>
+              <div class="text-end mt-4">
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-check me-2"></i>Change Room
+                </button>
+              </div>
+            </form>
+          {% else %}
+            <div class="text-center py-5">
+              <img src="{% static 'images/no-rooms.png' %}" alt="No Rooms" class="mb-3" width="120">
+              <h5 class="text-muted">No Available Rooms</h5>
+              <p class="text-muted mb-0">There are no rooms available at the moment.</p>
+              <a href="{% url 'admin-add-room' %}" class="btn btn-primary mt-3">
+                <i class="fas fa-plus me-2"></i>Add New Room
+              </a>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.feature-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feature-icon i {
+  font-size: 20px;
+  color: #4f46e5;
+}
+
+.bg-primary-subtle {
+  background-color: rgba(79, 70, 229, 0.1);
+}
+
+.form-check-input:checked {
+  background-color: #4f46e5;
+  border-color: #4f46e5;
+}
+
+.table thead th {
+  font-weight: 600;
+  color: #4b5563;
+}
+
+.room-selection-form .form-check {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+</style>
+{% endblock %} 

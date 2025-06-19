@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 """
-Hospital Management – Django views
+OpenMed – Django views
 Updated: 2025-06-02
 
 • Consolidated imports & helpers
@@ -154,7 +154,7 @@ def patient_signup_view(request):
                 # Auto-login after signup
                 from django.contrib.auth import login
                 login(request, user)
-                messages.success(request, "Registration successful! Welcome to HMS.")
+                messages.success(request, "Registration successful! Welcome to OpenMed.")
                 return redirect('patient-dashboard')
             except Exception as exc:
                 messages.error(request, f"Registration error: {exc}")
@@ -658,11 +658,28 @@ def admin_room_management(request, action=None, room_id=None, patient_id=None):
         available = models.Room.objects.filter(is_occupied=False)
         if request.method == "POST":
             room = get_object_or_404(models.Room, id=request.POST.get("room_id"))
-            if pat.room:  # free previous
-                pat.room.is_occupied = False; pat.room.save()
-            room.is_occupied, room.current_patient = True, pat.id
+            
+            # First, clear any existing room assignments
+            if pat.room:
+                pat.room.is_occupied = False
+                pat.room.current_patient = None
+                pat.room.save()
+            
+            # Clear any other rooms that might have this patient's ID
+            models.Room.objects.filter(current_patient=pat.id).exclude(id=room.id).update(
+                is_occupied=False,
+                current_patient=None
+            )
+            
+            # Set the new room's state
+            room.is_occupied = True
+            room.current_patient = pat.id
             room.save()
-            pat.room = room; pat.save()
+            
+            # Update patient's room reference
+            pat.room = room
+            pat.save()
+            
             return redirect("admin-view-patient-detail", pk=pat.id)
         return render(request, "hospital/admin_assign_room.html",
                       {"patient": pat, "rooms": available})
@@ -675,11 +692,29 @@ def admin_room_management(request, action=None, room_id=None, patient_id=None):
         )
         if request.method == "POST":
             new_room = get_object_or_404(models.Room, id=request.POST.get("room_id"))
+            
+            # First, clear the old room's state if it exists
             if cur:
-                cur.is_occupied = False; cur.save()
-            new_room.is_occupied, new_room.current_patient = True, pat.id
+                # Clear the old room's state
+                cur.is_occupied = False
+                cur.current_patient = None
+                cur.save()
+                
+                # Also clear any other rooms that might have this patient's ID
+                models.Room.objects.filter(current_patient=pat.id).exclude(id=new_room.id).update(
+                    is_occupied=False,
+                    current_patient=None
+                )
+            
+            # Then set the new room's state
+            new_room.is_occupied = True
+            new_room.current_patient = pat.id
             new_room.save()
-            pat.room = new_room; pat.save()
+            
+            # Finally update the patient's room reference
+            pat.room = new_room
+            pat.save()
+            
             return redirect("admin-view-patient-detail", pk=pat.id)
         return render(request, "hospital/admin_change_room.html",
                       {"patient": pat, "rooms": available, "current_room": cur})
