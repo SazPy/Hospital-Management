@@ -1,8 +1,8 @@
-# Hospital Management System
+# OpenMed
 
-A comprehensive hospital management system built with Django that streamlines healthcare facility operations by managing doctors, patients, appointments, and room allocations.
+A comprehensive hospital Infromation system built with Django that streamlines healthcare facility operations by managing doctors, patients, appointments, and room allocations.
 
-![Hospital Management System](static/screenshots/dashboard.png)
+![Hospital Information System](static/screenshots/dashboard.png)
 
 ## 🌟 Key Features
 
